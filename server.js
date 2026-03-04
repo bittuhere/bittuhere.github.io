@@ -24,18 +24,18 @@ io.on('connection', (socket) => {
         const symbol = Object.keys(rooms[roomId].players).length === 0 ? 'X' : 'O';
         rooms[roomId].players[socket.id] = { name: playerName, symbol };
         
-        // Sirf aane wale ko uska symbol batana
+        // Naye player ko signal dena
         socket.emit('init', { symbol, board: rooms[roomId].board });
 
-        // FIX: Agar 2 players ho gaye hain, toh poore room ko 'Game Start' bolo!
+        // AGAR 2 PLAYERS HO GAYE: Dono ko 'playing' status bhej do!
         if (Object.keys(rooms[roomId].players).length === 2) {
             rooms[roomId].status = 'playing';
             io.to(roomId).emit('updateBoard', { 
                 board: rooms[roomId].board, 
-                turn: rooms[roomId].turn, 
+                turn: 'X', // Game hamesha X se shuru hoga
                 status: 'playing' 
             });
-            console.log(`Game Started in Room: ${roomId}`);
+            console.log(`ROOM START: ${roomId}`);
         }
     });
 
@@ -47,7 +47,7 @@ io.on('connection', (socket) => {
                 room.board[index] = player.symbol;
                 room.turn = room.turn === 'X' ? 'O' : 'X';
                 
-                // Winner Check (Simple logic)
+                // Win Check Logic
                 const winPatterns = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
                 let winner = null;
                 for (let p of winPatterns) {
@@ -55,7 +55,6 @@ io.on('connection', (socket) => {
                         winner = room.board[p[0]];
                     }
                 }
-
                 let status = winner ? 'finished' : (room.board.includes("") ? 'playing' : 'draw');
                 io.to(roomId).emit('updateBoard', { board: room.board, turn: room.turn, status, winner });
             }
