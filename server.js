@@ -1,69 +1,44 @@
 const express = require('express');
-const http = require('http');
-const { Server } = require('socket.io');
-const mongoose = require('mongoose');
+const nodemailer = require('nodemailer');
 const cors = require('cors');
-
 const app = express();
-app.use(cors({ origin: "*" })); 
 
-const server = http.createServer(app);
-const io = new Server(server, { cors: { origin: "*" } });
+app.use(cors());
+app.use(express.json());
 
-mongoose.connect(process.env.MONGO_URI).then(() => console.log("MongoDB Connected!"));
+// Status check ke liye
+app.get('/', (req, res) => { res.send("Email Server is Running!"); });
 
-let rooms = {};
+// Email bhejne ka Route
+app.post('/send-email', async (req, res) => {
+    const { to, subject, text } = req.body;
 
-io.on('connection', (socket) => {
-    socket.on('joinRoom', ({ roomId, playerName }) => {
-        socket.join(roomId);
-        if (!rooms[roomId]) {
-            rooms[roomId] = { board: Array(9).fill(""), players: {}, turn: 'X', status: 'waiting' };
-        }
-        
-        const symbol = Object.keys(rooms[roomId].players).length === 0 ? 'X' : 'O';
-        rooms[roomId].players[socket.id] = { name: playerName, symbol };
-        
-        // Naye player ko signal dena
-        socket.emit('init', { symbol, board: rooms[roomId].board });
-
-        // AGAR 2 PLAYERS HO GAYE: Dono ko 'playing' status bhej do!
-        if (Object.keys(rooms[roomId].players).length === 2) {
-            rooms[roomId].status = 'playing';
-            io.to(roomId).emit('updateBoard', { 
-                board: rooms[roomId].board, 
-                turn: 'X', // Game hamesha X se shuru hoga
-                status: 'playing' 
-            });
-            console.log(`ROOM START: ${roomId}`);
+    // 1. Transporter setup (Aapki details Render ke Environment se aayengi)
+    const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user: process.env.EMAIL_USER, // Render par set karein
+            pass: process.env.EMAIL_PASS  // Aapka App Password
         }
     });
 
-    socket.on('makeMove', ({ roomId, index }) => {
-        const room = rooms[roomId];
-        if (room && room.status === 'playing' && room.board[index] === "") {
-            const player = room.players[socket.id];
-            if (player && room.turn === player.symbol) {
-                room.board[index] = player.symbol;
-                room.turn = room.turn === 'X' ? 'O' : 'X';
-                
-                // Win Check Logic
-                const winPatterns = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
-                let winner = null;
-                for (let p of winPatterns) {
-                    if (room.board[p[0]] && room.board[p[0]] === room.board[p[1]] && room.board[p[0]] === room.board[p[2]]) {
-                        winner = room.board[p[0]];
-                    }
-                }
-                let status = winner ? 'finished' : (room.board.includes("") ? 'playing' : 'draw');
-                io.to(roomId).emit('updateBoard', { board: room.board, turn: room.turn, status, winner });
-            }
-        }
-    });
+    // 2. Mail Options
+    const mailOptions = {
+        from: process.env.EMAIL_USER,
+        to: to,
+        subject: subject,
+        text: text
+    };
 
-    socket.on('chatMessage', ({ roomId, msg, sender }) => {
-        io.to(roomId).emit('newChatMessage', { text: msg, sender });
-    });
+    // 3. Email bhejna
+    try {
+        await transporter.sendMail(mailOptions);
+        res.status(200).send({ message: "Sent" });
+    } catch (error) {
+        console.log("Error:", error);
+        res.status(500).send({ message: "Failed" });
+    }
 });
 
-server.listen(process.env.PORT || 10000);
+const PORT = process.env.PORT || 10000;
+server.listen(PORT, () => console.log(`Server live on port ${PORT}`));
