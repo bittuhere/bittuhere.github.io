@@ -1474,7 +1474,7 @@
                         <div onclick="openGame('car')" class="game-btn btn-car full-width">
                             <span>&#127950;&#65039;</span> Real City Drift
                         </div>
-                        <div onclick="openGame('pacman')" class="game-btn btn-pacman"><span>&#42567;</span> Pac-Man
+                        <div onclick="openGame('pacman')" class="game-btn btn-pacman"><span>ᗧ</span> Pac-Man
                             Reworked<br>(Leaderboard Game)</div>
                         <div onclick="openGame('flappy')" class="game-btn btn-flappy"><span>&#128038;</span> Flappy
                             Bird<br>(Leaderboard Game)</div>
@@ -1530,7 +1530,7 @@
                         <option value="flappy_highscore">&#128038; Flappy Bird</option>
                         <option value="dino_highscore">&#129430; Dino Game</option>
                         <option value="snake_highscore">&#128013; Snake Game</option>
-                        <option value="pacman_highscore">&#42567; Pac-Man</option>
+                        <option value="pacman_highscore">ᗧ Pac-Man</option>
                     </select>
                 </div>
                 <div id="lb-loading" style="text-align:center;color:#888;">Please select a game.</div>
@@ -3280,8 +3280,7 @@ function saveFlappyScoreToCloud(finalScore) {
         }
 
         function resetControls() {
-           
-                const controlButtons = document.querySelectorAll('.ctrl-btn');
+                            const controlButtons = document.querySelectorAll('.ctrl-btn');
                 controlButtons.forEach(btn => {
                     localStorage.removeItem('pos_' + btn.id);
                 });
@@ -4157,7 +4156,6 @@ function _exitFs(cb){if(document.fullscreenElement||document.webkitFullscreenEle
         }
 
         function resetControls() {
-            
                 controlButtons.forEach(btn => localStorage.removeItem('pos_' + btn.id));
                 const def={'btn-up':['50%','90px','translateX(-50%)'],'btn-left':['calc(50% - 109px)','20px',''],'btn-down':['50%','20px','translateX(-50%)'],'btn-right':['calc(50% + 44px)','20px','']};
                 controlButtons.forEach(btn=>{const d=def[btn.id];if(d){btn.style.left=d[0];btn.style.bottom=d[1];btn.style.transform=d[2];}});
@@ -7140,7 +7138,7 @@ function drawMinimap() {
             document.getElementById('ty-msg').innerText = 'Your message is sending...';
             let t = 10; document.getElementById('ty-seconds').innerText = t;
             if (tyTimer) clearInterval(tyTimer);
-            // After 2s: flip to "Sent"
+            // After 0s: flip to "Sent"
             setTimeout(() => {
                 document.getElementById('ty-status').style.color = '#00f3ff';
                 document.getElementById('ty-status').innerText = 'Sent!';
