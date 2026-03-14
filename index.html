@@ -1474,7 +1474,7 @@
                         <div onclick="openGame('car')" class="game-btn btn-car full-width">
                             <span>&#127950;&#65039;</span> Real City Drift
                         </div>
-                        <div onclick="openGame('pacman')" class="game-btn btn-pacman"><span>ᗧ</span> Pac-Man
+                        <div onclick="openGame('pacman')" class="game-btn btn-pacman"><span>&#42567;</span> Pac-Man
                             Reworked<br>(Leaderboard Game)</div>
                         <div onclick="openGame('flappy')" class="game-btn btn-flappy"><span>&#128038;</span> Flappy
                             Bird<br>(Leaderboard Game)</div>
@@ -1530,7 +1530,7 @@
                         <option value="flappy_highscore">&#128038; Flappy Bird</option>
                         <option value="dino_highscore">&#129430; Dino Game</option>
                         <option value="snake_highscore">&#128013; Snake Game</option>
-                        <option value="pacman_highscore">ᗧ Pac-Man</option>
+                        <option value="pacman_highscore">&#42567; Pac-Man</option>
                     </select>
                 </div>
                 <div id="lb-loading" style="text-align:center;color:#888;">Please select a game.</div>
@@ -3280,14 +3280,14 @@ function saveFlappyScoreToCloud(finalScore) {
         }
 
         function resetControls() {
-            if (confirm(&quot;Reset all buttons to default?&quot;)) {
+           
                 const controlButtons = document.querySelectorAll('.ctrl-btn');
                 controlButtons.forEach(btn => {
                     localStorage.removeItem('pos_' + btn.id);
                 });
                 const def={'btn-up':['50%','90px','translateX(-50%)'],'btn-left':['calc(50% - 109px)','20px',''],'btn-down':['50%','20px','translateX(-50%)'],'btn-right':['calc(50% + 44px)','20px','']};
                 controlButtons.forEach(btn=>{const d=def[btn.id];if(d){btn.style.left=d[0];btn.style.bottom=d[1];btn.style.transform=d[2];}});
-            }
+            
         }
 
         // Load saved positions for each control button (run after DOM ready)
@@ -4157,12 +4157,12 @@ function _exitFs(cb){if(document.fullscreenElement||document.webkitFullscreenEle
         }
 
         function resetControls() {
-            if(confirm(&quot;Reset all buttons to default?&quot;)) {
+            
                 controlButtons.forEach(btn => localStorage.removeItem('pos_' + btn.id));
                 const def={'btn-up':['50%','90px','translateX(-50%)'],'btn-left':['calc(50% - 109px)','20px',''],'btn-down':['50%','20px','translateX(-50%)'],'btn-right':['calc(50% + 44px)','20px','']};
                 controlButtons.forEach(btn=>{const d=def[btn.id];if(d){btn.style.left=d[0];btn.style.bottom=d[1];btn.style.transform=d[2];}});
                 loadButtonPositions();
-            }
+            
         }
 
         // Individual Button Dragging Logic
