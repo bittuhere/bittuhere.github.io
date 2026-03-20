@@ -21,8 +21,12 @@
  -->
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
     <title>Arcade Hub</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://formywebfirebase-default-rtdb.firebaseio.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Teko:wght@400;600&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -33,6 +37,13 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+        button, a, [onclick], .game-btn, .l-btn, .hub-friends-btn,
+        .hub-lb-btn, .notif-btn, .hub-profile-btn, .lb-game-tab,
+        .rank-item, .friend-item, .inv-btn, .prof-action-btn,
+        .prof-search-btn, .pc-close-btn, .uc-btn, .lb-back-btn {
+            touch-action: manipulation;
         }
 
         :root {
@@ -60,12 +71,17 @@
         body {
             height: 100%;
             overflow: hidden;
+            overscroll-behavior: none;
+            -webkit-overflow-scrolling: touch;
         }
 
         body {
             background: var(--bg-gradient);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             color: var(--text-main);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            text-rendering: optimizeSpeed;
         }
 
         /* SPA SECTIONS */
@@ -75,27 +91,25 @@
             position: fixed;
             inset: 0;
             overflow-y: auto;
-            transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.32s ease;
-            will-change: transform, opacity;
+            transition: transform 0.28s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            will-change: transform;
             z-index: 1;
             contain: layout paint style;
+            -webkit-overflow-scrolling: touch;
         }
 
         .spa-section.hidden-right {
             transform: translateX(100%);
-            opacity: 0;
             pointer-events: none;
         }
 
         .spa-section.hidden-left {
             transform: translateX(-100%);
-            opacity: 0;
             pointer-events: none;
         }
 
         .spa-section.active {
             transform: translateX(0);
-            opacity: 1;
             pointer-events: auto;
         }
 
@@ -235,15 +249,15 @@
 
         .login-card {
             background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             padding: 3rem;
             border-radius: 20px;
             border: 1px solid rgba(255, 255, 255, 0.1);
             width: 100%;
             max-width: 380px;
             text-align: center;
-            box-shadow: 0 0 50px rgba(0, 243, 255, 0.1);
+            box-shadow: 0 0 30px rgba(0, 243, 255, 0.08);
             animation: fadeInUp 0.6s ease;
         }
 
@@ -473,10 +487,8 @@
             position: fixed;
             top: 20px;
             left: 20px;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(5px);
-            -webkit-backdrop-filter: blur(5px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: rgba(30, 27, 58, 0.92);
+            border: 1px solid rgba(255, 255, 255, 0.25);
             color: var(--text-main);
             padding: 10px 20px;
             border-radius: 30px;
@@ -484,7 +496,7 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            transition: all 0.3s ease;
+            transition: transform 0.18s, background 0.18s;
             z-index: 200;
             cursor: pointer;
             pointer-events: auto;
@@ -514,9 +526,7 @@
             position: fixed;
             top: 20px;
             right: 20px;
-            background: rgba(255, 215, 0, 0.1);
-            backdrop-filter: blur(5px);
-            -webkit-backdrop-filter: blur(5px);
+            background: rgba(40, 35, 10, 0.92);
             border: 1px solid rgba(255, 215, 0, 0.3);
             color: #ffcc00;
             padding: 10px 20px;
@@ -525,7 +535,7 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            transition: all 0.3s ease;
+            transition: transform 0.18s, background 0.18s;
             z-index: 200;
             cursor: pointer;
         }
@@ -541,10 +551,8 @@
             position: fixed;
             top: 65px;
             left: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(5px);
-            -webkit-backdrop-filter: blur(5px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: rgba(30, 27, 58, 0.92);
+            border: 1px solid rgba(255, 255, 255, 0.25);
             color: var(--text-main);
             padding: 10px 20px;
             border-radius: 30px;
@@ -556,6 +564,25 @@
             z-index: 200;
             cursor: pointer;
         }
+        .hub-profile-btn {
+            position: fixed;
+            top: 110px;
+            left: 10px;
+            background: rgba(0, 20, 30, 0.92);
+            border: 1px solid rgba(0,243,255,0.25);
+            color: #00f3ff;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            z-index: 200;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        .hub-profile-btn:hover { background: rgba(0,243,255,0.15); border-color: #00f3ff; }
 
         .notif-btn:hover {
             background: #32a852;
@@ -607,16 +634,16 @@
         /* hub-container: solid dark bg, single thin border — no blur, no heavy shadow */
         .hub-container {
             background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 24px;
             padding: 2.5rem;
             width: 100%;
             max-width: 600px;
             text-align: center;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-            animation: fadeInUp 0.6s ease-out;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            animation: fadeInUp 0.5s ease-out;
         }
 
         .hub-container h1 {
@@ -670,9 +697,11 @@
             font-size: 2.5rem;
         }
 
+        .game-btn {
+            will-change: transform;
+        }
         .game-btn:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            transform: scale(1.04);
             z-index: 10;
         }
 
@@ -826,71 +855,99 @@
 
         /* LEADERBOARD */
         #section-leaderboard {
-            background: var(--bg-gradient);
+            background: linear-gradient(135deg,#0a0a18 0%,#0f0c29 50%,#1a0a2e 100%);
             overflow-y: auto;
         }
-
         .lb-inner {
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 20px;
+            padding: 20px 16px 100px;
         }
-
+        .lb-title-wrap {
+            text-align: center;
+            margin-bottom: 18px;
+        }
         #section-leaderboard h1 {
             font-family: 'Teko', sans-serif;
-            font-size: 4rem;
-            color: #ffd700;
-            margin-bottom: 10px;
+            font-size: 3.2rem;
+            background: linear-gradient(45deg,#ffd700,#ff9500,#ffd700);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: none;
+            filter: drop-shadow(0 0 18px rgba(255,215,0,0.5));
+            margin: 0;
+            letter-spacing: 4px;
         }
-
-        /* Solid bg — no blur, no shadow */
+        .lb-subtitle { color: rgba(255,255,255,0.35); font-size:0.78rem; letter-spacing:2px; margin-top:2px; }
         .board-container {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
             border-radius: 20px;
             width: 100%;
-            max-width: 500px;
-            padding: 20px;
-            box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
+            max-width: 480px;
+            padding: 18px;
+            box-shadow: 0 0 30px rgba(0,0,0,0.4);
         }
-
-        .game-selector {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 20px;
+        .game-selector { display:flex; justify-content:center; margin-bottom:18px; flex-wrap:wrap; gap:8px; }
+        .lb-game-tab {
+            padding: 7px 16px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.05);
+            color: rgba(255,255,255,0.5);
+            font-family: 'Teko',sans-serif;
+            font-size: 1.05rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            letter-spacing: 0.5px;
         }
-
+        .lb-game-tab:hover { border-color: #00f3ff; color: #00f3ff; }
+        .lb-game-tab.active {
+            background: linear-gradient(45deg,rgba(0,243,255,0.15),rgba(0,102,255,0.15));
+            border-color: #00f3ff;
+            color: #00f3ff;
+            box-shadow: 0 0 12px rgba(0,243,255,0.2);
+        }
         #section-leaderboard select {
-            padding: 10px 20px;
-            font-size: 1.2rem;
-            background: #222;
+            padding: 8px 18px;
+            font-size: 1.1rem;
+            background: rgba(0,0,0,0.5);
             color: white;
-            border: 1px solid #00f3ff;
+            border: 1px solid rgba(0,243,255,0.4);
             border-radius: 10px;
             outline: none;
             cursor: pointer;
         }
-
         .rank-item {
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            padding: 15px;
-            margin-bottom: 10px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 10px;
-            transition: transform 0.18s;
-            border: 1px solid transparent;
+            gap: 12px;
+            padding: 12px 14px;
+            margin-bottom: 8px;
+            background: rgba(255,255,255,0.04);
+            border-radius: 12px;
+            transition: all 0.2s;
+            border: 1px solid rgba(255,255,255,0.06);
+            cursor: pointer;
+            position: relative;
         }
-
         .rank-item:hover {
-            transform: scale(1.02);
-            border-color: #00f3ff;
-            background: rgba(0, 243, 255, 0.1);
+            transform: translateX(4px);
+            border-color: rgba(0,243,255,0.3);
+            background: rgba(0,243,255,0.06);
+        }
+        .rank-item.rank-me {
+            border-color: rgba(46,204,113,0.5) !important;
+            background: rgba(46,204,113,0.08) !important;
+        }
+        .rank-item.rank-me::after {
+            content: 'YOU';
+            position: absolute; right: 12px;
+            font-size: 0.65rem; color: #2ecc71;
+            font-family: 'Teko',sans-serif; letter-spacing:1px;
         }
 
         .rank-num {
@@ -1491,6 +1548,211 @@
         .ping-badge.ping-medium { color: #f1c40f; border-color: #f1c40f; }
         .ping-badge.ping-bad    { color: #e74c3c; border-color: #e74c3c; }
         .ping-dot { width:6px; height:6px; border-radius:50%; background:currentColor; }
+
+        /* ── PROFILE CARD MODAL ── */
+        #profile-card-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.75); backdrop-filter: blur(8px);
+            z-index: 99990; align-items: center; justify-content: center;
+        }
+        #profile-card-overlay.pc-show { display: flex; }
+        #profile-card {
+            background: linear-gradient(135deg,#0f0c29,#24243e);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 20px; padding: 28px 24px;
+            max-width: 340px; width: 92%;
+            box-shadow: 0 0 60px rgba(0,0,0,0.8);
+            animation: pcSlideIn 0.3s ease;
+        }
+        @keyframes pcSlideIn { from { transform:scale(0.88) translateY(20px); opacity:0; } to { transform:scale(1) translateY(0); opacity:1; } }
+        .pc-avatar { width:72px; height:72px; border-radius:50%; background:linear-gradient(135deg,#00f3ff,#0066ff); display:flex; align-items:center; justify-content:center; font-size:2rem; margin:0 auto 14px; font-family:'Teko',sans-serif; box-shadow:0 0 20px rgba(0,243,255,0.3); }
+        .pc-username { text-align:center; font-family:'Teko',sans-serif; font-size:1.8rem; color:white; letter-spacing:2px; }
+        .pc-scores { margin:16px 0; display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+        .pc-score-item { background:rgba(255,255,255,0.05); border-radius:10px; padding:10px; text-align:center; }
+        .pc-score-game { font-size:0.7rem; color:rgba(255,255,255,0.4); letter-spacing:1px; text-transform:uppercase; }
+        .pc-score-val { font-family:'Teko',sans-serif; font-size:1.5rem; color:#00f3ff; }
+        .pc-joined { text-align:center; font-size:0.72rem; color:rgba(255,255,255,0.3); margin-top:8px; }
+        .pc-last-login { text-align:center; font-size:0.72rem; color:rgba(255,255,255,0.25); margin-top:3px; }
+        .pc-close-btn { width:100%; margin-top:16px; padding:10px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); border-radius:10px; color:rgba(255,255,255,0.6); cursor:pointer; font-family:'Teko',sans-serif; font-size:1.1rem; transition:0.2s; }
+        .pc-close-btn:hover { background:rgba(255,255,255,0.1); color:white; }
+        #lb-my-rank-bar { position:fixed; bottom:0; left:0; right:0; background:linear-gradient(to top,rgba(10,10,24,0.98),rgba(10,10,24,0.85)); border-top:1px solid rgba(46,204,113,0.3); padding:10px 20px; display:none; align-items:center; gap:12px; font-family:'Teko',sans-serif; z-index:100; backdrop-filter:blur(10px); }
+        #lb-my-rank-bar.show { display:flex; }
+        .lb-my-rank-label { color:rgba(255,255,255,0.5); font-size:0.9rem; letter-spacing:1px; }
+        .lb-my-rank-info { color:#2ecc71; font-size:1.2rem; flex:1; }
+        .lb-my-rank-score { color:#00f3ff; font-size:1.2rem; }
+        /* ── IN-GAME NOTIFICATION BADGE ── */
+        #in-game-notif-badge { position:fixed; top:12px; right:12px; z-index:99980; display:none; background:linear-gradient(45deg,#ff3366,#ff6b35); color:white; border-radius:20px; padding:6px 14px; font-size:0.8rem; font-family:'Segoe UI',sans-serif; box-shadow:0 0 20px rgba(255,51,102,0.5); animation:notifPulse 1.5s ease-in-out infinite; cursor:pointer; }
+        #in-game-notif-badge.show { display:flex; align-items:center; gap:6px; }
+        @keyframes notifPulse { 0%,100% { box-shadow:0 0 10px rgba(255,51,102,0.4); transform:scale(1); } 50% { box-shadow:0 0 25px rgba(255,51,102,0.8); transform:scale(1.05); } }
+
+        /* ── PROFILE SECTION ── */
+        #section-profile {
+            background: linear-gradient(135deg,#0a0a18 0%,#0f0c29 60%,#1a0a2e 100%);
+            overflow-y: auto;
+        }
+        .profile-inner {
+            min-height: 100vh;
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 20px 16px 60px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .profile-back-btn {
+            align-self: flex-start;
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.2);
+            color: rgba(255,255,255,0.6);
+            padding: 8px 18px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: 0.2s;
+        }
+        .profile-back-btn:hover { border-color: #00f3ff; color: #00f3ff; }
+        /* Avatar card */
+        .prof-avatar-card {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 20px;
+            padding: 24px;
+            text-align: center;
+        }
+        .prof-avatar-big {
+            width: 88px; height: 88px; border-radius: 50%;
+            background: linear-gradient(135deg,#00f3ff,#0066ff);
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'Teko',sans-serif; font-size: 2.6rem; color: white;
+            margin: 0 auto 12px;
+            box-shadow: 0 0 30px rgba(0,243,255,0.3);
+        }
+        .prof-display-name {
+            font-family: 'Teko',sans-serif; font-size: 2rem;
+            color: white; letter-spacing: 2px;
+        }
+        .prof-last-login {
+            font-size: 0.72rem; color: rgba(255,255,255,0.3);
+            margin-top: 4px; letter-spacing: 0.5px;
+        }
+        /* Stats grid */
+        .prof-stats-grid {
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .prof-stat-card {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 14px; padding: 14px;
+            text-align: center;
+        }
+        .prof-stat-icon { font-size: 1.4rem; margin-bottom: 4px; }
+        .prof-stat-label { font-size: 0.68rem; color: rgba(255,255,255,0.35); letter-spacing: 1px; text-transform: uppercase; }
+        .prof-stat-val { font-family: 'Teko',sans-serif; font-size: 1.5rem; color: #00f3ff; }
+        /* Section cards */
+        .prof-card {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 16px; padding: 18px;
+        }
+        .prof-card-title {
+            font-family: 'Teko',sans-serif; font-size: 1.1rem;
+            color: rgba(255,255,255,0.5); letter-spacing: 1px;
+            text-transform: uppercase; margin-bottom: 12px;
+        }
+        /* Search bar */
+        .prof-search-wrap {
+            display: flex; gap: 8px;
+        }
+        .prof-search-input {
+            flex: 1; padding: 10px 14px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 10px; color: white;
+            font-size: 0.9rem; outline: none;
+        }
+        .prof-search-input:focus { border-color: rgba(0,243,255,0.4); }
+        .prof-search-btn {
+            padding: 10px 18px; background: rgba(0,243,255,0.1);
+            border: 1px solid rgba(0,243,255,0.3);
+            border-radius: 10px; color: #00f3ff;
+            cursor: pointer; font-family:'Teko',sans-serif;
+            font-size: 1rem; transition: 0.2s;
+        }
+        .prof-search-btn:hover { background: rgba(0,243,255,0.2); }
+        /* Edit fields */
+        .prof-edit-row {
+            display: flex; align-items: center;
+            gap: 10px; margin-bottom: 10px;
+        }
+        .prof-edit-label {
+            font-size: 0.75rem; color: rgba(255,255,255,0.4);
+            letter-spacing: 1px; min-width: 80px;
+        }
+        .prof-action-btn {
+            width: 100%; padding: 12px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 10px; color: rgba(255,255,255,0.7);
+            cursor: pointer; font-family: 'Teko',sans-serif;
+            font-size: 1rem; letter-spacing: 1px;
+            transition: 0.2s; margin-bottom: 8px; text-align: left;
+        }
+        .prof-action-btn:hover { border-color: rgba(0,243,255,0.3); color: #00f3ff; }
+        .prof-action-btn.danger:hover { border-color: rgba(255,51,102,0.5); color: #ff3366; }
+        /* Username change cooldown bar */
+        .prof-cooldown {
+            font-size: 0.75rem; color: #f1c40f;
+            padding: 8px 12px;
+            background: rgba(241,196,15,0.08);
+            border: 1px solid rgba(241,196,15,0.2);
+            border-radius: 8px; margin-top: 6px;
+        }
+        /* Search result card */
+        #prof-search-result {
+            margin-top: 12px;
+            animation: pcSlideIn 0.3s ease;
+        }
+        .prof-search-card {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px; padding: 16px;
+            display: flex; align-items: center; gap: 14px;
+        }
+        .prof-search-avatar {
+            width: 52px; height: 52px; border-radius: 50%;
+            background: linear-gradient(135deg,#00f3ff,#0066ff);
+            display: flex; align-items: center; justify-content: center;
+            font-family:'Teko',sans-serif; font-size: 1.5rem; color: white;
+            flex-shrink: 0;
+        }
+        .prof-search-info { flex: 1; }
+        .prof-search-name { font-family:'Teko',sans-serif; font-size: 1.3rem; color: white; }
+        .prof-search-scores { font-size: 0.72rem; color: rgba(255,255,255,0.4); margin-top: 3px; }
+        /* Username change modal */
+        #uname-change-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.8); backdrop-filter: blur(8px);
+            z-index: 99992; align-items: center; justify-content: center;
+        }
+        #uname-change-overlay.uc-show { display: flex; }
+        #uname-change-box {
+            background: linear-gradient(135deg,#0f0c29,#24243e);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 20px; padding: 28px 24px;
+            max-width: 360px; width: 92%;
+            animation: pcSlideIn 0.3s ease;
+        }
+        .uc-title { font-family:'Teko',sans-serif; font-size:1.6rem; color:#00f3ff; margin-bottom:6px; }
+        .uc-sub { font-size:0.78rem; color:rgba(255,255,255,0.4); margin-bottom:16px; line-height:1.5; }
+        .uc-input { width:100%; padding:10px 14px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.15); border-radius:10px; color:white; font-size:0.95rem; outline:none; box-sizing:border-box; margin-bottom:10px; }
+        .uc-input:focus { border-color:rgba(0,243,255,0.4); }
+        .uc-btns { display:flex; gap:10px; margin-top:8px; }
+        .uc-btn { flex:1; padding:10px; border:none; border-radius:10px; cursor:pointer; font-family:'Teko',sans-serif; font-size:1.05rem; transition:0.2s; }
+        .uc-btn-send { background:linear-gradient(45deg,#00f3ff,#0066ff); color:white; }
+        .uc-btn-cancel { background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); color:rgba(255,255,255,0.5); }
+        .uc-status { font-size:0.8rem; margin-top:8px; min-height:18px; }
+
         /* ROTATE OVERLAY */
         #rotate-overlay {
             display: none;
@@ -1584,6 +1846,26 @@
     <div class="adm-input-overlay" id="adm-input-overlay"><div class="adm-input-box"><div class="adm-input-title" id="adm-input-title">INPUT</div><input class="adm-input-field" id="adm-input-field" type="text" autocomplete="off"/><div class="adm-input-btns"><button class="adm-ok-btn" id="adm-ok-btn">OK</button><button class="adm-cancel-btn" id="adm-cancel-btn">CANCEL</button></div></div></div>
     <!-- GLOBAL NOTIFICATION SYSTEM -->
     <div id="notify-container"></div>
+    <div id="in-game-notif-badge" onclick="_goBackFromGameNotif()">🔔 <span id="in-game-notif-text">New message!</span></div>
+    <!-- PROFILE CARD MODAL -->
+    <div id="profile-card-overlay" onclick="closeProfileCard()">
+        <div id="profile-card" onclick="event.stopPropagation()">
+            <div class="pc-avatar" id="pc-avatar">?</div>
+            <div class="pc-username" id="pc-username">Loading...</div>
+            <div class="pc-scores" id="pc-scores"></div>
+            <div class="pc-joined" id="pc-joined"></div>
+            <div class="pc-last-login" id="pc-last-login"></div>
+            <button class="pc-close-btn" onclick="closeProfileCard()">✕ CLOSE</button>
+        </div>
+    </div>
+    <!-- OWN RANK BAR (fixed at bottom of leaderboard) -->
+    <div id="lb-my-rank-bar">
+        <span class="lb-my-rank-label">YOUR RANK</span>
+        <span class="lb-my-rank-info" id="lb-my-rank-info">Not ranked</span>
+        <span class="lb-my-rank-score" id="lb-my-rank-score"></span>
+    </div>
+
+    <div id="offline-banner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:999999;background:rgba(231,76,60,0.95);color:white;text-align:center;padding:10px 16px;font-size:0.9rem;font-family:'Segoe UI',sans-serif;backdrop-filter:blur(8px);box-shadow:0 2px 20px rgba(231,76,60,0.5);">⚡ You're offline — Multiplayer & scores won't sync until reconnected.</div>
     <!-- FF-STYLE INVITE POPUP -->
     <div id="invite-popup">
         <div class="inv-header">
@@ -1733,6 +2015,7 @@
         </button>
         <div class="notif-btn" onclick="openNotifications()">&#128276; <div id="notif-dot" class="red-dot"></div>
         </div>
+        <div class="hub-profile-btn" onclick="openMyProfile()">👤 Profile</div>
         <div class="hub-lb-btn" onclick="MapsTo('section-leaderboard','right')">&#127942; Leaderboard</div>
         <div id="notif-modal" onclick="closeNotifications()">
             <div class="notif-content" onclick="event.stopPropagation()">
@@ -1747,6 +2030,7 @@
             <div class="hub-container">
                 <h1 id="hub-greeting">ARCADE HUB</h1>
                 <p class="subtitle" id="hub-subtitle">Select a Category</p>
+                <p id="hub-last-login" style="font-size:0.72rem;color:rgba(255,255,255,0.35);margin:-8px 0 8px;letter-spacing:0.5px;"></p>
                 <div id="hub-main" class="menu-grid">
                     <div onclick="showHubSection('study')" class="game-btn btn-study"><span>&#128218;</span> Study</div>
                     <div onclick="showHubSection('multi')" class="game-btn btn-multi"><span>&#9876;&#65039;</span>
@@ -2313,26 +2597,77 @@ th { text-align: left; color: #2ecc71; padding: 8px; }
 td { padding: 8px; border-bottom: 1px solid #333; }
 </style>
     <!-- LEADERBOARD -->
-    <div id="section-leaderboard" class="spa-section hidden-right"
-        style="background:linear-gradient(to right,#24243e,#302b63,#0f0c29);">
+    <div id="section-leaderboard" class="spa-section hidden-right">
         <div class="lb-inner">
-            <h1
-                style="font-family:'Teko',sans-serif;font-size:4rem;color:#ffd700;text-shadow:0 0 20px #ffd700;margin-bottom:10px;">
-                LEADERBOARD</h1>
+            <div class="lb-title-wrap">
+                <h1>🏆 LEADERBOARD</h1>
+                <div class="lb-subtitle">TOP PLAYERS · ARCADE HUB</div>
+            </div>
             <div class="board-container">
                 <div class="game-selector">
-                    <select id="lb-game-select" onchange="loadLeaderboard()">
-                        <option value="" disabled selected>Select a Game</option>
-                        <option value="flappy_highscore">&#128038; Flappy Bird</option>
-                        <option value="dino_highscore">&#129430; Dino Game</option>
-                        <option value="snake_highscore">&#128013; Snake Game</option>
-                        <option value="pacman_highscore">ᗧ Pac-Man</option>
-                    </select>
+                    <button class="lb-game-tab" onclick="lbSelectGame('flappy_highscore',this)">🐦 Flappy</button>
+                    <button class="lb-game-tab" onclick="lbSelectGame('dino_highscore',this)">🦕 Dino</button>
+                    <button class="lb-game-tab" onclick="lbSelectGame('snake_highscore',this)">🐍 Snake</button>
+                    <button class="lb-game-tab" onclick="lbSelectGame('pacman_highscore',this)">ᗧ Pac-Man</button>
                 </div>
-                <div id="lb-loading" style="text-align:center;color:#888;">Please select a game.</div>
+                <div id="lb-loading" style="text-align:center;color:rgba(255,255,255,0.3);padding:20px;font-size:0.85rem;letter-spacing:1px;">TAP A GAME TO VIEW RANKINGS</div>
                 <div id="lb-score-list"></div>
             </div>
             <button class="lb-back-btn" onclick="MapsTo('section-hub','left')">&#8592; Back to Hub</button>
+        </div>
+    </div>
+
+
+    <!-- PROFILE SECTION -->
+    <div id="section-profile" class="spa-section hidden-right">
+        <div class="profile-inner">
+            <button class="profile-back-btn" onclick="MapsTo('section-hub','left')">← Back</button>
+
+            <!-- My Profile Card -->
+            <div class="prof-avatar-card" id="my-profile-card">
+                <div class="prof-avatar-big" id="my-prof-avatar">?</div>
+                <div class="prof-display-name" id="my-prof-name">Loading...</div>
+                <div class="prof-last-login" id="my-prof-lastlogin"></div>
+            </div>
+
+            <!-- My Scores -->
+            <div class="prof-stats-grid" id="my-prof-stats"></div>
+
+            <!-- Actions -->
+            <div class="prof-card">
+                <div class="prof-card-title">⚙️ Account</div>
+                <button class="prof-action-btn" onclick="openUnameChangeModal()">
+                    ✏️ Request Username Change <span style="font-size:0.7rem;color:rgba(255,255,255,0.3);float:right;">Once per 7 days</span>
+                </button>
+                <div id="prof-cooldown-msg"></div>
+            </div>
+
+            <!-- Search other users -->
+            <div class="prof-card">
+                <div class="prof-card-title">🔍 Search Player</div>
+                <div class="prof-search-wrap">
+                    <input class="prof-search-input" id="prof-search-input"
+                        placeholder="Enter username..."
+                        onkeypress="if(event.key==='Enter')searchUserProfile()">
+                    <button class="prof-search-btn" onclick="searchUserProfile()">SEARCH</button>
+                </div>
+                <div id="prof-search-result"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- USERNAME CHANGE MODAL -->
+    <div id="uname-change-overlay" onclick="closeUnameModal()">
+        <div id="uname-change-box" onclick="event.stopPropagation()">
+            <div class="uc-title">✏️ Request Username Change</div>
+            <div class="uc-sub">Enter your desired new username. A request will be sent to admin via email. Admin will review and manually change it. This can only be done once every 7 days.</div>
+            <input class="uc-input" id="uc-new-name" placeholder="New username (letters & numbers only)" maxlength="20">
+            <input class="uc-input" id="uc-reason" placeholder="Reason (optional)">
+            <div class="uc-status" id="uc-status"></div>
+            <div class="uc-btns">
+                <button class="uc-btn uc-btn-cancel" onclick="closeUnameModal()">Cancel</button>
+                <button class="uc-btn uc-btn-send" onclick="submitUnameRequest()">Send Request</button>
+            </div>
         </div>
     </div>
 
@@ -6636,6 +6971,8 @@ function _exitFs(cb){if(document.fullscreenElement||document.webkitFullscreenEle
             }
         }
         function leaveGame(goBack) {
+            // Clear auto-delete interval
+            if (window._tttActivityInterval) { clearInterval(window._tttActivityInterval); window._tttActivityInterval = null; }
             if (roomId) {
                 db.ref('games/' + roomId + '/players/' + mySymbol).remove().then(() => {
                     db.ref('games/' + roomId + '/players').once('value').then(snap => {
@@ -7656,7 +7993,7 @@ function drawMinimap() {
             let last = 0;
             return function (...a) { const n = performance.now(); if (n - last >= ms) { last = n; requestAnimationFrame(() => fn.apply(this, a)); } }
         }
-        window.addEventListener('resize', _throttle(() => {/* reserved for future layout needs */ }, 120));
+        window.addEventListener('resize', _throttle(() => {/* reserved for future layout needs */ }, 120), { passive: true });
 
         // ─── SPA NAVIGATION ───
         let spaHistory = [];
@@ -7689,6 +8026,9 @@ function drawMinimap() {
 
             // Full lifecycle cleanup for the section we're leaving
             LC.leave(currentSection);
+            // Close any open modals when navigating
+            var _pcov = document.getElementById('profile-card-overlay');
+            if (_pcov) _pcov.classList.remove('pc-show');
             if (_gameIframe[currentSection]) { _unmountGame(_gameIframe[currentSection]); _fsActive = false; }
             try { if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock(); } catch (_) { }
 
@@ -7712,6 +8052,12 @@ function drawMinimap() {
             history.pushState({ spa: targetId }, '', '#' + targetId);
 
             if (targetId === 'section-chat') LC.timer('section-chat', setTimeout(initChat, 300));
+            if (targetId === 'section-profile') LC.timer('section-profile', setTimeout(function(){
+                var _pn = (localStorage.getItem('playerName')||'').toLowerCase().trim();
+                if (_pn) _loadMyProfile(_pn);
+            }, 200));
+            var _bar = document.getElementById('lb-my-rank-bar');
+            if (_bar && targetId !== 'section-leaderboard') _bar.classList.remove('show');
             if (targetId === 'section-hub') { LC.timer('section-hub', setTimeout(initHub, 300)); if (currentSection && currentSection.startsWith('section-game')) _setUserStatus('online'); setTimeout(_checkInviteQueue, 800); }
             hideLoader();
             setTimeout(_updateRotateOverlay, 370);
@@ -7740,10 +8086,11 @@ function drawMinimap() {
             currentSection = prev;
             if (prev === 'section-hub') {
                 LC.timer('section-hub', setTimeout(initHub, 300));
-                // Reset game status to online when returning to hub
                 _setUserStatus('online');
                 setTimeout(_checkInviteQueue, 800);
             }
+            // Reset status when leaving any game (even via back)
+            if (cur && cur.id && cur.id.startsWith('section-game-')) _setUserStatus('online');
             setTimeout(_updateRotateOverlay, 370);
         }
 
@@ -7819,7 +8166,7 @@ function drawMinimap() {
                 db.ref('users/' + user).once('value').then(snap => {
                     if (snap.exists()) { loader.style.display = 'none'; status.innerText = 'Username taken! Choose another.'; status.className = 'status-msg l-error'; showT(); }
                     else {
-                        db.ref('users/' + user).set({ password: pass, score: 0, dino_highscore: 0, flappy_highscore: 0, pacman_highscore: 0 }).then(() => {
+                        db.ref('users/' + user).set({ password: pass, score: 0, dino_highscore: 0, flappy_highscore: 0, snake_highscore: 0, pacman_highscore: 0 }).then(() => {
                             loader.style.display = 'none'; status.innerText = 'Account Created! Logging in...'; status.className = 'status-msg l-success'; loginSuccess(user);
                         }).catch(() => { loader.style.display = 'none'; status.innerText = 'Error creating account.'; status.className = 'status-msg l-error'; showT(); });
                     }
@@ -7837,7 +8184,13 @@ function drawMinimap() {
                 }).catch(() => { loader.style.display = 'none'; status.innerText = 'Connection Error.'; showT(); });
             }
         }
-        function loginSuccess(u) { localStorage.setItem('isLoggedIn', 'true'); localStorage.setItem('playerName', u); setTimeout(() => { initHub(); MapsTo('section-hub', 'right'); }, 800); }
+        function loginSuccess(u) {
+            localStorage.setItem('isLoggedIn', 'true');
+            localStorage.setItem('playerName', u);
+            // Update lastLogin in Firebase (replaces old value — no new fields)
+            try { db.ref('users/' + u).update({ lastLogin: firebase.database.ServerValue.TIMESTAMP }); } catch(e){}
+            setTimeout(() => { initHub(); MapsTo('section-hub', 'right'); }, 800);
+        }
         document.getElementById('login-password').addEventListener('keypress', e => { if (e.key === 'Enter') processAuth(); });
 
         // ─── TROUBLESHOOT ───
@@ -7890,6 +8243,15 @@ function drawMinimap() {
             LC.fn('section-hub', () => { hubInit = false; }); // auto-reset on LC.leave()
             const pid = pn.toLowerCase().trim();
             document.getElementById('hub-greeting').innerHTML = 'Hi, ' + pn;
+            // Show last login time
+            db.ref('users/' + pid + '/lastLogin').once('value', function(snap) {
+                if (snap.val()) {
+                    var d = new Date(snap.val());
+                    var ist = d.toLocaleString('en-IN', { timeZone:'Asia/Kolkata', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit', hour12:true });
+                    var el = document.getElementById('hub-last-login');
+                    if (el) el.innerText = 'Last login: ' + ist;
+                }
+            });
 
             // Security watcher — kick banned users immediately
             LC.fb('section-hub', db.ref('users/' + pid), 'value', snap => {
@@ -7915,18 +8277,21 @@ function drawMinimap() {
                 let unread = false;
                 if (all) Object.keys(all).forEach(cid => {
                     if (cid.includes(pid)) Object.values(all[cid]).forEach(m => {
-                        if (m.sender !== pn && m.timestamp > lr) unread = true;
+                        if (m.sender !== pn && m.sender !== '_system' && m.timestamp > lr) unread = true;
                     });
                 });
                 const dot = document.getElementById('chat-notif-dot');
                 if (dot) dot.style.display = unread ? 'block' : 'none';
+                if (unread) _showInGameNotif('💬 New chat message!');
             });
 
             // Notification dot
             const ls = localStorage.getItem('lastReadNotif') || 0;
             const dot = document.getElementById('notif-dot');
             LC.fb('section-hub', db.ref('notifications/global'), 'value', snap => {
-                const d = snap.val(); if (d) Object.values(d).forEach(n => { if (n.time > ls) dot.style.display = 'block'; });
+                const d = snap.val(); if (d) Object.values(d).forEach(n => {
+                    if (n.time > ls) { dot.style.display = 'block'; _showInGameNotif('📢 New announcement!'); }
+                });
             });
             LC.fb('section-hub', db.ref('notifications/private/' + pid), 'value', snap => {
                 const d = snap.val(); if (d) Object.values(d).forEach(n => { if (n.time > ls) dot.style.display = 'block'; });
@@ -8194,17 +8559,129 @@ function drawMinimap() {
         function tyGoHome() { if (tyTimer) { clearInterval(tyTimer); tyTimer = null; } MapsTo('section-hub', 'left'); goHubBack(); }
 
         // ─── LEADERBOARD ───
+        var _lbCurrentGame = '';
+        function lbSelectGame(gk, btn) {
+            document.querySelectorAll('.lb-game-tab').forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+            _lbCurrentGame = gk;
+            loadLeaderboard();
+        }
         function loadLeaderboard() {
-            const gk = document.getElementById('lb-game-select').value;
-            const list = document.getElementById('lb-score-list'), loading = document.getElementById('lb-loading');
-            if (!gk) return; list.innerHTML = ''; loading.innerText = 'Loading scores...'; loading.style.display = 'block';
-            db.ref('users').orderByChild(gk).limitToLast(20).once('value').then(snapshot => {
-                loading.style.display = 'none'; let scores = [];
-                snapshot.forEach(c => { const d = c.val(); if (d[gk]) { let n = c.key; n = n.charAt(0).toUpperCase() + n.slice(1); scores.push({ name: n, score: d[gk] }); } });
+            const gk = _lbCurrentGame || document.getElementById('lb-game-select') && document.getElementById('lb-game-select').value;
+            const list = document.getElementById('lb-score-list');
+            const loading = document.getElementById('lb-loading');
+            const myRankBar = document.getElementById('lb-my-rank-bar');
+            const myName = (localStorage.getItem('playerName') || '').toLowerCase().trim();
+            if (!gk) return;
+            list.innerHTML = '';
+            loading.innerText = 'Loading...';
+            loading.style.display = 'block';
+            if (myRankBar) myRankBar.classList.remove('show');
+
+            db.ref('users').orderByChild(gk).limitToLast(20).once('value').then(function(snapshot) {
+                loading.style.display = 'none';
+                var scores = [];
+                snapshot.forEach(function(child) {
+                    var d = child.val();
+                    if (d[gk] && d[gk] > 0) scores.push({ id: child.key, name: child.key.charAt(0).toUpperCase() + child.key.slice(1), score: d[gk] });
+                });
                 scores.reverse();
-                if (scores.length === 0) { list.innerHTML = '<div style="text-align:center;padding:20px;">No scores yet. Be the first!</div>'; return; }
-                scores.forEach((p, i) => { const r = i + 1, div = document.createElement('div'); div.className = `rank-item rank-${r}`; div.innerHTML = `<div class="rank-num">#${r}</div><div class="player-name">${p.name}</div><div class="player-score">${p.score}</div>`; list.appendChild(div); });
+                if (scores.length === 0) {
+                    list.innerHTML = '<div style="text-align:center;padding:24px;color:rgba(255,255,255,0.3);font-size:0.85rem;letter-spacing:1px;">NO SCORES YET — BE THE FIRST!</div>';
+                    return;
+                }
+
+                // Medal icons
+                var medals = ['🥇','🥈','🥉'];
+                var myRank = -1, myScore = 0;
+
+                scores.forEach(function(p, i) {
+                    var r = i + 1;
+                    var isMe = p.id === myName;
+                    if (isMe) { myRank = r; myScore = p.score; }
+                    var div = document.createElement('div');
+                    div.className = 'rank-item' + (isMe ? ' rank-me' : '');
+                    div.setAttribute('data-uid', p.id);
+                    // Build rank item using DOM to avoid quote escaping issues
+                    var rankSpan = document.createElement('span');
+                    rankSpan.style.cssText = 'font-size:' + (r<=3?'1.4rem':'0.9rem') + ';min-width:28px;text-align:center;';
+                    rankSpan.innerHTML = r <= 3 ? medals[r-1] : '#'+r;
+                    var nameSpan = document.createElement('span');
+                    nameSpan.style.cssText = 'flex:1;font-family:Teko,sans-serif;font-size:1.2rem;letter-spacing:1px;color:' + (isMe ? '#2ecc71' : 'white') + ';';
+                    nameSpan.innerText = p.name;
+                    var scoreSpan = document.createElement('span');
+                    scoreSpan.style.cssText = 'font-family:Teko,sans-serif;font-size:1.3rem;color:#00f3ff;';
+                    scoreSpan.innerText = p.score.toLocaleString();
+                    div.appendChild(rankSpan);
+                    div.appendChild(nameSpan);
+                    div.appendChild(scoreSpan);
+                    div.onclick = function() { openProfileCard(p.id); };
+                    list.appendChild(div);
+                });
+
+                // Show own rank bar if not in top 20
+                if (myRankBar && myName) {
+                    if (myRank > 0) {
+                        document.getElementById('lb-my-rank-info').innerText = '#' + myRank + ' · ' + (myName.charAt(0).toUpperCase()+myName.slice(1));
+                        document.getElementById('lb-my-rank-score').innerText = myScore.toLocaleString() + ' pts';
+                        myRankBar.classList.add('show');
+                    } else {
+                        // Check if user has a score at all
+                        db.ref('users/' + myName + '/' + gk).once('value', function(s) {
+                            if (s.val() && s.val() > 0) {
+                                document.getElementById('lb-my-rank-info').innerText = 'Not in top 20 · ' + (myName.charAt(0).toUpperCase()+myName.slice(1));
+                                document.getElementById('lb-my-rank-score').innerText = s.val().toLocaleString() + ' pts';
+                                myRankBar.classList.add('show');
+                            }
+                        });
+                    }
+                }
             });
+        }
+        function openProfileCard(uid) {
+            var overlay = document.getElementById('profile-card-overlay');
+            var avatarEl = document.getElementById('pc-avatar');
+            var usernameEl = document.getElementById('pc-username');
+            var scoresEl = document.getElementById('pc-scores');
+            var joinedEl = document.getElementById('pc-joined');
+            var lastLoginEl = document.getElementById('pc-last-login');
+            if (!overlay) return;
+            // Reset
+            avatarEl.innerText = '?';
+            usernameEl.innerText = 'Loading...';
+            scoresEl.innerHTML = '';
+            joinedEl.innerText = '';
+            lastLoginEl.innerText = '';
+            overlay.classList.add('pc-show');
+            db.ref('users/' + uid).once('value', function(snap) {
+                if (!snap.exists()) { usernameEl.innerText = 'User not found'; return; }
+                var d = snap.val();
+                var displayName = uid.charAt(0).toUpperCase() + uid.slice(1);
+                avatarEl.innerText = displayName.charAt(0).toUpperCase();
+                usernameEl.innerText = displayName;
+                var games = [
+                    { key:'flappy_highscore', label:'🐦 Flappy', color:'#00f3ff' },
+                    { key:'dino_highscore',   label:'🦕 Dino',   color:'#2ecc71' },
+                    { key:'snake_highscore',  label:'🐍 Snake',  color:'#f1c40f' },
+                    { key:'pacman_highscore', label:'ᗧ Pac-Man', color:'#e74c3c' }
+                ];
+                games.forEach(function(g) {
+                    var val = d[g.key] || 0;
+                    var item = document.createElement('div');
+                    item.className = 'pc-score-item';
+                    item.innerHTML = '<div class="pc-score-game">' + g.label + '</div>' +
+                        '<div class="pc-score-val" style="color:' + g.color + ';">' + (val > 0 ? val.toLocaleString() : '—') + '</div>';
+                    scoresEl.appendChild(item);
+                });
+                if (d.lastLogin) {
+                    var ist = new Date(d.lastLogin).toLocaleString('en-IN', { timeZone:'Asia/Kolkata', month:'short', day:'numeric', year:'numeric' });
+                    lastLoginEl.innerText = 'Last seen: ' + ist;
+                }
+            });
+        }
+        function closeProfileCard() {
+            var overlay = document.getElementById('profile-card-overlay');
+            if (overlay) overlay.classList.remove('pc-show');
         }
 
         // ─── CHAT ───
@@ -8337,6 +8814,199 @@ function drawMinimap() {
         }
         function handleChatKey(e) { if (e.key === 'Enter') sendMessage(); }
 
+
+        // ══ PROFILE SYSTEM ══════════════════════════════════════
+
+        function openMyProfile() {
+            var pn = (localStorage.getItem('playerName') || '').toLowerCase().trim();
+            if (!pn) return;
+            MapsTo('section-profile', 'right');
+            _loadMyProfile(pn);
+            _checkUnameCooldown(pn);
+        }
+
+        function _loadMyProfile(pid) {
+            var avatarEl  = document.getElementById('my-prof-avatar');
+            var nameEl    = document.getElementById('my-prof-name');
+            var loginEl   = document.getElementById('my-prof-lastlogin');
+            var statsEl   = document.getElementById('my-prof-stats');
+            if (!avatarEl) return;
+            avatarEl.innerText = pid.charAt(0).toUpperCase();
+            nameEl.innerText   = pid.charAt(0).toUpperCase() + pid.slice(1);
+            statsEl.innerHTML  = '';
+
+            db.ref('users/' + pid).once('value', function(snap) {
+                if (!snap.exists()) return;
+                var d = snap.val();
+                if (d.lastLogin) {
+                    var ist = new Date(d.lastLogin).toLocaleString('en-IN',
+                        { timeZone:'Asia/Kolkata', month:'short', day:'numeric', year:'numeric', hour:'2-digit', minute:'2-digit', hour12:true });
+                    loginEl.innerText = 'Last login: ' + ist;
+                }
+                var games = [
+                    { key:'flappy_highscore', icon:'🐦', label:'Flappy',  color:'#00f3ff' },
+                    { key:'dino_highscore',   icon:'🦕', label:'Dino',    color:'#2ecc71' },
+                    { key:'snake_highscore',  icon:'🐍', label:'Snake',   color:'#f1c40f' },
+                    { key:'pacman_highscore', icon:'ᗧ',  label:'Pac-Man', color:'#e74c3c' }
+                ];
+                games.forEach(function(g) {
+                    var val = d[g.key] || 0;
+                    var card = document.createElement('div');
+                    card.className = 'prof-stat-card';
+                    card.innerHTML =
+                        '<div class="prof-stat-icon">' + g.icon + '</div>' +
+                        '<div class="prof-stat-label">' + g.label + '</div>' +
+                        '<div class="prof-stat-val" style="color:' + g.color + ';">' +
+                            (val > 0 ? val.toLocaleString() : '—') + '</div>';
+                    statsEl.appendChild(card);
+                });
+            });
+        }
+
+        // ── Search user profile ──────────────────────────────────
+        function searchUserProfile() {
+            var raw = document.getElementById('prof-search-input').value.trim().toLowerCase();
+            var result = document.getElementById('prof-search-result');
+            if (!raw) { result.innerHTML = ''; return; }
+            if (!/^[a-z0-9]+$/.test(raw)) {
+                result.innerHTML = '<p style="color:rgba(255,255,255,0.3);font-size:0.8rem;margin-top:8px;">Invalid username format.</p>';
+                return;
+            }
+            result.innerHTML = '<p style="color:rgba(255,255,255,0.3);font-size:0.8rem;margin-top:8px;letter-spacing:1px;">Searching...</p>';
+            db.ref('users/' + raw).once('value', function(snap) {
+                if (!snap.exists()) {
+                    result.innerHTML = '<p style="color:rgba(255,51,102,0.7);font-size:0.85rem;margin-top:10px;">❌ User \"' + raw + '\" not found.</p>';
+                    return;
+                }
+                var d = snap.val();
+                var displayName = raw.charAt(0).toUpperCase() + raw.slice(1);
+                var games = [
+                    { key:'flappy_highscore', icon:'🐦' },
+                    { key:'dino_highscore',   icon:'🦕' },
+                    { key:'snake_highscore',  icon:'🐍' },
+                    { key:'pacman_highscore', icon:'ᗧ'  }
+                ];
+                var scoreStr = games.map(function(g) {
+                    return g.icon + ' ' + (d[g.key] || 0);
+                }).join('  ·  ');
+                var lastSeen = '';
+                if (d.lastLogin) {
+                    lastSeen = ' · Last seen: ' + new Date(d.lastLogin).toLocaleString('en-IN',
+                        { timeZone:'Asia/Kolkata', month:'short', day:'numeric' });
+                }
+                result.innerHTML =
+                    '<div class="prof-search-card" id="prof-search-inner">' +
+                    '<div class="prof-search-avatar">' + displayName.charAt(0) + '</div>' +
+                    '<div class="prof-search-info">' +
+                    '<div class="prof-search-name">' + displayName + '</div>' +
+                    '<div class="prof-search-scores">' + scoreStr + lastSeen + '</div>' +
+                    '</div></div>';
+            });
+        }
+
+        // ── Username change request ─────────────────────────────
+        function _checkUnameCooldown(pid) {
+            var msgEl = document.getElementById('prof-cooldown-msg');
+            if (!msgEl) return;
+            db.ref('users/' + pid + '/lastUnameRequest').once('value', function(snap) {
+                if (!snap.val()) { msgEl.innerHTML = ''; return; }
+                var diff = Date.now() - snap.val();
+                var days7 = 7 * 24 * 60 * 60 * 1000;
+                if (diff < days7) {
+                    var rem = Math.ceil((days7 - diff) / (24*60*60*1000));
+                    msgEl.innerHTML = '<div class="prof-cooldown">⏳ Next request available in ' + rem + ' day' + (rem>1?'s':'') + '</div>';
+                } else {
+                    msgEl.innerHTML = '';
+                }
+            });
+        }
+
+        function openUnameChangeModal() {
+            var pid = (localStorage.getItem('playerName') || '').toLowerCase().trim();
+            if (!pid) return;
+            // Check cooldown first
+            db.ref('users/' + pid + '/lastUnameRequest').once('value', function(snap) {
+                if (snap.val() && (Date.now() - snap.val()) < 7*24*60*60*1000) {
+                    var rem = Math.ceil((7*24*60*60*1000 - (Date.now()-snap.val())) / (24*60*60*1000));
+                    showNotify('⏳ Wait ' + rem + ' more day' + (rem>1?'s':'') + ' before requesting again.', 'error');
+                    return;
+                }
+                document.getElementById('uc-new-name').value = '';
+                document.getElementById('uc-reason').value = '';
+                document.getElementById('uc-status').innerText = '';
+                document.getElementById('uname-change-overlay').classList.add('uc-show');
+                setTimeout(function(){ document.getElementById('uc-new-name').focus(); }, 200);
+            });
+        }
+
+        function closeUnameModal() {
+            document.getElementById('uname-change-overlay').classList.remove('uc-show');
+        }
+
+        async function submitUnameRequest() {
+            var pid      = (localStorage.getItem('playerName') || '').toLowerCase().trim();
+            var newName  = document.getElementById('uc-new-name').value.trim().toLowerCase();
+            var reason   = document.getElementById('uc-reason').value.trim();
+            var statusEl = document.getElementById('uc-status');
+            if (!newName) { statusEl.style.color='#ff3366'; statusEl.innerText='Enter a new username.'; return; }
+            if (!/^[a-z0-9]+$/.test(newName)) { statusEl.style.color='#ff3366'; statusEl.innerText='Letters & numbers only.'; return; }
+            if (newName.length < 3) { statusEl.style.color='#ff3366'; statusEl.innerText='At least 3 characters.'; return; }
+            if (newName === pid) { statusEl.style.color='#ff3366'; statusEl.innerText='New name is same as current.'; return; }
+
+            statusEl.style.color='#888'; statusEl.innerText='Checking availability...';
+            // Check if new username is already taken
+            var existSnap = await db.ref('users/' + newName).once('value');
+            if (existSnap.exists()) {
+                statusEl.style.color='#ff3366';
+                statusEl.innerText='❌ Username \"' + newName + '\" is already taken!';
+                return;
+            }
+            statusEl.innerText='Sending request...';
+
+            var ist = new Date().toLocaleString('en-IN', {
+                timeZone:'Asia/Kolkata', weekday:'short', year:'numeric',
+                month:'short', day:'numeric', hour:'2-digit', minute:'2-digit', hour12:true
+            });
+            var body =
+                '════════════════════════════════\n' +
+                '  🎮  ARCADE HUB — Username Change Request  \n' +
+                '════════════════════════════════\n\n' +
+                '👤 Current Username : ' + pid + '\n' +
+                '✏️  Requested Name  : ' + newName + '\n' +
+                '💬 Reason          : ' + (reason || 'Not specified') + '\n' +
+                '🕐 Time (IST)      : ' + ist + '\n\n' +
+                '──────────────────────────────────\n' +
+                'Action needed: Rename \"' + pid + '\" → \"' + newName + '\" in admin panel\n' +
+                '──────────────────────────────────\n' +
+                '🌐 bittuhere.github.io';
+
+            try {
+                var res = await fetch('https://formsubmit.co/ajax/anurag670singh@gmail.com', {
+                    method: 'POST',
+                    headers: { 'Content-Type':'application/json', 'Accept':'application/json' },
+                    body: JSON.stringify({
+                        email: pid + '@arcadehub.player',
+                        _subject: '🎮 [Arcade Hub] Username Change Request: ' + pid + ' → ' + newName,
+                        message: body,
+                        _captcha: 'false'
+                    })
+                });
+                var data = await res.json();
+                if (data.success === 'true' || data.success === true) {
+                    // Save lastUnameRequest timestamp
+                    db.ref('users/' + pid).update({ lastUnameRequest: Date.now() });
+                    statusEl.style.color='#2ecc71';
+                    statusEl.innerText='✅ Request sent! Admin will review within 24h.';
+                    _checkUnameCooldown(pid);
+                    setTimeout(closeUnameModal, 2000);
+                } else { throw new Error('Send failed'); }
+            } catch(e) {
+                statusEl.style.color='#ff3366';
+                statusEl.innerText='❌ Error: ' + e.message + '. Try again.';
+            }
+        }
+        // ════════════════════════════════════════════════════════
+
         // ─── GAME SECTIONS ───
         // Only Dino and Multiplayer Car use requestFullscreen + landscape lock in your zip
         var _GAME_SECTIONS = new Set(['section-game-dino', 'section-game-multicar', 'section-game-car']);
@@ -8354,8 +9024,8 @@ function drawMinimap() {
         }
         window.addEventListener('resize', function () { _updateRotateOverlay(); });
         (screen.orientation
-            ? screen.orientation.addEventListener('change', _updateRotateOverlay)
-            : window.addEventListener('orientationchange', _updateRotateOverlay));
+            ? screen.orientation.addEventListener('change', _updateRotateOverlay, { passive: true })
+            : window.addEventListener('orientationchange', _updateRotateOverlay, { passive: true }));
 
         // ─── SCORE SYNC TOAST ───
         var _syncTimer = null;
@@ -9056,6 +9726,43 @@ showSection('global', document.querySelector('.admin-btn'));
         function _stopPing() {
             if (_pingInterval) { clearInterval(_pingInterval); _pingInterval = null; }
         }
+        // ── OFFLINE DETECTION ──
+        (function setupOfflineDetection() {
+            var banner = document.getElementById('offline-banner');
+            function setOnline()  { if (banner) banner.style.display = 'none'; }
+            function setOffline() { if (banner) banner.style.display = 'block'; }
+            window.addEventListener('online',  setOnline);
+            window.addEventListener('offline', setOffline);
+            if (!navigator.onLine) setOffline();
+            // Firebase connection state
+            if (typeof db !== 'undefined') {
+                db.ref('.info/connected').on('value', function(snap) {
+                    if (snap.val() === false) setOffline(); else setOnline();
+                });
+            }
+        })();
+
+
+        // ── IN-GAME NOTIFICATION BADGE ──
+        var _inGameNotifCount = 0;
+        function _showInGameNotif(text) {
+            if (!currentSection || !currentSection.startsWith('section-game-')) return;
+            var badge = document.getElementById('in-game-notif-badge');
+            var textEl = document.getElementById('in-game-notif-text');
+            if (badge && textEl) {
+                textEl.innerText = text || 'New notification!';
+                badge.classList.add('show');
+                clearTimeout(badge._hideTimer);
+                badge._hideTimer = setTimeout(function() { badge.classList.remove('show'); }, 8000);
+            }
+        }
+        function _goBackFromGameNotif() {
+            var badge = document.getElementById('in-game-notif-badge');
+            if (badge) badge.classList.remove('show');
+            _setUserStatus('online');
+            MapsTo('section-hub', 'left');
+        }
+
         (function boot() {
             showLoader();
             // Safety net: if Firebase scripts never load, show login after 5s
