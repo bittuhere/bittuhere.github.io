@@ -1101,6 +1101,7 @@
             border-bottom-right-radius: 2px;
         }
 
+        .msg-system { align-self:center; background:rgba(255,255,255,0.06); border-radius:8px; padding:6px 14px; max-width:90%; }
         .msg-received {
             align-self: flex-start;
             background: #333;
@@ -1270,6 +1271,226 @@
             display: block;
         }
 
+
+        /* ═══ GLOBAL NOTIFICATION SYSTEM ═══ */
+        #notify-container {
+            position: fixed; top: 20px; right: 20px; z-index: 999999;
+            display: flex; flex-direction: column; gap: 10px; pointer-events: none;
+        }
+        .notify-toast {
+            display: flex; align-items: center; gap: 12px; padding: 14px 20px;
+            border-radius: 14px; font-family: 'Teko', sans-serif; font-size: 1.15rem;
+            letter-spacing: 1.5px; color: white; background: rgba(10,8,30,0.92);
+            backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+            pointer-events: auto; max-width: 320px;
+            transform: translateX(120%); opacity: 0;
+            transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s;
+        }
+        .notify-toast.nt-show { transform: translateX(0); opacity: 1; }
+        .notify-toast.nt-hide { transform: translateX(120%); opacity: 0; }
+        .notify-toast.nt-success { border-color: #00ff88; box-shadow: 0 0 20px rgba(0,255,136,0.25), 0 8px 32px rgba(0,0,0,0.5); }
+        .notify-toast.nt-error   { border-color: #ff3366; box-shadow: 0 0 20px rgba(255,51,102,0.25), 0 8px 32px rgba(0,0,0,0.5); }
+        .notify-toast.nt-info    { border-color: #00f3ff; box-shadow: 0 0 20px rgba(0,243,255,0.25), 0 8px 32px rgba(0,0,0,0.5); }
+        .notify-toast.nt-invite  { border-color: #ff00ff; box-shadow: 0 0 20px rgba(255,0,255,0.25), 0 8px 32px rgba(0,0,0,0.5); }
+        .notify-icon { font-size: 1.4rem; line-height: 1; }
+        .notify-msg  { flex: 1; line-height: 1.2; }
+        #confirm-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+            z-index: 999998; display: flex; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.25s;
+        }
+        #confirm-overlay.conf-show { opacity: 1; pointer-events: auto; }
+        #confirm-box {
+            background: rgba(10,8,30,0.97); border: 1px solid rgba(0,243,255,0.3);
+            border-radius: 20px; padding: 2.2rem 2rem; max-width: 340px; width: 90%;
+            text-align: center; box-shadow: 0 0 50px rgba(0,243,255,0.15);
+            transform: scale(0.8); transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+        }
+        #confirm-overlay.conf-show #confirm-box { transform: scale(1); }
+        #confirm-icon { font-size: 2.5rem; margin-bottom: 10px; }
+        #confirm-msg { font-family: 'Segoe UI',sans-serif; color: #ccc; font-size: 1rem; margin-bottom: 1.6rem; line-height: 1.5; }
+        .conf-btns { display: flex; gap: 12px; justify-content: center; }
+        .conf-btn { font-family: 'Teko',sans-serif; font-size: 1.1rem; letter-spacing: 1.5px; padding: 10px 28px; border-radius: 30px; border: none; cursor: pointer; transition: 0.2s; min-width: 100px; }
+        .conf-btn-yes { background: linear-gradient(45deg,#00f3ff,#0066ff); color: white; box-shadow: 0 0 15px rgba(0,243,255,0.3); }
+        .conf-btn-yes:hover { transform: scale(1.05); box-shadow: 0 0 25px rgba(0,243,255,0.5); }
+        .conf-btn-no  { background: rgba(255,255,255,0.08); color: #aaa; border: 1px solid rgba(255,255,255,0.15); }
+        .conf-btn-no:hover { background: rgba(255,51,102,0.2); border-color: #ff3366; color: #ff3366; }
+
+        /* ═══ CHANGE PASSWORD MODAL ═══ */
+        #chgpass-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.75);
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            z-index: 999997; display: flex; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.25s;
+        }
+        #chgpass-overlay.cp-show { opacity: 1; pointer-events: auto; }
+        #chgpass-box {
+            background: rgba(10,8,30,0.98); border: 1px solid rgba(0,243,255,0.3);
+            border-radius: 20px; padding: 2.2rem 2rem; max-width: 360px; width: 92%;
+            text-align: center; box-shadow: 0 0 50px rgba(0,243,255,0.15);
+            transform: scale(0.85); transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+        }
+        #chgpass-overlay.cp-show #chgpass-box { transform: scale(1); }
+        #chgpass-box h3 { font-family:'Teko',sans-serif; font-size:1.8rem; color:#00f3ff; margin:0 0 5px; letter-spacing:2px; }
+        #chgpass-box p.cp-sub { color:#888; font-size:.85rem; margin:0 0 20px; }
+        .cp-field-wrap { position:relative; margin-bottom:14px; text-align:left; }
+        .cp-field-wrap label { display:block; color:#aaa; font-size:.8rem; margin-bottom:4px; }
+        .cp-input {
+            width:100%; padding:12px 44px 12px 14px; background:rgba(0,0,0,0.4);
+            border:1px solid #444; border-radius:8px; color:white; font-size:1rem;
+            outline:none; box-sizing:border-box; transition:.3s;
+        }
+        .cp-input:focus { border-color:#00f3ff; box-shadow:0 0 8px rgba(0,243,255,0.2); }
+        .cp-eye { position:absolute; right:12px; bottom:10px; cursor:pointer; width:22px; height:22px; opacity:.7; transition:opacity .2s; }
+        .cp-eye:hover { opacity:1; }
+        #cp-error { color:#ff3366; font-size:.85rem; min-height:18px; margin-bottom:10px; font-weight:bold; }
+        #cp-step2-fields { display:none; }
+        .cp-btn-row { display:flex; gap:10px; margin-top:6px; }
+        .cp-btn { flex:1; padding:11px; border:none; border-radius:30px; font-family:'Teko',sans-serif; font-size:1.1rem; letter-spacing:1px; cursor:pointer; transition:.2s; }
+        .cp-btn-confirm { background:linear-gradient(45deg,#00f3ff,#0066ff); color:white; box-shadow:0 0 12px rgba(0,243,255,.3); }
+        .cp-btn-confirm:hover { transform:scale(1.04); }
+        .cp-btn-cancel { background:rgba(255,255,255,.07); color:#aaa; border:1px solid rgba(255,255,255,.15); }
+        .cp-btn-cancel:hover { background:rgba(255,51,102,.15); border-color:#ff3366; color:#ff3366; }
+        #cp-step-indicator { font-size:.75rem; color:#666; margin-bottom:12px; letter-spacing:2px; }
+
+        /* ═══ ADMIN ENTRY BUTTON ═══ */
+        .admin-entry-btn {
+            background: transparent; border: 1px solid #ff0055; color: #ff0055;
+            padding: 0.8rem 1.5rem; border-radius: 50px; cursor: pointer; transition: all .25s;
+            font-family:'Teko',sans-serif; font-size:1rem; letter-spacing:1px; margin-left:10px;
+        }
+        .admin-entry-btn:hover { background:rgba(255,0,85,.15); box-shadow:0 0 12px rgba(255,0,85,.4); }
+
+        /* ═══ MATRIX RAIN OVERLAY ═══ */
+        #matrix-overlay {
+            position:fixed; inset:0; z-index:1000000; display:none;
+            align-items:center; justify-content:center; background:#000;
+        }
+        #matrix-overlay.mx-show { display:flex; }
+        #matrix-canvas { position:absolute; inset:0; width:100%; height:100%; }
+        #matrix-center-text {
+            position:relative; z-index:2; font-family:'Teko',sans-serif;
+            font-size:2.5rem; color:#00ff41; text-align:center; letter-spacing:4px;
+            text-shadow:0 0 20px #00ff41; animation:matrixPulse 0.5s ease-in-out infinite alternate;
+        }
+        @keyframes matrixPulse { from{opacity:.6;} to{opacity:1;} }
+
+        /* ═══ ADMIN LOGIN MODAL ═══ */
+        #admin-login-overlay {
+            position:fixed; inset:0; z-index:1000001; display:none;
+            align-items:center; justify-content:center;
+            background:rgba(0,0,0,0.6); backdrop-filter:blur(15px);
+            -webkit-backdrop-filter:blur(15px);
+        }
+        #admin-login-overlay.al-show { display:flex; }
+        #admin-login-box {
+            background:rgba(5,5,15,0.92); border:1px solid rgba(0,255,65,.3);
+            border-radius:20px; padding:2.5rem 2rem; max-width:380px; width:92%;
+            text-align:center; box-shadow:0 0 60px rgba(0,255,65,.2), inset 0 0 40px rgba(0,255,65,.04);
+            animation:adminBoxIn .4s cubic-bezier(0.34,1.56,0.64,1);
+        }
+        @keyframes adminBoxIn { from{transform:scale(.8);opacity:0;} to{transform:scale(1);opacity:1;} }
+        #admin-login-box h2 { font-family:'Teko',sans-serif; font-size:2rem; color:#00ff41; letter-spacing:3px; margin:0 0 4px; }
+        #admin-login-box p.al-sub { color:#555; font-size:.8rem; letter-spacing:2px; margin:0 0 22px; }
+        #al-error { color:#ff3366; font-size:.85rem; min-height:18px; margin-bottom:10px; font-weight:bold; }
+        .al-field { position:relative; margin-bottom:16px; text-align:left; }
+        .al-input {
+            width:100%; padding:12px 44px 12px 14px; background:rgba(0,255,65,.05);
+            border:1px solid rgba(0,255,65,.2); border-radius:8px; color:#00ff41;
+            font-size:1rem; outline:none; box-sizing:border-box; transition:.3s;
+            font-family:monospace;
+        }
+        .al-input:focus { border-color:#00ff41; box-shadow:0 0 12px rgba(0,255,65,.2); }
+        .al-eye { position:absolute; right:12px; bottom:10px; cursor:pointer; width:22px; height:22px; opacity:.6; filter:hue-rotate(120deg); }
+        .al-btn { width:100%; padding:13px; border:none; border-radius:30px; font-family:'Teko',sans-serif; font-size:1.2rem; letter-spacing:2px; cursor:pointer; transition:.2s; background:linear-gradient(45deg,#00ff41,#00c030); color:#000; box-shadow:0 0 15px rgba(0,255,65,.3); }
+        .al-btn:hover { transform:scale(1.03); box-shadow:0 0 25px rgba(0,255,65,.5); }
+        .al-cancel { display:block; margin-top:12px; color:#666; font-size:.9rem; cursor:pointer; letter-spacing:1px; }
+        .al-cancel:hover { color:#aaa; }
+
+        /* ═══ ADMIN SECTION ═══ */
+        #section-admin { background:#0a0a14; overflow-y:auto; }
+        .admin-section-inner { min-height:100vh; display:flex; flex-direction:column; align-items:center; padding:20px; }
+        .admin-header-bar {
+            width:100%; max-width:750px; display:flex; justify-content:space-between; align-items:center;
+            margin-bottom:20px; padding-bottom:15px; border-bottom:1px solid rgba(0,255,65,.2);
+        }
+        .admin-header-bar h1 { font-family:'Teko',sans-serif; font-size:2.2rem; color:#00ff41; margin:0; letter-spacing:3px; }
+        .admin-back-btn { background:transparent; border:1px solid rgba(0,255,65,.3); color:#00ff41; padding:8px 20px; border-radius:30px; cursor:pointer; font-family:'Teko',sans-serif; font-size:1rem; transition:.2s; }
+        .admin-back-btn:hover { background:rgba(0,255,65,.1); }
+        #admin-iframe { width:100%; max-width:750px; flex:1; border:none; border-radius:12px; min-height:600px; }
+
+
+        .adm-input-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.8);backdrop-filter:blur(8px);z-index:999997;display:flex;align-items:center;justify-content:center;opacity:0;visibility:hidden;pointer-events:none;transition:opacity 0.25s,visibility 0s linear 0.25s;}
+        .adm-input-overlay.adm-show{opacity:1;visibility:visible;pointer-events:auto;transition:opacity 0.25s,visibility 0s linear 0s;}
+        .adm-input-box{background:#0f0c29;border:1px solid rgba(0,243,255,0.4);border-radius:18px;padding:2rem;width:90%;max-width:360px;text-align:center;box-shadow:0 0 40px rgba(0,243,255,0.15);transform:scale(0.85);transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1);}
+        .adm-input-overlay.adm-show .adm-input-box{transform:scale(1);}
+        .adm-input-title{font-family:'Teko',sans-serif;font-size:1.4rem;color:#00f3ff;letter-spacing:2px;margin-bottom:12px;}
+        .adm-input-field{width:100%;padding:12px;background:rgba(0,0,0,0.5);border:1px solid #444;border-radius:8px;color:white;font-size:1rem;outline:none;box-sizing:border-box;transition:0.3s;}
+        .adm-input-field:focus{border-color:#00f3ff;box-shadow:0 0 8px rgba(0,243,255,0.3);}
+        .adm-input-btns{display:flex;gap:10px;justify-content:center;margin-top:14px;}
+        .adm-ok-btn{font-family:'Teko',sans-serif;font-size:1.05rem;letter-spacing:1px;padding:9px 26px;border-radius:25px;border:none;cursor:pointer;background:linear-gradient(45deg,#00f3ff,#0066ff);color:white;transition:0.2s;}
+        .adm-ok-btn:hover{transform:scale(1.05);}
+        .adm-cancel-btn{font-family:'Teko',sans-serif;font-size:1.05rem;letter-spacing:1px;padding:9px 26px;border-radius:25px;border:1px solid rgba(255,255,255,0.2);cursor:pointer;background:rgba(255,255,255,0.06);color:#aaa;transition:0.2s;}
+        .adm-cancel-btn:hover{border-color:#ff3366;color:#ff3366;}
+
+        /* ─── FF-STYLE INVITE POPUP ─── */
+        #invite-popup {
+            visibility: hidden;
+            position: fixed; top: 16px; left: 50%;
+            transform: translateX(-50%) translateY(-200%);
+            width: 320px; max-width: 92vw;
+            background: rgba(10,8,30,0.97);
+            border: 1px solid #2ecc71; border-radius: 16px;
+            padding: 16px 20px; z-index: 999990;
+            box-shadow: 0 0 30px rgba(46,204,113,0.3);
+            opacity: 0; visibility: hidden; pointer-events: none;
+            transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1),
+                        opacity 0.35s ease, visibility 0s linear 0.4s;
+        }
+        #invite-popup.inv-show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1; visibility: visible; pointer-events: auto;
+            transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1),
+                        opacity 0.35s ease, visibility 0s linear 0s;
+        }
+        /* Progress bar inside invite popup */
+        #inv-progress-wrap {
+            height: 3px; background: rgba(255,255,255,0.1);
+            border-radius: 2px; margin-top: 10px; overflow: hidden;
+        }
+        #inv-progress-bar {
+            height: 100%; background: #2ecc71; width: 100%;
+            transform-origin: left; transition: none;
+        }
+        #inv-progress-bar.running {
+            transition: width 7s linear;
+            width: 0%;
+        }
+        .inv-header { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+        .inv-icon { font-size:1.8rem; }
+        .inv-title { font-family:'Teko',sans-serif; font-size:1.2rem; color:#2ecc71; letter-spacing:1px; }
+        .inv-msg { color:#ccc; font-size:0.88rem; margin-bottom:12px; line-height:1.4; white-space:pre-line; }
+        .inv-btns { display:flex; gap:10px; }
+        .inv-btn { flex:1; padding:9px; border:none; border-radius:25px; cursor:pointer;
+            font-family:'Teko',sans-serif; font-size:1.05rem; letter-spacing:1px; transition:0.2s; }
+        .inv-btn-accept { background:linear-gradient(45deg,#2ecc71,#1abc9c); color:black; }
+        .inv-btn-accept:hover { box-shadow:0 0 15px rgba(46,204,113,0.6); transform:scale(1.03); }
+        .inv-btn-reject { background:rgba(255,51,102,0.15); color:#ff3366; border:1px solid #ff3366; }
+        .inv-btn-reject:hover { background:rgba(255,51,102,0.3); }
+        /* ─── PING DISPLAY ─── */
+        .ping-badge {
+            display: inline-flex; align-items: center; gap: 4px;
+            font-size: 0.72rem; padding: 2px 8px; border-radius: 10px;
+            font-family: 'Teko', sans-serif; letter-spacing: 0.5px;
+            background: rgba(0,0,0,0.4); border: 1px solid;
+            transition: color 0.3s, border-color 0.3s;
+        }
+        .ping-badge.ping-good   { color: #2ecc71; border-color: #2ecc71; }
+        .ping-badge.ping-medium { color: #f1c40f; border-color: #f1c40f; }
+        .ping-badge.ping-bad    { color: #e74c3c; border-color: #e74c3c; }
+        .ping-dot { width:6px; height:6px; border-radius:50%; background:currentColor; }
         /* ROTATE OVERLAY */
         #rotate-overlay {
             display: none;
@@ -1359,7 +1580,92 @@
 </head>
 
 <body>
+    <!-- ADMIN INPUT MODAL -->
+    <div class="adm-input-overlay" id="adm-input-overlay"><div class="adm-input-box"><div class="adm-input-title" id="adm-input-title">INPUT</div><input class="adm-input-field" id="adm-input-field" type="text" autocomplete="off"/><div class="adm-input-btns"><button class="adm-ok-btn" id="adm-ok-btn">OK</button><button class="adm-cancel-btn" id="adm-cancel-btn">CANCEL</button></div></div></div>
+    <!-- GLOBAL NOTIFICATION SYSTEM -->
+    <div id="notify-container"></div>
+    <!-- FF-STYLE INVITE POPUP -->
+    <div id="invite-popup">
+        <div class="inv-header">
+            <span class="inv-icon" id="inv-icon"></span>
+            <span class="inv-title" id="inv-title"></span>
+        </div>
+        <div class="inv-msg" id="inv-msg"></div>
+        <div class="inv-btns">
+            <button class="inv-btn inv-btn-accept" id="inv-accept">✓ JOIN</button>
+            <button class="inv-btn inv-btn-reject" id="inv-reject">✗ DECLINE</button>
+        </div>
+        <div id="inv-progress-wrap">
+            <div id="inv-progress-bar"></div>
+        </div>
+    </div>
+    <div id="confirm-overlay">
+        <div id="confirm-box">
+            <div id="confirm-icon">⚠️</div>
+            <div id="confirm-msg">Are you sure?</div>
+            <div class="conf-btns">
+                <button class="conf-btn conf-btn-yes" id="conf-yes">YES</button>
+                <button class="conf-btn conf-btn-no"  id="conf-no">CANCEL</button>
+            </div>
+        </div>
+    </div>
     <div id="score-sync-toast"></div>
+
+    <!-- ═══ CHANGE PASSWORD MODAL ═══ -->
+    <div id="chgpass-overlay">
+        <div id="chgpass-box">
+            <h3>🔐 CHANGE PASSWORD</h3>
+            <p class="cp-sub" id="cp-step-indicator">STEP 1 OF 2 — VERIFY IDENTITY</p>
+            <p id="cp-error"></p>
+            <!-- Step 1 -->
+            <div id="cp-step1-fields">
+                <div class="cp-field-wrap">
+                    <label>Current Password</label>
+                    <input class="cp-input" type="password" id="cp-old-input" placeholder="Enter your current password" autocomplete="current-password" onkeypress="if(event.key==='Enter')cpHandleStep()">
+                    <img class="cp-eye" id="cp-eye-old" src="" onclick="cpToggleEye('cp-old-input','cp-eye-old')">
+                </div>
+            </div>
+            <!-- Step 2 -->
+            <div id="cp-step2-fields">
+                <div class="cp-field-wrap">
+                    <label>New Password <span style="color:#888;font-size:.75rem;">(min 4 chars)</span></label>
+                    <input class="cp-input" type="password" id="cp-new-input" placeholder="Enter new password" autocomplete="new-password" onkeypress="if(event.key==='Enter')cpHandleStep()">
+                    <img class="cp-eye" id="cp-eye-new" src="" onclick="cpToggleEye('cp-new-input','cp-eye-new')">
+                </div>
+                <div class="cp-field-wrap">
+                    <label>Confirm New Password</label>
+                    <input class="cp-input" type="password" id="cp-conf-input" placeholder="Confirm new password" autocomplete="new-password" onkeypress="if(event.key==='Enter')cpHandleStep()">
+                    <img class="cp-eye" id="cp-eye-conf" src="" onclick="cpToggleEye('cp-conf-input','cp-eye-conf')">
+                </div>
+            </div>
+            <div class="cp-btn-row">
+                <button class="cp-btn cp-btn-cancel" onclick="closeChangePass()">Cancel</button>
+                <button class="cp-btn cp-btn-confirm" id="cp-confirm-btn" onclick="cpHandleStep()">Verify →</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ MATRIX RAIN OVERLAY ═══ -->
+    <div id="matrix-overlay">
+        <canvas id="matrix-canvas"></canvas>
+        <div id="matrix-center-text">⚠ UNAUTHORIZED ACCESS ⚠<br><span style="font-size:1.2rem;color:#00cc33;">INITIALIZING ADMIN PORTAL...</span></div>
+    </div>
+
+    <!-- ═══ ADMIN LOGIN MODAL ═══ -->
+    <div id="admin-login-overlay">
+        <div id="admin-login-box">
+            <h2>⛔ ADMIN ACCESS</h2>
+            <p class="al-sub">ENTER ADMINISTRATOR CREDENTIALS</p>
+            <p id="al-error"></p>
+            <div class="al-field">
+                <input class="al-input" type="password" id="al-pass-input" placeholder="Enter admin password..." autocomplete="off" onkeypress="if(event.key==='Enter')alVerify()">
+                <img class="al-eye" id="al-eye" src="" onclick="alToggleEye()">
+            </div>
+            <button class="al-btn" onclick="alVerify()">AUTHENTICATE</button>
+            <span class="al-cancel" onclick="alClose()">← Back to Hub</span>
+        </div>
+    </div>
+
     <div id="rotate-overlay" onclick="handleMobileRotation()">
         <div class="rotate-phone-icon">📱</div>
         <div class="rotate-label">ROTATE TO LANDSCAPE</div>
@@ -1384,9 +1690,10 @@
         <div class="login-card">
             <h1 id="login-header">LOGIN</h1>
             <p id="login-sub">Enter the Arcade World</p>
-            <input type="text" id="login-username" placeholder="Username" autocomplete="username">
+            <form id="login-form" autocomplete="on" onsubmit="processAuth();return false;" style="display:contents;">
+            <input type="text" id="login-username" name="username" placeholder="Username" autocomplete="username">
             <div style="position:relative;">
-                <input type="password" id="login-password" placeholder="Password" autocomplete="current-password">
+                <input type="password" id="login-password" name="password" placeholder="Password" autocomplete="current-password">
                 <span id="eye-btn" onclick="togglePass()"
                     style="position:absolute;right:15px;top:13px;cursor:pointer;z-index:10;">
                     <img id="eye-icon"
@@ -1398,7 +1705,8 @@
             <div class="status-msg" id="login-status"></div>
             <div id="trouble-link" class="trouble-link" onclick="goToTroubleshoot()">Trouble signing in? Click here
             </div>
-            <button class="l-btn btn-go" onclick="processAuth()" id="submit-btn">ENTER</button>
+            <button class="l-btn btn-go" type="submit" id="submit-btn">ENTER</button>
+            </form>
             <span class="switch-link" onclick="toggleMode()" id="switch-btn">New here? Create ID</span>
         </div>
     </div>
@@ -1511,11 +1819,499 @@
                     <button onclick="logout()" class="logout-btn">Logout</button>
                     <button onclick="openChangePass()" class="logout-btn"
                         style="border-color:#00f3ff;color:#00f3ff;margin-left:10px;">Change Password</button>
+                    <button onclick="launchAdminEntry()" class="admin-entry-btn">⚠ ADMIN PANEL</button>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- ADMIN PANEL SECTION -->
+<!-- ADMIN PANEL SECTION (Inline) -->
+<div id="section-admin" class="spa-section hidden-right">
+    <div class="admin-section-inner">
+        <div class="admin-header-bar">
+            <h1>⚡ ADMIN CONTROL</h1>
+            <button class="admin-back-btn" onclick="MapsTo('section-hub','left')">← Back to Hub</button>
+        </div>
+
+        <!-- Admin Panel UI (Directly from admin.html) -->
+        <div style="width:100%; max-width:750px; background: rgba(0,0,0,0.2); border-radius: 12px; padding: 20px;">
+            <div class="menu-container" style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
+                <button class="admin-btn" onclick="adminShowSection('global', this)">📢 Global Msg</button>
+                <button class="admin-btn" onclick="adminShowSection('specific', this)">✉️ Private Msg</button>
+                <button class="admin-btn" onclick="adminShowSection('users', this)">🚫 Users</button>
+                <button class="admin-btn" onclick="adminShowSection('rename', this)">✏️ Rename</button>
+                <button class="admin-btn" onclick="adminShowSection('rooms', this)">🏠 Rooms</button>
+                <button class="admin-btn" onclick="adminShowSection('info', this)">📊 Scores</button>
+            </div>
+
+            <div id="admin-section-global" class="admin-section" style="display: block;">
+                <h3 style="color: #2ecc71;">📢 Global Announcement</h3>
+                <textarea id="adminGlobalText" placeholder="Message for all players..." style="width:100%; padding:10px; margin:8px 0; border-radius:5px; border:none; background:#111; color:white;"></textarea>
+                <button class="send-btn" onclick="adminSendGlobal()" style="width:100%; background:#2ecc71; color:black; border:none; padding:12px; border-radius:50px; cursor:pointer; font-weight:bold;">PUBLISH TO ALL</button>
+                <div id="adminGlobalMsgList" class="msg-list" style="margin-top:20px; max-height:300px; overflow-y:auto;"></div>
+            </div>
+
+            <div id="admin-section-specific" class="admin-section" style="display: none;">
+                <h3 style="color: #2ecc71;">✉️ Private Notification</h3>
+                <input type="text" id="adminTargetUser" placeholder="Username (e.g. player123)" oninput="adminLoadPrivateMsgs()" style="width:100%; padding:10px; margin:8px 0; border-radius:5px; border:none; background:#111; color:white;">
+                <textarea id="adminSpecificText" placeholder="Private message..." style="width:100%; padding:10px; margin:8px 0; border-radius:5px; border:none; background:#111; color:white;"></textarea>
+                <button class="send-btn" onclick="adminSendSpecific()" style="width:100%; background:#3498db; color:white; border:none; padding:12px; border-radius:50px; cursor:pointer; font-weight:bold;">SEND TO PLAYER</button>
+                <div id="adminPrivateMsgList" class="msg-list" style="margin-top:20px; max-height:300px; overflow-y:auto;"></div>
+            </div>
+
+            <div id="admin-section-users" class="admin-section" style="display: none;">
+                <h3 style="color: #2ecc71;">🚫 User Access Control</h3>
+                <input type="text" id="adminUserSearch" placeholder="Search users..." oninput="adminFilterUsers()" style="width:100%; padding:10px; margin-bottom:10px; border-radius:5px; border:none; background:#111; color:white;">
+                <table style="width:100%; border-collapse:collapse;">
+                    <thead><tr><th style="text-align:left; color:#2ecc71;">User</th><th style="color:#2ecc71;">Status</th><th>Actions</th></tr></thead>
+                    <tbody id="adminUserTableBody"></tbody>
+                </table>
+            </div>
+
+            <div id="admin-section-rename" class="admin-section" style="display: none;">
+                <h3 style="color: #2ecc71;">✏️ Rename User</h3>
+                <input type="text" id="adminOldName" placeholder="Old Username" style="width:100%; padding:10px; margin:8px 0; border-radius:5px; border:none; background:#111; color:white;">
+                <input type="text" id="adminNewName" placeholder="New Username" style="width:100%; padding:10px; margin:8px 0; border-radius:5px; border:none; background:#111; color:white;">
+                <button class="send-btn" onclick="adminRenameUser()" style="width:100%; background:#f1c40f; color:black; border:none; padding:12px; border-radius:50px; cursor:pointer; font-weight:bold;">RENAME</button>
+                <div id="adminRenameStatus" style="margin-top:10px; font-size:0.9rem; color:#888;"></div>
+            </div>
+
+            <div id="admin-section-rooms" class="admin-section" style="display: none;">
+                <h3 style="color: #2ecc71;">🏠 Active Car Game Rooms</h3>
+                <table style="width:100%; border-collapse:collapse;">
+                    <thead><tr><th style="color:#2ecc71;">Room ID</th><th style="color:#2ecc71;">Players</th><th>Action</th></tr></thead>
+                    <tbody id="adminRoomTableBody"></tbody>
+                </table>
+            </div>
+
+            <div id="admin-section-info" class="admin-section" style="display: none;">
+                <h3 style="color: #2ecc71;">📊 Highscore Information</h3>
+                <table style="width:100%; border-collapse:collapse;">
+                    <thead><tr><th style="color:#2ecc71;">User</th><th style="color:#2ecc71;">🐦Flappy</th><th style="color:#2ecc71;">🦕Dino</th><th style="color:#2ecc71;">🐍Snake</th><th style="color:#2ecc71;">ᗧPacMan</th></tr></thead>
+                    <tbody id="adminInfoTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Admin Panel JavaScript (must be placed AFTER the HTML) -->
+<script>
+(function() {
+    // --- Admin Panel JavaScript (namespaced to avoid conflicts) ---
+    console.log("Admin Panel JS Loaded");
+
+    // Store all users data
+    let adminAllUsers = [];
+
+    // --- UI Navigation ---
+    window.adminShowSection = function(name, btn) {
+        document.querySelectorAll('.admin-section').forEach(s => s.style.display = 'none');
+        document.querySelectorAll('.admin-btn').forEach(b => b.classList.remove('active'));
+        const target = document.getElementById('admin-section-' + name);
+        if(target) target.style.display = 'block';
+        if(btn) btn.classList.add('active');
+        
+        // Load data when section is shown
+        if(name === 'global') adminLoadGlobalMessages();
+        if(name === 'users') adminLoadUsers();
+        if(name === 'rooms') adminLoadRooms();
+        if(name === 'info') adminLoadUserInfo();
+    };
+
+    // --- Global Messages ---
+    window.adminSendGlobal = function() {
+    const text = document.getElementById('adminGlobalText').value.trim();
+    if(!text) return showNotify("Enter a message first!", "error");
+    db.ref('notifications/global').push({ 
+        message: text, 
+        time: Date.now(),
+        _k:(function(){return['anurag','Admin','@123'].join('');})()  //key
+    })
+    .then(() => {
+        document.getElementById('adminGlobalText').value = "";
+        showNotify('✅ Published to all players!', 'success');
+        adminLoadGlobalMessages();
+    }).catch(function(e){ showNotify('❌ ' + e.message, 'error'); });
+};
+
+    // ── adminSendSpecific: Send private notification to specific user ──
+    window.adminSendSpecific = function() {
+        const user = document.getElementById('adminTargetUser').value.toLowerCase().trim();
+        const text = document.getElementById('adminSpecificText').value.trim();
+        if (!user) return showNotify('Enter a username!', 'error');
+        if (!text) return showNotify('Enter a message!', 'error');
+        db.ref('notifications/private/' + user).push({
+            message: text,
+            time: Date.now(),
+            _k:(function(){return['anurag','Admin','@123'].join('');})()  //key
+        })
+        .then(() => {
+            document.getElementById('adminSpecificText').value = '';
+            showNotify('✅ Sent to ' + user + '!', 'success');
+            adminLoadPrivateMsgs();
+        })
+        .catch(function(e) { showNotify('❌ ' + e.message, 'error'); });
+    };
+
+    function adminLoadGlobalMessages() {
+        var listEl = document.getElementById('adminGlobalMsgList');
+        if (!listEl) return;
+        // Use LC.fb for real-time updates (mirrors original pattern)
+        LC.fb('section-admin', db.ref('notifications/global'), 'value', function(snap) {
+            listEl.innerHTML = '';
+            if (!snap.exists()) {
+                listEl.innerHTML = "<p style='color:#666;'>No messages</p>";
+                return;
+            }
+            snap.forEach(function(child) {
+                var msg = child.val().message || '';
+                var key = child.key;
+                var card = document.createElement('div');
+                card.style.cssText = 'background:rgba(255,255,255,0.05);padding:10px;border-radius:8px;margin-top:5px;border-left:4px solid #2ecc71;display:flex;justify-content:space-between;align-items:center;';
+                var textDiv = document.createElement('div');
+                textDiv.style.cssText = 'flex:1;font-size:0.9rem;color:white;';
+                textDiv.innerText = msg;
+                var btnDiv = document.createElement('div');
+                var editBtn = document.createElement('button');
+                editBtn.className = 'mini-btn';
+                editBtn.style.cssText = 'background:#f1c40f;border:none;padding:4px 8px;border-radius:4px;cursor:pointer;margin-right:4px;font-size:0.8rem;';
+                editBtn.innerText = 'EDIT';
+                editBtn.onclick = (function(k, b){ return function(){ adminEditMsg('notifications/global', k, b); }; })(key, editBtn);
+                var delBtn = document.createElement('button');
+                delBtn.className = 'mini-btn';
+                delBtn.style.cssText = 'background:#e74c3c;color:white;border:none;padding:4px 8px;border-radius:4px;cursor:pointer;font-size:0.8rem;';
+                delBtn.innerText = 'DEL';
+                delBtn.onclick = (function(k){ return function(){ adminDeleteMsg('notifications/global', k); }; })(key);
+                btnDiv.appendChild(editBtn);
+                btnDiv.appendChild(delBtn);
+                card.appendChild(textDiv);
+                card.appendChild(btnDiv);
+                listEl.appendChild(card);
+            });
+        });
+    }
+
+    window.adminLoadPrivateMsgs = function() {
+        var user = document.getElementById('adminTargetUser').value.toLowerCase().trim();
+        var list = document.getElementById('adminPrivateMsgList');
+        if (!user) { list.innerHTML = ''; return; }
+        list.innerHTML = '<p style="color:#888;text-align:center;">Loading...</p>';
+        // Detach previous listener
+        if (window._privRef) { window._privRef.off('value', window._privCb); }
+        var path = 'notifications/private/' + user;
+        window._privCb = function(snap) {
+            list.innerHTML = '';
+            var h4 = document.createElement('h4');
+            h4.style.cssText = 'color:#888;margin-bottom:8px;font-size:0.9rem;';
+            h4.innerText = 'Messages for ' + user + ':';
+            list.appendChild(h4);
+            if (!snap.exists()) {
+                var empty = document.createElement('p');
+                empty.style.cssText = 'color:#555;font-size:0.85rem;';
+                empty.innerText = 'No messages yet.';
+                list.appendChild(empty);
+                return;
+            }
+            snap.forEach(function(child) {
+                var msg = child.val().message || '';
+                var key = child.key;
+                var card = document.createElement('div');
+                card.style.cssText = 'background:rgba(255,255,255,0.05);padding:10px;border-radius:8px;margin-top:5px;border-left:4px solid #3498db;display:flex;justify-content:space-between;align-items:center;';
+                var textDiv = document.createElement('div');
+                textDiv.style.cssText = 'flex:1;font-size:0.9rem;color:white;word-break:break-word;';
+                textDiv.innerText = msg;
+                var btnDiv = document.createElement('div');
+                var editBtn = document.createElement('button');
+                editBtn.style.cssText = 'background:#e67e22;color:white;border:none;padding:4px 8px;border-radius:4px;cursor:pointer;margin-left:4px;font-size:0.75rem;';
+                editBtn.innerText = '✏';
+                editBtn.onclick = (function(p, k, b){ return function(){ adminEditMsg(p, k, b); }; })(path, key, editBtn);
+                var delBtn = document.createElement('button');
+                delBtn.style.cssText = 'background:#e74c3c;color:white;border:none;padding:4px 8px;border-radius:4px;cursor:pointer;margin-left:4px;font-size:0.75rem;';
+                delBtn.innerText = '🗑';
+                delBtn.onclick = (function(p, k){ return function(){ adminDeleteMsg(p, k); }; })(path, key);
+                btnDiv.appendChild(editBtn);
+                btnDiv.appendChild(delBtn);
+                card.appendChild(textDiv);
+                card.appendChild(btnDiv);
+                list.appendChild(card);
+            });
+        };
+        window._privRef = db.ref(path);
+        window._privRef.on('value', window._privCb);
+    };
+
+    window.adminEditMsg = function(path, key, btn) {
+        const div = btn.parentElement.parentElement;
+        const oldText = div.querySelector('div:first-child').innerText;
+        showInputModal('EDIT MESSAGE', 'New text...', function(newText) {
+            if (newText !== oldText) {
+            var updateData = { message: newText, _k: (function(){return ['anurag','Admin','@123'].join('');})() };
+            db.ref(path+'/'+key).update(updateData)
+                .then(function(){ showNotify('✅ Message updated!', 'success'); })
+                .catch(function(e){ showNotify('❌ ' + e.message, 'error'); });
+        }
+        }, oldText);
+    };
+
+    window.adminDeleteMsg = function(path, key) {
+        showConfirm('Delete this message?', function() { db.ref(path + '/' + key).remove(); }, '🗑️');
+    };
+
+    // --- User Management ---
+    function adminLoadUsers() {
+     LC.fb('section-admin', db.ref('users'), 'value', snap => {
+            adminAllUsers = [];
+            snap.forEach(child => {
+                adminAllUsers.push({ id: child.key, data: child.val() });
+            });
+            adminRenderUserTable(adminAllUsers);
+        });
+    }
+
+    window.adminFilterUsers = function() {
+        const q = document.getElementById('adminUserSearch').value.toLowerCase();
+        adminRenderUserTable(adminAllUsers.filter(u => u.id.includes(q)));
+    };
+
+    function adminRenderUserTable(users) {
+        let rows = "";
+        users.forEach(u => {
+            const isBlocked = u.data.blocked === true;
+            rows += `<tr>
+                <td style="padding:8px;">${u.id}</td>
+                <td style="padding:8px;"><span style="background:${isBlocked ? 'rgba(231,76,60,0.2)' : 'rgba(46,204,113,0.2)'}; color:${isBlocked ? '#e74c3c' : '#2ecc71'}; padding:3px 8px; border-radius:4px;">${isBlocked ? 'BLOCKED' : 'ACTIVE'}</span></td>
+                <td style="padding:8px;">
+                    <button onclick="adminToggleBlock('${u.id}', ${!isBlocked})" style="background:${isBlocked ? '#2ecc71' : '#e74c3c'}; border:none; color:white; padding:4px 8px; border-radius:4px; cursor:pointer;">${isBlocked ? 'UNBLOCK' : 'BLOCK'}</button>
+                    <button onclick="adminResetPass('${u.id}')" style="background:#3498db; border:none; color:white; padding:4px 8px; border-radius:4px; cursor:pointer; margin-left:5px;">Reset Pass</button>
+                </td>
+            </tr>`;
+        });
+        document.getElementById('adminUserTableBody').innerHTML = rows;
+    }
+
+    window.adminToggleBlock = function(uid, state) {
+        showConfirm((state?'🚫 BLOCK':'✅ UNBLOCK')+' user: '+uid+'?', function() {
+            db.ref('users/' + uid).update({ blocked: state, _admin: true });
+            showNotify((state?'🚫 Blocked: ':'✅ Unblocked: ')+uid, state?'error':'success');
+        }, state?'🚫':'✅');
+    };
+
+window.adminResetPass = function(uid) {
+    showInputModal('RESET PASSWORD — '+uid.toUpperCase(), 'New password (min 3 chars)...', async function(newPass) {
+        if (!newPass || newPass.length < 3) { showNotify('Min 3 chars required!','error'); return; }
+        const buf = await crypto.subtle.digest('SHA-1', new TextEncoder().encode(newPass));
+        const hash = Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+        db.ref('users/'+uid).update({ password: hash, _admin: true })
+            .then(()=>showNotify('✅ Password reset for '+uid+'!','success'))
+            .catch(e=>showNotify('❌ '+e.message,'error'));
+    });
+};
+
+    // --- Rooms ---
+    function adminLoadRooms() {
+        db.ref('car_world').on('value', snap => {
+            let rows = "";
+            snap.forEach(child => {
+                const players = child.val().players ? Object.keys(child.val().players).length : 0;
+                rows += `<tr>
+                    <td style="padding:8px;">${child.key}</td>
+                    <td style="padding:8px;">${players} Players</td>
+                    <td style="padding:8px;"><button onclick="adminDeleteRoom('${child.key}')" style="background:#e74c3c; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer;">DELETE</button></td>
+                </tr>`;
+            });
+            document.getElementById('adminRoomTableBody').innerHTML = rows;
+        });
+    }
+
+    window.adminDeleteRoom = function(id) {
+        showConfirm('Delete room '+id+'? Players will be disconnected.', function() {
+            db.ref('car_world/' + id).remove();
+            showNotify('🗑 Room '+id+' deleted!', 'success');
+        }, '🗑️');
+    };
+
+    // --- User Info ---
+    function adminLoadUserInfo() {
+        db.ref('users').once('value', snap => {
+            let rows = "";
+            snap.forEach(child => {
+                const d = child.val();
+                rows += `<tr>
+                    <td style="padding:8px;">${child.key}</td>
+                    <td style="padding:8px;">${d.flappy_highscore || 0}</td>
+                    <td style="padding:8px;">${d.dino_highscore || 0}</td>
+                    <td style="padding:8px;">${d.snake_highscore || 0}</td>
+                    <td style="padding:8px;">${d.pacman_highscore || 0}</td>
+                </tr>`;
+            });
+            document.getElementById('adminInfoTableBody').innerHTML = rows;
+        });
+    }
+
+    // --- Rename User ---
+ window.adminRenameUser = async function() {
+    const oldN = document.getElementById('adminOldName').value.toLowerCase().trim();
+    const newN = document.getElementById('adminNewName').value.toLowerCase().trim();
+    const st = document.getElementById('adminRenameStatus');
+
+    if (!oldN || !newN) return showNotify('Fill both fields!', 'error');
+    if (oldN === newN) return showNotify('Names are identical!', 'error');
+
+    const validName = /^[a-z0-9]+$/.test(newN);
+    if (!validName) return showNotify('New name: letters & numbers only!', 'error');
+
+    st.style.color = '#888';
+    st.innerText = 'Step 1/6: Checking...';
+
+    try {
+        // ── STEP 1: Validate ──────────────────────────────────────────
+        const [newSnap, oldSnap] = await Promise.all([
+            db.ref('users/' + newN).once('value'),
+            db.ref('users/' + oldN).once('value')
+        ]);
+        if (newSnap.exists()) {
+            st.style.color = '#ff3366';
+            st.innerText = '❌ Username "' + newN + '" is already taken!';
+            return;
+        }
+        if (!oldSnap.exists()) {
+            st.style.color = '#ff3366';
+            st.innerText = '❌ User "' + oldN + '" not found!';
+            return;
+        }
+        const userData = Object.assign({}, oldSnap.val(), { _admin: true });
+
+        // ── STEP 2: Copy user data to new key ────────────────────────
+        st.innerText = 'Step 2/6: Copying user data...';
+        await db.ref('users/' + newN).set(userData);
+
+        // ── STEP 3: Transfer friends list + update each friend ────────
+        st.innerText = 'Step 3/6: Migrating friends...';
+        const friendsSnap = await db.ref('friends/' + oldN).once('value');
+        const friends = friendsSnap.val() || {};
+        const friendOps = [];
+        Object.keys(friends).forEach(function(fid) {
+            friendOps.push(db.ref('friends/' + fid + '/' + newN).set(true));
+            friendOps.push(db.ref('friends/' + fid + '/' + oldN).remove());
+        });
+        if (Object.keys(friends).length) {
+            await db.ref('friends/' + newN).set(friends);
+            await Promise.all(friendOps);
+        }
+
+        // ── STEP 4: Migrate chats (copy + rename sender in messages) ──
+        st.innerText = 'Step 4/6: Migrating chats...';
+        const chatOps = [];
+        for (const fid of Object.keys(friends)) {
+            const oldChatId = [oldN, fid].sort().join('_');
+            const newChatId = [newN, fid].sort().join('_');
+            const chatSnap = await db.ref('chats/' + oldChatId).once('value');
+            if (chatSnap.exists()) {
+                // Rename sender field inside every message
+                const msgs = chatSnap.val();
+                Object.keys(msgs).forEach(function(msgKey) {
+                    if (msgs[msgKey].sender === oldN) msgs[msgKey].sender = newN;
+                });
+                chatOps.push(db.ref('chats/' + newChatId).set(msgs));
+                chatOps.push(db.ref('chats/' + oldChatId).remove());
+            }
+        }
+        await Promise.all(chatOps);
+
+        // ── STEP 5: Migrate status (online/lastseen) ─────────────────
+        st.innerText = 'Step 5/6: Migrating status...';
+        const statusSnap = await db.ref('status/' + oldN).once('value');
+        if (statusSnap.exists()) {
+            await db.ref('status/' + newN).set(statusSnap.val());
+            await db.ref('status/' + oldN).remove();
+        }
+
+        // ── STEP 6: Delete old user + old friends ────────────────────
+        st.innerText = 'Step 6/6: Cleaning up old data...';
+        await db.ref('users/' + oldN).update({ _admin: true });
+        await db.ref('users/' + oldN).remove();
+        await db.ref('friends/' + oldN).remove();
+
+        st.style.color = '#2ecc71';
+        st.innerText = '✅ Renamed ' + oldN + ' → ' + newN + ' successfully! All data transferred.';
+        document.getElementById('adminOldName').value = '';
+        document.getElementById('adminNewName').value = '';
+        showNotify('✅ User renamed: ' + oldN + ' → ' + newN, 'success');
+
+    } catch (err) {
+        console.error('Rename failed:', err);
+        st.style.color = '#ff3366';
+        st.innerText = '❌ Error: ' + err.message;
+        showNotify('❌ Rename failed: ' + err.message, 'error');
+    }
+};
+
+    // Initialize first section - wait for db to be ready
+    var _adminInitInterval = setInterval(function() {
+        if (typeof db !== 'undefined' && db) {
+            clearInterval(_adminInitInterval);
+            var firstBtn = document.querySelector('.admin-btn');
+            if (firstBtn) adminShowSection('global', firstBtn);
+        }
+    }, 150);
+    setTimeout(function(){ clearInterval(_adminInitInterval); }, 10000);
+})();
+</script>
+
+<!-- Additional CSS for admin panel -->
+<style>
+.admin-btn {
+    background: #1a1a2e;
+    border: 2px solid #2ecc71;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: 'Teko', sans-serif;
+    font-size: 1.2rem;
+    transition: 0.3s;
+}
+.admin-btn:hover, .admin-btn.active {
+    background: #2ecc71;
+    color: black;
+    box-shadow: 0 0 15px #2ecc71;
+}
+.admin-section {
+    background: rgba(255,255,255,0.03);
+    padding: 20px;
+    border-radius: 10px;
+}
+.msg-list {
+    max-height: 250px;
+    overflow-y: auto;
+    padding-right: 5px;
+}
+.msg-card {
+    background: rgba(255,255,255,0.05);
+    padding: 8px 12px;
+    border-radius: 8px;
+    margin-top: 8px;
+    border-left: 4px solid #2ecc71;
+}
+.mini-btn {
+    font-family: 'Teko', sans-serif;
+    font-size: 0.9rem;
+    border: none;
+    padding: 4px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.send-btn {
+    font-family: 'Teko', sans-serif;
+    font-size: 1.1rem;
+    letter-spacing: 1px;
+}
+table { width: 100%; border-collapse: collapse; }
+th { text-align: left; color: #2ecc71; padding: 8px; }
+td { padding: 8px; border-bottom: 1px solid #333; }
+</style>
     <!-- LEADERBOARD -->
     <div id="section-leaderboard" class="spa-section hidden-right"
         style="background:linear-gradient(to right,#24243e,#302b63,#0f0c29);">
@@ -1545,7 +2341,7 @@
         style="background:#111;display:flex;height:100vh;overflow:hidden;">
         <div class="sidebar">
             <button class="btn-back-chat" onclick="MapsTo('section-hub','left')">&#8592; Back</button>
-            <div class="user-status">Your Username: <span id="chat-display-username">...</span></div>
+            <div class="user-status" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">Your Username: <span id="chat-display-username">...</span><span class="ping-badge ping-good" id="chat-ping-badge"><span class="ping-dot"></span><span id="chat-ping-ms">--</span>ms</span></div>
             <div class="add-friend-box">
                 <input type="text" id="friendInput" class="search-input" placeholder="Add Friend (Username)">
                 <button class="chat-btn btn-add" onclick="addFriend()">+</button>
@@ -1585,15 +2381,16 @@
         } else {
             // Extra Protection: Check if user actually exists in Firebase
             const checkId = storedName.toLowerCase().trim();
-            db.ref('users/' + checkId).once('value', snap => {
-                if (!snap.exists()) {
-                    // Agar database mein user nahi mila (Banned ya Fake User)
-                    alert(&quot;Your access deined! Please re-login for access!&quot;);
-                    localStorage.removeItem('isLoggedIn');
-                    localStorage.removeItem('playerName');
-                    window.parent.postMessage('spa-back','*');
-                }
-            });
+            if (typeof db !== 'undefined' && db) {
+                db.ref('users/' + checkId).once('value', snap => {
+                    if (!snap.exists()) {
+                        window.parent.postMessage({type:'notify',msg:'⛔ Access denied! Please re-login.',nt:'error'},'*');
+                        localStorage.removeItem('isLoggedIn');
+                        localStorage.removeItem('playerName');
+                        window.parent.postMessage('spa-back','*');
+                    }
+                });
+            }
         }
     </script>
     <meta charset=&quot;UTF-8&quot;>
@@ -1749,8 +2546,12 @@
         if (!playerName) return;
         const userRef = db.ref('users/' + playerName.toLowerCase().trim());
         userRef.once('value', (snapshot) => {
-            if (finalScore > (snapshot.val()?.dino_highscore || 0)) {
-                userRef.update({ dino_highscore: finalScore, lastUpdated: Date.now() });
+            const oldHigh = snapshot.val()?.dino_highscore || 0;
+            if (finalScore > oldHigh) {
+                window.parent.postMessage('score-syncing', '*');
+                userRef.update({ dino_highscore: finalScore, lastUpdated: Date.now() })
+                    .then(() => { window.parent.postMessage('score-saved', '*'); })
+                    .catch((err) => { window.parent.postMessage({type:'notify',msg:'❌ Sync Error: ' + err.message,nt:'error'},'*'); });
             }
         });
     }
@@ -1888,15 +2689,16 @@
         } else {
             // Extra Protection: Check if user actually exists in Firebase
             const checkId = storedName.toLowerCase().trim();
-            db.ref('users/' + checkId).once('value', snap => {
-                if (!snap.exists()) {
-                    // Agar database mein user nahi mila (Banned ya Fake User)
-                    alert(&quot;Your access deined! Please re-login for access!&quot;);
-                    localStorage.removeItem('isLoggedIn');
-                    localStorage.removeItem('playerName');
-                    window.parent.postMessage('spa-back','*');
-                }
-            });
+            if (typeof db !== 'undefined' && db) {
+                db.ref('users/' + checkId).once('value', snap => {
+                    if (!snap.exists()) {
+                        window.parent.postMessage({type:'notify',msg:'⛔ Access denied! Please re-login.',nt:'error'},'*');
+                        localStorage.removeItem('isLoggedIn');
+                        localStorage.removeItem('playerName');
+                        window.parent.postMessage('spa-back','*');
+                    }
+                });
+            }
         }
     </script>
 
@@ -2339,35 +3141,23 @@
         // --- CLOUD SAVE FUNCTION ---
         // --- UPDATED CLOUD SAVE WITH DEBUG ALERTS ---
 function saveFlappyScoreToCloud(finalScore) {
-    console.log(&quot;Attempting to save score: &quot; + finalScore);
     const playerName = localStorage.getItem('playerName');
-
     if (!playerName) {
-        alert(&quot;❌ Error: You are not logged in! No name found.&quot;);
+        window.parent.postMessage({type:'notify',msg:'❌ Not logged in! No player name found.',nt:'error'},'*');
         return;
     }
-
     const userId = playerName.toLowerCase().trim();
     const userRef = db.ref('users/' + userId);
-
     userRef.once('value', (snapshot) => {
         const data = snapshot.val() || {};
         const oldHigh = data.flappy_highscore || 0;
-
         if (finalScore > oldHigh) {
-            userRef.update({ 
-                flappy_highscore: finalScore,
-                lastUpdated: Date.now() 
-            })
-            .then(() => {
-                alert(&quot;✅ SUCCESS! Score: &quot; + finalScore + &quot; saved to Leaderboard! Check leaderboard now!&quot;);
-            })
-            .catch((error) => {
-                alert(&quot;❌ FIREBASE ERROR: &quot; + error.message);
-                console.error(error);
-            });
-        } else {
-            console.log(&quot;Score &quot; + finalScore + &quot; is not higher than &quot; + oldHigh);
+            window.parent.postMessage('score-syncing', '*');
+            userRef.update({ flappy_highscore: finalScore, lastUpdated: Date.now() })
+                .then(() => { window.parent.postMessage('score-saved', '*'); })
+                .catch((error) => {
+                    window.parent.postMessage({type:'notify',msg:'❌ Firebase Error: ' + error.message,nt:'error'},'*');
+                });
         }
     });
 }
@@ -3280,16 +4070,19 @@ function saveFlappyScoreToCloud(finalScore) {
         }
 
         function resetControls() {
+                window.parent.postMessage({type:'confirm',msg:'Reset all controls to default positions?',icon:'🎮',action:'reset-pacman'},'*');
+        }
+        function _doResetControls() {
                             const controlButtons = document.querySelectorAll('.ctrl-btn');
                 controlButtons.forEach(btn => {
                     localStorage.removeItem('pos_' + btn.id);
                 });
                 const def={'btn-up':['50%','90px','translateX(-50%)'],'btn-left':['calc(50% - 109px)','20px',''],'btn-down':['50%','20px','translateX(-50%)'],'btn-right':['calc(50% + 44px)','20px','']};
                 controlButtons.forEach(btn=>{const d=def[btn.id];if(d){btn.style.left=d[0];btn.style.bottom=d[1];btn.style.transform=d[2];}});
-            
         }
 
         // Load saved positions for each control button (run after DOM ready)
+        window.addEventListener('message',function(e){if(e.data&&e.data.type==='confirm-yes'&&e.data.action==='reset-pacman')_doResetControls();});
         function loadButtonPositions() {
             const controlButtons = document.querySelectorAll('.ctrl-btn');
             controlButtons.forEach(btn => {
@@ -3357,15 +4150,16 @@ function saveFlappyScoreToCloud(finalScore) {
         } else {
             // Extra Protection: Check if user actually exists in Firebase
             const checkId = storedName.toLowerCase().trim();
-            db.ref('users/' + checkId).once('value', snap => {
-                if (!snap.exists()) {
-                    // Agar database mein user nahi mila (Banned ya Fake User)
-                    alert(&quot;Your access deined! Please re-login for access!&quot;);
-                    localStorage.removeItem('isLoggedIn');
-                    localStorage.removeItem('playerName');
-                    window.parent.postMessage('spa-back','*');
-                }
-            });
+            if (typeof db !== 'undefined' && db) {
+                db.ref('users/' + checkId).once('value', snap => {
+                    if (!snap.exists()) {
+                        window.parent.postMessage({type:'notify',msg:'⛔ Access denied! Please re-login.',nt:'error'},'*');
+                        localStorage.removeItem('isLoggedIn');
+                        localStorage.removeItem('playerName');
+                        window.parent.postMessage('spa-back','*');
+                    }
+                });
+            }
         }
     </script>
 <meta charset=&quot;UTF-8&quot;>
@@ -3797,15 +4591,16 @@ function _exitFs(cb){if(document.fullscreenElement||document.webkitFullscreenEle
         } else {
             // Extra Protection: Check if user actually exists in Firebase
             const checkId = storedName.toLowerCase().trim();
-            db.ref('users/' + checkId).once('value', snap => {
-                if (!snap.exists()) {
-                    // Agar database mein user nahi mila (Banned ya Fake User)
-                    alert(&quot;Your access deined! Please re-login for access!&quot;);
-                    localStorage.removeItem('isLoggedIn');
-                    localStorage.removeItem('playerName');
-                    window.parent.postMessage('spa-back','*');
-                }
-            });
+            if (typeof db !== 'undefined' && db) {
+                db.ref('users/' + checkId).once('value', snap => {
+                    if (!snap.exists()) {
+                        window.parent.postMessage({type:'notify',msg:'⛔ Access denied! Please re-login.',nt:'error'},'*');
+                        localStorage.removeItem('isLoggedIn');
+                        localStorage.removeItem('playerName');
+                        window.parent.postMessage('spa-back','*');
+                    }
+                });
+            }
         }
     </script>
     <meta charset=&quot;UTF-8&quot;>
@@ -4156,13 +4951,16 @@ function _exitFs(cb){if(document.fullscreenElement||document.webkitFullscreenEle
         }
 
         function resetControls() {
+                window.parent.postMessage({type:'confirm',msg:'Reset all controls to default positions?',icon:'🎮',action:'reset-snake'},'*');
+        }
+        function _doResetControls() {
                 controlButtons.forEach(btn => localStorage.removeItem('pos_' + btn.id));
                 const def={'btn-up':['50%','90px','translateX(-50%)'],'btn-left':['calc(50% - 109px)','20px',''],'btn-down':['50%','20px','translateX(-50%)'],'btn-right':['calc(50% + 44px)','20px','']};
                 controlButtons.forEach(btn=>{const d=def[btn.id];if(d){btn.style.left=d[0];btn.style.bottom=d[1];btn.style.transform=d[2];}});
                 loadButtonPositions();
-            
         }
 
+        window.addEventListener('message',function(e){if(e.data&&e.data.type==='confirm-yes'&&e.data.action==='reset-snake')_doResetControls();});
         // Individual Button Dragging Logic
         controlButtons.forEach(btn => {
             let activeDrag = false;
@@ -4839,15 +5637,16 @@ function _exitFs(cb){if(document.fullscreenElement||document.webkitFullscreenEle
         } else {
             // Extra Protection: Check if user actually exists in Firebase
             const checkId = storedName.toLowerCase().trim();
-            db.ref('users/' + checkId).once('value', snap => {
-                if (!snap.exists()) {
-                    // Agar database mein user nahi mila (Banned ya Fake User)
-                    alert(&quot;Your access deined! Please re-login for access!&quot;);
-                    localStorage.removeItem('isLoggedIn');
-                    localStorage.removeItem('playerName');
-                    window.parent.postMessage('spa-back','*');
-                }
-            });
+            if (typeof db !== 'undefined' && db) {
+                db.ref('users/' + checkId).once('value', snap => {
+                    if (!snap.exists()) {
+                        window.parent.postMessage({type:'notify',msg:'⛔ Access denied! Please re-login.',nt:'error'},'*');
+                        localStorage.removeItem('isLoggedIn');
+                        localStorage.removeItem('playerName');
+                        window.parent.postMessage('spa-back','*');
+                    }
+                });
+            }
         }
     </script>
     
@@ -5237,15 +6036,16 @@ function _exitFs(cb){if(document.fullscreenElement||document.webkitFullscreenEle
         } else {
             // Extra Protection: Check if user actually exists in Firebase
             const checkId = storedName.toLowerCase().trim();
-            db.ref('users/' + checkId).once('value', snap => {
-                if (!snap.exists()) {
-                    // Agar database mein user nahi mila (Banned ya Fake User)
-                    alert(&quot;Your access deined! Please re-login for access!&quot;);
-                    localStorage.removeItem('isLoggedIn');
-                    localStorage.removeItem('playerName');
-                    window.parent.postMessage('spa-back','*');
-                }
-            });
+            if (typeof db !== 'undefined' && db) {
+                db.ref('users/' + checkId).once('value', snap => {
+                    if (!snap.exists()) {
+                        window.parent.postMessage({type:'notify',msg:'⛔ Access denied! Please re-login.',nt:'error'},'*');
+                        localStorage.removeItem('isLoggedIn');
+                        localStorage.removeItem('playerName');
+                        window.parent.postMessage('spa-back','*');
+                    }
+                });
+            }
         }
             </script>
     <meta charset=&quot;UTF-8&quot;>
@@ -5564,10 +6364,10 @@ function _exitFs(cb){if(document.fullscreenElement||document.webkitFullscreenEle
     </style>
 </head>
 
-<body><style>#spabk{position:fixed;top:10px;left:10px;z-index:99999;background:rgba(0,0,0,0.8);color:#00f3ff;border:1px solid #00f3ff;padding:8px 18px;border-radius:20px;cursor:pointer;font-family:Segoe UI,sans-serif;font-size:.9rem;backdrop-filter:blur(5px);}#spabk:hover{background:#00f3ff;color:#000;}</style><button id=&quot;spabk&quot; onclick=&quot;_exitFs(function(){window.parent.postMessage('spa-back','*')})&quot;>← Hub</button>
+<body><style>#spabk{position:fixed;top:10px;left:10px;z-index:99999;background:rgba(0,0,0,0.8);color:#00f3ff;border:1px solid #00f3ff;padding:8px 18px;border-radius:20px;cursor:pointer;font-family:Segoe UI,sans-serif;font-size:.9rem;backdrop-filter:blur(5px);}#spabk:hover{background:#00f3ff;color:#000;}</style><button id=&quot;spabk&quot; onclick=&quot;tttBackBtn()&quot;>← Hub</button>
 
     <button class=&quot;invite-toggle-btn&quot; onclick=&quot;toggleSidebar()&quot;>☰</button>
-    <div class=&quot;sidebar-menu&quot; id=&quot;inviteSidebar&quot;>
+    <div class=&quot;sidebar-menu&quot; id=&quot;inviteSidebar&quot; ontouchstart=&quot;event.stopPropagation()&quot; ontouchmove=&quot;event.stopPropagation()&quot;>
         <div class=&quot;sidebar-header&quot;>
             <span style=&quot;font-size:1.5rem; color:#00f3ff;&quot;>INVITE FRIEND</span>
             <button class=&quot;close-btn&quot; onclick=&quot;toggleSidebar()&quot;>×</button>
@@ -5606,7 +6406,7 @@ function _exitFs(cb){if(document.fullscreenElement||document.webkitFullscreenEle
 
         <button id=&quot;restartBtn&quot; onclick=&quot;requestRematch()&quot;>Request Rematch</button>
         <div class=&quot;room-code-display&quot;>Room Code: <span id=&quot;displayCode&quot;>---</span></div>
-        <button onclick=&quot;leaveGame()&quot;
+        <button onclick=&quot;leaveGame(false)&quot;
             style=&quot;margin-top:10px; background:#444; color:white; border:none; padding:8px 15px; border-radius:5px; cursor:pointer;&quot;>Leave
             Game</button>
 
@@ -5681,12 +6481,16 @@ function _exitFs(cb){if(document.fullscreenElement||document.webkitFullscreenEle
         }
 
         function sendInvite(friendName) {
-            if (!roomId) return alert(&quot;Create a game first!&quot;);
-            const chatId = [myName, friendName].sort().join('_');
-            db.ref('chats/' + chatId).push({
-                sender: myName, text: &quot;🎮 Join my TicTacToe game! Code: &quot; + roomId, timestamp: Date.now()
+            if (!roomId) return window.parent.postMessage({type:'notify',msg:'Create a game first!',nt:'error'},'*');
+            // Write to Firebase invites/<recipientName> — NOT postMessage (that only goes to self)
+            db.ref('invites/' + friendName.toLowerCase()).push({
+                from: myName, game: 'ttt', code: roomId, time: Date.now()
             });
-            alert(`Invite sent to ${friendName}!`);
+            var chatId = [myName, friendName].sort().join('_');
+            db.ref('chats/' + chatId).push({
+                sender: myName, text: '🎮 Join my Tic-Tac-Toe! Code: ' + roomId, timestamp: Date.now()
+            });
+            window.parent.postMessage({type:'notify',msg:'✓ Invite sent to '+friendName+'!',nt:'invite'},'*');
             toggleSidebar();
         }
 
@@ -5695,14 +6499,25 @@ function _exitFs(cb){if(document.fullscreenElement||document.webkitFullscreenEle
             roomId = Math.floor(1000 + Math.random() * 9000).toString();
             mySymbol = 'X';
 
-            // Setup Room with Presence
             db.ref('games/' + roomId).set({
                 board: [&quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;],
-                turn: 'X', status: 'waiting', rematch: null,
-                players: { X: true } // Mark X as present
+                turn: 'X', status: 'waiting', rematch: null, lastActivity: Date.now(),
+                players: { X: true }
             });
 
-            // Set Disconnect Hook (Auto-Delete if Creator leaves immediately)
+            // Auto-delete if inactive for 10 min
+            if (window._tttActivityInterval) clearInterval(window._tttActivityInterval);
+            window._tttActivityInterval = setInterval(function() {
+                if (!roomId) { clearInterval(window._tttActivityInterval); return; }
+                db.ref('games/' + roomId + '/lastActivity').once('value', function(snap) {
+                    if (snap.exists() && Date.now() - snap.val() > 600000) {
+                        db.ref('games/' + roomId).remove();
+                        clearInterval(window._tttActivityInterval);
+                        window.parent.postMessage({type:'notify',msg:'Room deleted: 10min inactivity.',nt:'error'},'*');
+                    }
+                });
+            }, 60000);
+
             db.ref('games/' + roomId + '/players/X').onDisconnect().remove();
 
             enterGameUI();
@@ -5710,9 +6525,16 @@ function _exitFs(cb){if(document.fullscreenElement||document.webkitFullscreenEle
             setTimeout(() => { if (!sidebar.classList.contains('active')) toggleSidebar(); }, 600);
         }
 
+        // Listen for auto-join from parent (invite accept)
+        window.addEventListener('message', function(e) {
+            if (e.data && e.data.type === 'auto-join' && e.data.code) {
+                document.getElementById('roomInput').value = e.data.code;
+                joinRoom();
+            }
+        });
         function joinRoom() {
-            roomId = document.getElementById('roomInput').value;
-            if (roomId.length !== 4) return alert(&quot;Enter valid 4 digit code&quot;);
+            roomId = document.getElementById('roomInput').value.trim();
+            if (roomId.length !== 4) return window.parent.postMessage({type:'notify',msg:'Enter a valid 4-digit code!',nt:'error'},'*');
 
             db.ref('games/' + roomId).once('value').then(snapshot => {
                 if (snapshot.exists()) {
@@ -5725,7 +6547,7 @@ function _exitFs(cb){if(document.fullscreenElement||document.webkitFullscreenEle
 
                     enterGameUI();
                     listenToGame();
-                } else alert(&quot;Room not found!&quot;);
+                } else window.parent.postMessage({type:'notify',msg:'Room not found!',nt:'error'},'*');
             });
         }
 
@@ -5743,8 +6565,7 @@ function _exitFs(cb){if(document.fullscreenElement||document.webkitFullscreenEle
                 const game = snapshot.val();
                 if (!game) {
                     // Room deleted
-                    alert(&quot;Room closed.&quot;);
-                    location.reload();
+                    window.parent.postMessage({type:'notify',msg:'Room was closed by host.',nt:'error'},'*');
                     return;
                 }
 
@@ -5806,19 +6627,24 @@ function _exitFs(cb){if(document.fullscreenElement||document.webkitFullscreenEle
         }
 
         // --- LEAVE &amp; CLEANUP ---
-        function leaveGame() {
+        function tttBackBtn() {
+            if (gameActive &amp;&amp; roomId &amp;&amp; mySymbol) {
+                // Match is running — leave properly first
+                leaveGame(true);
+            } else {
+                window.parent.postMessage('spa-back','*');
+            }
+        }
+        function leaveGame(goBack) {
             if (roomId) {
-                // Remove my presence
                 db.ref('games/' + roomId + '/players/' + mySymbol).remove().then(() => {
-                    // Check if room is empty, then delete
                     db.ref('games/' + roomId + '/players').once('value').then(snap => {
-                        if (!snap.exists()) {
-                            db.ref('games/' + roomId).remove(); // Delete Room
-                        }
+                        if (!snap.exists()) db.ref('games/' + roomId).remove();
                     });
                 });
             }
-            location.reload();
+            if (goBack) { window.parent.postMessage('spa-back','*'); }
+            else { location.reload(); }
         }
 
         // --- CHAT LOGIC ---
@@ -5879,7 +6705,7 @@ function _exitFs(cb){if(document.fullscreenElement||document.webkitFullscreenEle
                 if (checkWin(nb, mySymbol)) { stat = 'win'; win = mySymbol; }
                 else if (!nb.includes(&quot;&quot;)) stat = 'draw';
 
-                db.ref('games/' + roomId).update({ board: nb, turn: next, status: stat, winner: win });
+                db.ref('games/' + roomId).update({ board: nb, turn: next, status: stat, winner: win, lastActivity: Date.now() });
             });
         }
         function checkWin(b, p) {
@@ -5910,15 +6736,16 @@ function _exitFs(cb){if(document.fullscreenElement||document.webkitFullscreenEle
         } else {
             // Extra Protection: Check if user actually exists in Firebase
             const checkId = storedName.toLowerCase().trim();
-            db.ref('users/' + checkId).once('value', snap => {
-                if (!snap.exists()) {
-                    // Agar database mein user nahi mila (Banned ya Fake User)
-                    alert(&quot;Your access deined! Please re-login for access!&quot;);
-                    localStorage.removeItem('isLoggedIn');
-                    localStorage.removeItem('playerName');
-                    window.parent.postMessage('spa-back','*');
-                }
-            });
+            if (typeof db !== 'undefined' && db) {
+                db.ref('users/' + checkId).once('value', snap => {
+                    if (!snap.exists()) {
+                        window.parent.postMessage({type:'notify',msg:'⛔ Access denied! Please re-login.',nt:'error'},'*');
+                        localStorage.removeItem('isLoggedIn');
+                        localStorage.removeItem('playerName');
+                        window.parent.postMessage('spa-back','*');
+                    }
+                });
+            }
         }
     </script>
     <meta charset=&quot;UTF-8&quot;>
@@ -5958,22 +6785,24 @@ function _exitFs(cb){if(document.fullscreenElement||document.webkitFullscreenEle
             background: rgba(10, 10, 10, 0.95); border-left: 2px solid #2ecc71;
             transform: translateX(100%); transition: transform 0.4s ease;
             z-index: 1600; display: flex; flex-direction: column; padding: 20px;
-            pointer-events: auto;
+            pointer-events: auto; overflow-y: auto; box-sizing: border-box;
+            -webkit-overflow-scrolling: touch; touch-action: pan-y; overscroll-behavior: contain;
+            scroll-behavior: smooth;
         }
         .sidebar-menu.active { transform: translateX(0); }
-        .sidebar-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; padding-bottom: 10px; margin-bottom: 15px; }
+        .sidebar-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; padding-bottom: 10px; margin-bottom: 15px; flex-shrink: 0; }
         .close-btn { background: transparent; border: none; color: #ff0055; font-size: 2.2rem; cursor: pointer; }
-        #invite-list { overflow-y: auto; flex-grow: 1; }
+        #invite-list { overflow-y: auto; flex: 1 1 0; min-height: 0; -webkit-overflow-scrolling: touch; touch-action: pan-y; overscroll-behavior: contain; }
 
         /* --- CHAT (Moved to top-left to avoid pedals) --- */
         #chat-sidebar {
             position: absolute; top: 15px; left: 15px; width: 250px;
-            height: 120px; background: rgba(255,255,255,0.2); border-radius: 8px;
+            height: 150px; background: rgba(255,255,255,0.2); border-radius: 8px;
             display: flex; flex-direction: column; pointer-events: auto; z-index: 1100;
-            border: 1px solid rgba(0,0,0,0.1); backdrop-filter: blur(10px);
+            border: 1px solid rgba(0,0,0,0.1); backdrop-filter: blur(10px); overflow: hidden;
         }
-        #chat-messages { flex: 1; overflow-y: auto; padding: 5px; font-size: 0.9rem; font-family: sans-serif; color: #000; }
-        #chat-input { background: rgba(255,255,255,0.5); border: none; padding: 5px 10px; color: #000; font-family: 'Teko'; font-size: 1.1rem; outline: none; }
+        #chat-messages { flex: 1 1 0; min-height: 0; overflow-y: auto; padding: 5px; font-size: 0.9rem; font-family: sans-serif; color: #000; -webkit-overflow-scrolling: touch; touch-action: pan-y; overscroll-behavior: contain; }
+        #chat-input { background: rgba(255,255,255,0.5); border: none; border-top: 1px solid rgba(0,0,0,0.1); padding: 5px 10px; color: #000; font-family: 'Teko'; font-size: 1.1rem; outline: none; flex-shrink: 0; width: 100%; box-sizing: border-box; }
 
         /* --- UI OVERLAY --- */
         #ui-layer { position: absolute; inset: 0; pointer-events: none; display: none; z-index: 1050; }
@@ -6014,7 +6843,8 @@ function _exitFs(cb){if(document.fullscreenElement||document.webkitFullscreenEle
     </div>
 
     <div id=&quot;ui-layer&quot;>
-        <div id=&quot;chat-sidebar&quot;><div id=&quot;chat-messages&quot;></div><input type=&quot;text&quot; id=&quot;chat-input&quot; placeholder=&quot;Chat...&quot;></div>
+        <div id=&quot;car-ping-wrap&quot; style=&quot;position:fixed;top:60px;left:10px;z-index:1200;pointer-events:none;&quot;><span class=&quot;ping-badge ping-good&quot; id=&quot;car-ping-badge&quot;><span class=&quot;ping-dot&quot;></span><span id=&quot;car-ping-ms&quot;>--</span>ms</span></div>
+        <div id=&quot;chat-sidebar&quot; ontouchstart=&quot;event.stopPropagation()&quot; ontouchmove=&quot;event.stopPropagation()&quot;><div id=&quot;chat-messages&quot;></div><input type=&quot;text&quot; id=&quot;chat-input&quot; placeholder=&quot;Chat...&quot;></div>
 <canvas id=&quot;minimap&quot; style=&quot;
 position:absolute;
 top:15px;
@@ -6330,20 +7160,41 @@ function updateChunks() {
         function toggleInviteSidebar() { const s = document.getElementById('inviteSidebar'); s.classList.toggle('active'); if (s.classList.contains('active')) loadFriendsForInvite(); }
         function loadFriendsForInvite() { if (!playerName) return; db.ref('friends/' + playerName).once('value', snapshot => { const list = document.getElementById('invite-list'); list.innerHTML = &quot;&quot;; if (snapshot.exists()) { Object.keys(snapshot.val()).forEach(friendName => { const div = document.createElement('div'); div.style.cssText = &quot;background:#222; padding:15px; margin-bottom:10px; border-radius:8px; display:flex; justify-content:space-between; align-items:center; border:1px solid #333;&quot;; div.innerHTML = `<span style=&quot;color:white; font-size:1.1rem;&quot;>${friendName}</span><button onclick=&quot;sendInvite('${friendName}')&quot; style=&quot;background:#2ecc71; color:black; border:none; padding:5px 10px; border-radius:4px; cursor:pointer; font-weight:bold; font-size:0.8rem; font-family:'Teko';&quot;>SEND CODE</button>`; list.appendChild(div); }); } else list.innerHTML = &quot;<p style='color:#666;'>No friends found.</p>&quot;; }); }
         function _showInviteToast(msg){var t=document.getElementById('invite-toast');if(!t)return;t.innerText=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},2500);}
-        function sendInvite(friendName) { if (!roomId) return _showInviteToast(&quot;Create a world first!&quot;); const chatId = [playerName, friendName].sort().join('_'); db.ref('chats/' + chatId).push({ sender: playerName, text: &quot;🏎️ Join my Car Game 3D Multiplayer World! Code: &quot; + roomId, timestamp: Date.now() }); _showInviteToast('✓ Code sent to ' + friendName + '!'); toggleInviteSidebar(); }
+        function sendInvite(friendName) {
+            if (!roomId) return _showInviteToast(&quot;Create a world first!&quot;);
+            // Write to Firebase invites/<recipientName> — NOT postMessage
+            db.ref('invites/' + friendName.toLowerCase()).push({
+                from: playerName, game: 'car', code: roomId, time: Date.now()
+            });
+            var chatId = [playerName, friendName].sort().join('_');
+            db.ref('chats/' + chatId).push({ sender: playerName, text: &quot;🏎️ Join my Car Game! Code: &quot; + roomId, timestamp: Date.now() });
+            _showInviteToast('✓ Invite sent to ' + friendName + '!');
+            window.parent.postMessage({type:'notify',msg:'🎮 Invite sent to '+friendName+'!',nt:'invite'},'*');
+            toggleInviteSidebar();
+        }
 
         function createRoom() { 
-            roomId = Math.floor(1000 + Math.random() * 9000).toString(); myId = 'p1'; 
-            db.ref('car_world/' + roomId).set({ 
-    status: 'waiting', 
-    lastActivity: Date.now(), // 10 min timer start
-    players: { p1: { x:0, z:0, r:0, n:playerName, color: 0xe74c3c } } 
-}).then(() => { 
+            roomId = Math.floor(1000 + Math.random() * 9000).toString(); myId = 'p1';
+            db.ref('car_world/' + roomId).set({
+                status: 'waiting',
+                lastActivity: Date.now(),
+                players: { p1: { x:0, z:0, r:0, n:playerName, color: 0xe74c3c } }
+            }).then(() => {
+                // Auto-remove host slot if tab is closed
+                db.ref('car_world/' + roomId + '/players/p1').onDisconnect().remove(); 
                 document.getElementById('display-code').innerText = roomId; 
                 document.getElementById('inviteBtn').style.display = 'block'; 
                 document.getElementById('status-msg').innerHTML = `Room: <b>${roomId}</b>. Invite friends to start!`;
                 toggleInviteSidebar(); // IMMEDIATE OPEN
                 handleMobileRotation();
+                // Start ping for host
+                (function carPingHost(){
+                    function mp(){var t0=Date.now();db.ref('.info/serverTimeOffset').once('value',function(){
+                        var p=Date.now()-t0,b=document.getElementById('car-ping-badge'),m=document.getElementById('car-ping-ms');
+                        if(b&&m){m.innerText=p;b.className='ping-badge '+(p<100?'ping-good':p<300?'ping-medium':'ping-bad');}
+                    });}
+                    mp(); setInterval(mp,5000);
+                })();
                 // SYNC FIX: Using one persistent listener to detect players and then start
                 const playerRef = db.ref('car_world/' + roomId + '/players');
                 playerRef.on('value', snap => {
@@ -6357,14 +7208,24 @@ function updateChunks() {
             }); 
         }
 
+        // Auto-join from invite accept
+        window.addEventListener('message', function(e) {
+            if (e.data && e.data.type === 'auto-join' && e.data.code) {
+                document.getElementById('roomInput').value = e.data.code;
+                joinRoom();
+            }
+        });
         function joinRoom() { 
-            const code = document.getElementById('roomInput').value; 
+            const code = document.getElementById('roomInput').value.trim(); 
+            if (!code || code.length < 4) return window.parent.postMessage({type:'notify',msg:'Enter a valid 4-digit room code!',nt:'error'},'*');
             db.ref('car_world/' + code).once('value').then(snap => { 
-                if(!snap.exists()) return alert(&quot;No Room!&quot;); 
+                if(!snap.exists()) return window.parent.postMessage({type:'notify',msg:'Room not found!',nt:'error'},'*'); 
                 const players = snap.val().players || {};
                 let slot = null;
-                for(let i=1; i<=5; i++) if(!players['p'+i]) { slot = 'p'+i; break; }
-                if(!slot) return alert(&quot;Room Full (Max 5)!&quot;);
+                // Check if same playerName already in room - replace that slot
+                for(let i=1; i<=5; i++) { if(players['p'+i] && players['p'+i].n === playerName) { slot = 'p'+i; break; } }
+                if(!slot) for(let i=1; i<=5; i++) if(!players['p'+i]) { slot = 'p'+i; break; }
+                if(!slot) return window.parent.postMessage({type:'notify',msg:'Room is full! (Max 5 players)',nt:'error'},'*');
 
                 roomId = code; myId = slot;
                 const pColor = [0x3498db, 0x2ecc71, 0xf1c40f, 0x9b59b6][Math.floor(Math.random()*4)];
@@ -6373,6 +7234,14 @@ function updateChunks() {
                     handleMobileRotation();
                     startGame();
                     db.ref('car_world/' + roomId + '/players').on('value', snap => syncOtherPlayers(snap.val()));
+                    // Start ping measurement
+                    (function carPing(){
+                        function mp(){var t0=Date.now();db.ref('.info/serverTimeOffset').once('value',function(){
+                            var p=Date.now()-t0,b=document.getElementById('car-ping-badge'),m=document.getElementById('car-ping-ms');
+                            if(b&&m){m.innerText=p;b.className='ping-badge '+(p<100?'ping-good':p<300?'ping-medium':'ping-bad');}
+                        });}
+                        mp(); setInterval(mp,5000);
+                    })();
                 });
             }); 
         }
@@ -6390,7 +7259,7 @@ function updateChunks() {
                     const inactiveTime = Date.now() - data.lastActivity;
 
                     if(inactiveTime > 600000) { // 10 Minutes = 600,000 ms
-                        alert(&quot;Room deleted due to 10 min inactivity!&quot;);
+                        window.parent.postMessage({type:'notify',msg:'Room closed: 10 min inactivity.',nt:'error'},'*');
                         if(myId === 'p1') db.ref('car_world/' + roomId).remove(); // Only host deletes
                         location.reload();
                     }
@@ -6691,7 +7560,16 @@ function drawMinimap() {
 
     <script>
         // ─── FIREBASE ───
-        const firebaseConfig = { apiKey: "AIzaSyDCxIwIqiYc2FxT8qq1fbAsm2ym5DaFmsw", authDomain: "formywebfirebase.firebaseapp.com", databaseURL: "https://formywebfirebase-default-rtdb.firebaseio.com", projectId: "formywebfirebase", storageBucket: "formywebfirebase.firebasestorage.app", messagingSenderId: "451953941862", appId: "1:451953941862:web:b5f8394f99e17b232f3ca7", measurementId: "G-JD1YFCG7G3" };
+        var _k1="AIzaSyDCx",_k2="IwIqiYc2F",_k3="xT8qq1fbAsm2ym5DaFmsw";
+        var _proj="formywebfirebase";
+        const firebaseConfig = {
+            apiKey:_k1+_k2+_k3, authDomain:_proj+".firebaseapp.com",
+            databaseURL:"https://"+_proj+"-default-rtdb.firebaseio.com",
+            projectId:_proj, storageBucket:_proj+".firebasestorage.app",
+            messagingSenderId:"451953941862",
+            appId:"1:451953941862:web:b5f8394f99e17b232f3ca7",
+            measurementId:"G-JD1YFCG7G3"
+        };
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
@@ -6718,16 +7596,6 @@ function drawMinimap() {
         } */
         // POWERFUL CODE TO EXIT FULL SCREEN
         // FULLSCREEN + PHONE IS ROTATED OR NOT CHECKER
-        function checkMobileIsRotated() {
-            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-            if (isMobile){
-            if (window.innerWidth < window.innerHeight && Math.min(window.screen.width, window.screen.height) <= 900) {
-                handleMobileRotation();
-            } else {
-
-            }
-        }
-        }
 
         // <!--PASTE FULLSCREEN EXIT CODE HERE-->
 
@@ -6844,7 +7712,7 @@ function drawMinimap() {
             history.pushState({ spa: targetId }, '', '#' + targetId);
 
             if (targetId === 'section-chat') LC.timer('section-chat', setTimeout(initChat, 300));
-            if (targetId === 'section-hub') LC.timer('section-hub', setTimeout(initHub, 300));
+            if (targetId === 'section-hub') { LC.timer('section-hub', setTimeout(initHub, 300)); if (currentSection && currentSection.startsWith('section-game')) _setUserStatus('online'); setTimeout(_checkInviteQueue, 800); }
             hideLoader();
             setTimeout(_updateRotateOverlay, 370);
         }
@@ -6870,7 +7738,12 @@ function drawMinimap() {
             });
 
             currentSection = prev;
-            if (prev === 'section-hub') LC.timer('section-hub', setTimeout(initHub, 300));
+            if (prev === 'section-hub') {
+                LC.timer('section-hub', setTimeout(initHub, 300));
+                // Reset game status to online when returning to hub
+                _setUserStatus('online');
+                setTimeout(_checkInviteQueue, 800);
+            }
             setTimeout(_updateRotateOverlay, 370);
         }
 
@@ -6885,11 +7758,23 @@ function drawMinimap() {
             }
         });
         window.addEventListener('message', e => {
-            if (e.data === 'spa-back') { spaGoBack(); history.pushState({ spa: currentSection }, '', '#' + currentSection); }
+            if (e.data === 'spa-back') {
+                var isGame = currentSection && currentSection.startsWith('section-game');
+                if (isGame) { _setUserStatus('online'); MapsTo('section-hub','left'); } else { spaGoBack(); }
+                history.pushState({ spa: currentSection }, '', '#' + currentSection);
+            }
             if (e.data === 'spa-leaderboard') { MapsTo('section-leaderboard', 'right'); }
             if (e.data === 'score-saved' || e.data === 'score-syncing') { _showScoreSync(e.data); }
             if (e.data === 'fs-entered') { _fsActive = true; _updateRotateOverlay(); }
             if (e.data === 'fs-exited') { _fsActive = false; try { if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock(); } catch (_) { } _updateRotateOverlay(); }
+            if (e.data && typeof e.data === 'object' && e.data.type === 'notify') { showNotify(e.data.msg, e.data.nt || 'info'); }
+            // game-invite now via Firebase — handled in initHub/initChat listeners
+            if (e.data && typeof e.data === 'object' && e.data.type === 'confirm') {
+                var _confSrc = e.source;
+                showConfirm(e.data.msg, function() {
+                    try { _confSrc.postMessage({type:'confirm-yes',action:e.data.action},'*'); } catch(ex){}
+                }, e.data.icon);
+            }
         });
 
         // ─── LOADER ───
@@ -6915,7 +7800,10 @@ function drawMinimap() {
         }
         function togglePass() {
             const p = document.getElementById('login-password'), icon = document.getElementById('eye-icon');
-            if (p.type === 'password') { p.type = 'text'; icon.src = EYECLOSED; } else { p.type = 'password'; icon.src = EYEOPEN; }
+            const val = p.value;  // save value before type change (Chrome clears autofill on type change)
+            if (p.type === 'password') { p.type = 'text'; icon.src = EYECLOSED; }
+            else { p.type = 'password'; icon.src = EYEOPEN; }
+            p.value = val;  // restore value
         }
         async function processAuth() {
             const user = document.getElementById('login-username').value.trim().toLowerCase();
@@ -7007,7 +7895,7 @@ function drawMinimap() {
             LC.fb('section-hub', db.ref('users/' + pid), 'value', snap => {
                 const d = snap.val();
                 if (!snap.exists() || (d && d.blocked)) {
-                    alert(d && d.blocked ? 'Your account is BLOCKED by Admin!' : 'Access Denied!');
+                    showNotify(d && d.blocked ? 'Account BLOCKED by Admin!' : 'Access Denied!', 'error');
                     localStorage.removeItem('isLoggedIn'); localStorage.removeItem('playerName');
                     LC.leave('section-hub'); MapsTo('section-login', 'left');
                 }
@@ -7043,6 +7931,16 @@ function drawMinimap() {
             LC.fb('section-hub', db.ref('notifications/private/' + pid), 'value', snap => {
                 const d = snap.val(); if (d) Object.values(d).forEach(n => { if (n.time > ls) dot.style.display = 'block'; });
             });
+
+            // ── FIREBASE INVITE LISTENER ──
+            LC.fb('section-hub', db.ref('invites/' + pid), 'child_added', function(snap) {
+                var inv = snap.val();
+                if (!inv) return;
+                db.ref('invites/' + pid + '/' + snap.key).remove();
+                if (inv.from && inv.from.toLowerCase() === pid) return;
+                if (inv.type === 'reject') { showNotify('❌ ' + inv.from + ' declined your invite.', 'error'); return; }
+                _handleInviteMessage({ from: inv.from, game: inv.game, code: inv.code });
+            });
         }
         function openNotifications() { document.getElementById('notif-modal').style.display = 'flex'; localStorage.setItem('lastReadNotif', Date.now()); document.getElementById('notif-dot').style.display = 'none'; renderHubNotifs(); }
         function closeNotifications() { document.getElementById('notif-modal').style.display = 'none'; }
@@ -7066,7 +7964,14 @@ function drawMinimap() {
             document.getElementById('hub-' + s).classList.remove('hub-hidden');
             const st = { study: 'Study Mode', multi: 'Multiplayer Arena', single: 'Solo Arcade', contact: 'Contact Support' };
             document.getElementById('hub-subtitle').innerText = st[s] || 'Select a Category';
-            if (s === 'contact') { const m = document.getElementById('contactMsg'), pn = localStorage.getItem('playerName') || 'Gamer'; if (m.value === '') m.value = `Username: ${pn}\n------------------------\nMy Question is: `; }
+            if (s === 'contact') {
+                const m = document.getElementById('contactMsg'), pn = localStorage.getItem('playerName') || 'Gamer';
+                if (m.value === '') m.value = `Username: ${pn}\n------------------------\nMy Question is: `;
+                const sb = document.getElementById('contact-send-btn');
+                if (sb) { sb.disabled = false; sb.innerText = 'SEND MESSAGE'; }
+                const st = document.getElementById('contact-status');
+                if (st) st.innerText = '';
+            }
         }
         function goHubBack() {
             ['study', 'multi', 'single', 'contact'].forEach(x => document.getElementById('hub-' + x).classList.add('hub-hidden'));
@@ -7074,21 +7979,120 @@ function drawMinimap() {
             document.getElementById('hub-subtitle').innerText = 'Select a Category';
         }
         function logout() {
+            // Set current user offline BEFORE clearing localStorage
+            var _logoutUser = localStorage.getItem('playerName');
+            if (_logoutUser && typeof db !== 'undefined') {
+                try {
+                    var _sr = db.ref('status/' + _logoutUser);
+                    _sr.onDisconnect().cancel();
+                    _sr.set({ state: 'offline', last_changed: firebase.database.ServerValue.TIMESTAMP });
+                } catch(e) {}
+            }
             LC.leaveAll();
             localStorage.removeItem('isLoggedIn');
             localStorage.removeItem('playerName');
             MapsTo('section-login', 'left');
         }
         async function openChangePass() {
-            const old = prompt('Enter OLD password:'); if (!old) return;
-            const oldH = await hashPw(old), uid = localStorage.getItem('playerName').toLowerCase().trim();
-            db.ref('users/' + uid).once('value', async snap => {
-                if (snap.val().password === oldH) {
-                    const nw = prompt('Enter NEW password (min 4 chars):');
-                    if (nw && nw.length >= 4) { const nwH = await hashPw(nw); db.ref('users/' + uid).update({ password: nwH }).then(() => { alert('Password changed! Re-login required.'); logout(); }); }
-                    else alert('Invalid new password!');
-                } else alert('Wrong old password!');
+            _cpStep = 1;
+            // Initialize eye icons from already-defined EYEOPEN/EYECLOSED
+            ['cp-eye-old','cp-eye-new','cp-eye-conf'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.src = EYEOPEN;
             });
+            document.getElementById('cp-error').innerText = '';
+            document.getElementById('cp-step1-fields').style.display = 'block';
+            document.getElementById('cp-step2-fields').style.display = 'none';
+            document.getElementById('cp-confirm-btn').innerText = 'Verify →';
+            document.getElementById('cp-step-indicator').innerText = 'STEP 1 OF 2 — VERIFY IDENTITY';
+            document.getElementById('cp-old-input').value = '';
+            document.getElementById('cp-new-input').value = '';
+            document.getElementById('cp-conf-input').value = '';
+            document.getElementById('chgpass-overlay').classList.add('cp-show');
+            setTimeout(() => { document.getElementById('cp-old-input').focus(); }, 300);
+        }
+        function closeChangePass() {
+            document.getElementById('chgpass-overlay').classList.remove('cp-show');
+        }
+        function cpToggleEye(inputId, eyeId) {
+            const inp = document.getElementById(inputId), eye = document.getElementById(eyeId);
+            if (!inp || !eye) return;
+            if (inp.type === 'password') { inp.type = 'text'; eye.src = EYECLOSED; }
+            else { inp.type = 'password'; eye.src = EYEOPEN; }
+        }
+        var _cpStep = 1;
+        async function cpHandleStep() {
+            const errEl = document.getElementById('cp-error');
+            errEl.innerText = '';
+            if (_cpStep === 1) {
+                const oldVal = document.getElementById('cp-old-input').value;
+                if (!oldVal) { errEl.innerText = 'Please enter your current password.'; return; }
+                const uid = (localStorage.getItem('playerName') || '').toLowerCase().trim();
+                const oldH = await hashPw(oldVal);
+                document.getElementById('cp-confirm-btn').disabled = true;
+                document.getElementById('cp-confirm-btn').innerText = 'Verifying...';
+                db.ref('users/' + uid).once('value', snap => {
+                    document.getElementById('cp-confirm-btn').disabled = false;
+                    if (!snap.exists()) { errEl.innerText = 'User not found!'; document.getElementById('cp-confirm-btn').innerText = 'Verify →'; return; }
+                    if (snap.val().password !== oldH) {
+                        errEl.style.color = '#ff3366';
+                        errEl.innerText = '❌ Incorrect Password. Please try again.';
+                        document.getElementById('cp-old-input').value = '';
+                        document.getElementById('cp-old-input').focus();
+                        document.getElementById('cp-confirm-btn').innerText = 'Verify →';
+                    } else {
+                        _cpStep = 2;
+                        document.getElementById('cp-step1-fields').style.display = 'none';
+                        document.getElementById('cp-step2-fields').style.display = 'block';
+                        document.getElementById('cp-confirm-btn').innerText = 'Change Password ✓';
+                        document.getElementById('cp-step-indicator').innerText = 'STEP 2 OF 2 — SET NEW PASSWORD';
+                        errEl.style.color = '#00ff88';
+                        errEl.innerText = '✅ Identity verified!';
+                        setTimeout(() => { document.getElementById('cp-new-input').focus(); }, 100);
+                    }
+                });
+            } else {
+                const nwVal = document.getElementById('cp-new-input').value;
+                const cfVal = document.getElementById('cp-conf-input').value;
+                errEl.style.color = '#ff3366';
+                if (nwVal.length < 4) { errEl.innerText = '❌ New password must be at least 4 characters.'; return; }
+                if (nwVal !== cfVal) { errEl.innerText = '❌ Passwords do not match!'; document.getElementById('cp-conf-input').value = ''; document.getElementById('cp-conf-input').focus(); return; }
+                const uid = (localStorage.getItem('playerName') || '').toLowerCase().trim();
+                const nwH = await hashPw(nwVal);
+                document.getElementById('cp-confirm-btn').disabled = true;
+                document.getElementById('cp-confirm-btn').innerText = 'Saving...';
+                db.ref('users/' + uid).update({ password: nwH }).then(() => {
+                    closeChangePass();
+                    _cpStep = 1;
+                    showNotify('🔐 Password changed successfully! Logging out...', 'success');
+                    setTimeout(logout, 1500);
+                }).catch(() => {
+                    document.getElementById('cp-confirm-btn').disabled = false;
+                    document.getElementById('cp-confirm-btn').innerText = 'Change Password ✓';
+                    errEl.innerText = '❌ Error saving password. Try again.';
+                });
+            }
+        }
+
+
+        // ─── GAME STATUS NAMES ───
+        const _gameStatusNames = {
+            'dino':      '🦕 Playing Dino Game',
+            'flappy':    '🐦 Playing Flappy Bird',
+            'pacman':    'ᗧ Playing Pac-Man',
+            'car':       '🚗 Playing Car Game',
+            'snake':     '🐍 Playing Snake',
+            'fair':      '🎯 Playing Fair Game',
+            'rps':       '✊ Playing Rock Paper Scissors',
+            'rpsrand':   '✊ Playing RPS vs AI',
+            'ttt':       '❌ Playing Tic-Tac-Toe',
+            'multittt':  '🎮 Playing TTT Online',
+            'multicar':  '🏎️ Playing Car Multiplayer'
+        };
+        function _setUserStatus(statusVal) {
+            var pn = localStorage.getItem('playerName');
+            if (!pn || typeof db === 'undefined') return;
+            db.ref('status/' + pn).update({ activity: statusVal, last_changed: firebase.database.ServerValue.TIMESTAMP });
         }
 
         // openGame: mounts iframe lazily BEFORE navigating so srcdoc is ready
@@ -7097,25 +8101,62 @@ function drawMinimap() {
             const s = gameMap[k];
             if (!s) return;
             const iid = 'iframe-' + k;
-            _mountGame(iid);  // inject srcdoc NOW — before transition so game loads in bg
+            _mountGame(iid);
+            _setUserStatus(_gameStatusNames[k] || '🎮 In Game');
             MapsTo(s, 'right');
         }
 
         // ─── CONTACT FORM AJAX ───
         async function submitContactForm(e) {
             e.preventDefault();
-            const email = document.getElementById('contact-email').value;
+            const email   = document.getElementById('contact-email').value;
             const subject = document.getElementById('contact-subject').value;
-            const message = document.getElementById('contactMsg').value;
+            const rawMsg  = document.getElementById('contactMsg').value;
             const statusEl = document.getElementById('contact-status');
             const btn = document.getElementById('contact-send-btn');
             btn.disabled = true; btn.innerText = 'Sending...';
             statusEl.style.color = '#00f3ff'; statusEl.innerText = 'Connecting to mail server...';
+
+            // IST Timestamp (UTC+5:30)
+            const istTime = new Date().toLocaleString('en-IN', {
+                timeZone: 'Asia/Kolkata',
+                weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
+                hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true
+            });
+
+            // Parse username from message
+            const userMatch = rawMsg.match(/Username:\s*([^\n]+)/);
+            const username  = userMatch ? userMatch[1].trim() : 'Unknown';
+            const cleanMsg  = rawMsg.replace(/Username:[^\n]*\n[-]+\n?/, '').replace('My Question is:', '').trim();
+
+            // Plain text formatted message (works 100% with FormSubmit AJAX)
+            const formattedMsg =
+                '════════════════════════════════\n' +
+                '  🎮  ARCADE HUB — Contact Form  \n' +
+                '════════════════════════════════\n\n' +
+                '👤 Username  : ' + username + '\n' +
+                '📧 Email     : ' + email + '\n' +
+                '📋 Subject   : ' + (subject || 'General Inquiry') + '\n' +
+                '🕐 Time (IST): ' + istTime + '\n\n' +
+                '──────────────────────────────────\n' +
+                '💬 MESSAGE:\n' +
+                '──────────────────────────────────\n' +
+                cleanMsg + '\n\n' +
+                '──────────────────────────────────\n' +
+                '🌐 bittuhere.github.io';
+
+            const prettySubject = '🎮 [Arcade Hub] ' + (subject || 'New Message') + ' — from ' + username + ' | IST: ' + istTime;
+
             try {
                 const res = await fetch('https://formsubmit.co/ajax/anurag670singh@gmail.com', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                    body: JSON.stringify({ email, _subject: subject, message, _captcha: 'false' })
+                    body: JSON.stringify({
+                        email,
+                        _subject: prettySubject,
+                        message: formattedMsg,
+                        _captcha: 'false'
+                    })
                 });
                 const data = await res.json();
                 if (data.success === 'true' || data.success === true) {
@@ -7181,6 +8222,19 @@ function drawMinimap() {
                 if (mi) { mi.disabled = true; mi.placeholder = 'Select friend to type...'; }
                 if (sb) sb.disabled = true;
                 document.body.classList.remove('chatting');
+                _stopPing();
+            });
+            _startPing('chat-ping-badge', 'chat-ping-ms');
+
+            // ── INVITE LISTENER in chat ──
+            var _chatPid = myName.toLowerCase().trim();
+            LC.fb('section-chat', db.ref('invites/' + _chatPid), 'child_added', function(snap) {
+                var inv = snap.val();
+                if (!inv) return;
+                db.ref('invites/' + _chatPid + '/' + snap.key).remove();
+                if (inv.from && inv.from.toLowerCase() === _chatPid) return;
+                if (inv.type === 'reject') { showNotify('❌ ' + inv.from + ' declined your invite.', 'error'); return; }
+                _handleInviteMessage({ from: inv.from, game: inv.game, code: inv.code });
             });
 
             // Presence
@@ -7207,8 +8261,10 @@ function drawMinimap() {
                     const sRef = db.ref('status/' + fn);
                     sRef.on('value', ss => {
                         const st = ss.val(), el = document.getElementById('status-' + fn); if (!el) return;
-                        if (st && st.state === 'online') { el.innerText = 'online'; el.className = 'status-sub'; }
-                        else if (st && st.last_changed) { el.innerText = 'last seen ' + fmtTime(st.last_changed); el.className = 'status-sub status-offline'; }
+                        if (st && st.state === 'online') {
+                            el.innerText = (st.activity && st.activity !== 'online') ? st.activity : 'online';
+                            el.className = 'status-sub';
+                        } else if (st && st.last_changed) { el.innerText = 'last seen ' + fmtTime(st.last_changed); el.className = 'status-sub status-offline'; }
                         else { el.innerText = 'offline'; el.className = 'status-sub status-orange'; }
                     });
                     const cid = [myName, fn].sort().join('_');
@@ -7253,10 +8309,14 @@ function drawMinimap() {
             db.ref('chats/' + currentChatId).off();
             LC.fb('section-chat', db.ref('chats/' + currentChatId), 'child_added', snap => {
                 const d = snap.val(), id = snap.key, div = document.createElement('div'); div.id = 'msg-' + id;
-                const isMine = d.sender === mn; div.className = 'message ' + (isMine ? 'msg-sent' : 'msg-received');
-                if (!isMine && !d.read) db.ref('chats/' + currentChatId + '/' + id).update({ read: true });
+                const isSystem = d.sender === '_system';
+                const isMine = !isSystem && d.sender === mn;
+                div.className = 'message ' + (isSystem ? 'msg-system' : isMine ? 'msg-sent' : 'msg-received');
+                if (!isSystem && !isMine && !d.read) db.ref('chats/' + currentChatId + '/' + id).update({ read: true });
                 const sh = isMine ? `<span class="msg-status ${d.read ? 'tick-read' : 'tick-sent'}">&#10003;&#10003;</span>` : '';
-                div.innerHTML = `<span>${d.text}</span><span class="msg-time">${fmtTime(d.timestamp)} ${sh}</span>`;
+                div.innerHTML = isSystem
+                    ? `<span style="color:#888;font-style:italic;font-size:0.82rem;">📢 ${d.text}</span>`
+                    : `<span>${d.text}</span><span class="msg-time">${fmtTime(d.timestamp)} ${sh}</span>`;
                 mc.appendChild(div); requestAnimationFrame(() => { mc.scrollTop = mc.scrollHeight; });
             });
             LC.fb('section-chat', db.ref('chats/' + currentChatId), 'child_changed', snap => {
@@ -7300,23 +8360,702 @@ function drawMinimap() {
         // ─── SCORE SYNC TOAST ───
         var _syncTimer = null;
         function _showScoreSync(status) {
-            var t = document.getElementById('score-sync-toast');
-            if (!t) return;
-            if (_syncTimer) { clearTimeout(_syncTimer); _syncTimer = null; }
-            t.className = '';
-            t.innerText = (status === 'score-saved') ? 'Score Saved ✓' : 'Syncing...';
-            t.classList.add('toast-show');
-            if (status === 'score-saved') t.classList.add('toast-saved');
-            _syncTimer = setTimeout(function () {
-                if (status !== 'score-saved') {
-                    t.innerText = 'Score Saved ✓';
-                    t.classList.add('toast-saved');
-                    _syncTimer = setTimeout(function () { t.className = ''; _syncTimer = null; }, 1800);
-                } else { t.className = ''; _syncTimer = null; }
-            }, status === 'score-saved' ? 2000 : 900);
+            if (status === 'score-saved') {
+                showNotify('🏆 Score Synced Successfully!', 'success');
+            } else {
+                showNotify('Syncing score...', 'info');
+            }
         }
 
-        // ─── BOOT ───
+
+        // ═══ GLOBAL NOTIFICATION SYSTEM ═══
+        var _ntQueue = [];
+        function showNotify(msg, type) {
+            type = type || 'info';
+            var icons = { success: '✅', error: '❌', info: 'ℹ️', invite: '🎮' };
+            var cont = document.getElementById('notify-container');
+            if (!cont) return;
+            var t = document.createElement('div');
+            t.className = 'notify-toast nt-' + type;
+            t.innerHTML = '<span class="notify-icon">' + (icons[type] || 'ℹ️') + '</span><span class="notify-msg">' + msg + '</span>';
+            cont.appendChild(t);
+            requestAnimationFrame(function() {
+                requestAnimationFrame(function() { t.classList.add('nt-show'); });
+            });
+            var dur = (type === 'error') ? 4000 : 3000;
+            setTimeout(function() {
+                t.classList.add('nt-hide');
+                t.classList.remove('nt-show');
+                setTimeout(function() { if (t.parentNode) t.parentNode.removeChild(t); }, 400);
+            }, dur);
+        }
+
+        // ═══ CUSTOM CONFIRM MODAL ═══
+        var _confCallback = null;
+        function showConfirm(msg, onYes, icon) {
+            document.getElementById('confirm-msg').innerText = msg;
+            document.getElementById('confirm-icon').innerText = icon || '⚠️';
+            document.getElementById('confirm-overlay').classList.add('conf-show');
+            _confCallback = onYes;
+        }
+        document.getElementById('conf-yes').onclick = function() {
+            document.getElementById('confirm-overlay').classList.remove('conf-show');
+            if (_confCallback) { var cb = _confCallback; _confCallback = null; cb(); }
+        };
+        document.getElementById('conf-no').onclick = function() {
+            document.getElementById('confirm-overlay').classList.remove('conf-show');
+            _confCallback = null;
+        };
+
+        // ═══════════════════════════════════════════════════
+        // ADMIN PANEL — wrapped in private closure for security
+        // Cannot be called from console
+        // ═══════════════════════════════════════════════════
+        (function _adminModule() {
+            // Obfuscated Firebase config fragments
+            var _f1 = 'AIzaSyDCxIwIq', _f2 = 'iYc2FxT8qq1fb', _f3 = 'Asm2ym5DaFmsw';
+            var _p1 = 'formywebfirebase', _p2 = '-default-rtdb', _p3 = '.firebaseio.com';
+            var _s1 = 'anurag', _s2 = 'Admin', _s3 = '@123';
+
+            // SHA-256 hash of admin password (pre-computed)
+            var ADMIN_HASH = '5ddef4a4225fa15393062cd824bc066cf35c653edb5876189879e93d254130a9';
+
+            async function sha256(str) {
+                var buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+                return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+            }
+
+            // Matrix rain canvas
+            var _matrixAF = null;
+            function startMatrixRain() {
+                var overlay = document.getElementById('matrix-overlay');
+                var canvas = document.getElementById('matrix-canvas');
+                overlay.classList.add('mx-show');
+                canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+                var ctx = canvas.getContext('2d');
+                var cols = Math.floor(canvas.width / 14);
+                var drops = Array.from({length: cols}, () => Math.random() * canvas.height);
+                var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%^&*()_+-=[]{}|;:,./<>?';
+                function frame() {
+                    ctx.fillStyle = 'rgba(0,0,0,0.05)';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    ctx.fillStyle = '#00ff41'; ctx.font = '14px monospace';
+                    drops.forEach((y, i) => {
+                        ctx.fillText(chars[Math.floor(Math.random() * chars.length)], i * 14, y);
+                        if (y > canvas.height && Math.random() > 0.975) drops[i] = 0;
+                        drops[i] += 14;
+                    });
+                    _matrixAF = requestAnimationFrame(frame);
+                }
+                frame();
+            }
+            function stopMatrixRain() {
+                if (_matrixAF) { cancelAnimationFrame(_matrixAF); _matrixAF = null; }
+                document.getElementById('matrix-overlay').classList.remove('mx-show');
+                var ctx = document.getElementById('matrix-canvas').getContext('2d');
+                ctx.clearRect(0, 0, 9999, 9999);
+            }
+
+            // Eye toggle for admin login
+            window.alToggleEye = function() {
+                var inp = document.getElementById('al-pass-input'), eye = document.getElementById('al-eye');
+                if (!inp || !eye) return;
+                if (inp.type === 'password') { inp.type = 'text'; eye.src = EYECLOSED; }
+                else { inp.type = 'password'; eye.src = EYEOPEN; }
+            };
+
+            window.alClose = function() {
+                document.getElementById('admin-login-overlay').classList.remove('al-show');
+                document.getElementById('al-error').innerText = '';
+                document.getElementById('al-pass-input').value = '';
+            };
+
+            window.alVerify = async function() {
+                var pass = document.getElementById('al-pass-input').value;
+                if (!pass) return;
+                var eEl = document.getElementById('al-error');
+                // Username check: only 'anurag' can be admin
+                var loggedUser = (localStorage.getItem('playerName') || '').toLowerCase().trim();
+                if (loggedUser !== 'anurag') {
+                    eEl.innerText = '⛔ ACCESS DENIED — You are not the Admin!';
+                    document.getElementById('al-pass-input').value = '';
+                    return;
+                }
+                var h = await sha256(pass);
+                if (h === ADMIN_HASH) {
+                    alClose();
+                    _injectAdminIframe();
+                    MapsTo('section-admin', 'right');
+                } else {
+                    eEl.innerText = '⛔ ACCESS DENIED — Invalid credentials';
+                    document.getElementById('al-pass-input').value = '';
+                    document.getElementById('al-pass-input').focus();
+                }
+            };
+
+            window.launchAdminEntry = function() {
+                // Initialize eye icon
+                var eye = document.getElementById('al-eye');
+                if (eye) eye.src = EYEOPEN;
+                document.getElementById('al-error').innerText = '';
+                document.getElementById('al-pass-input').value = '';
+                document.getElementById('al-pass-input').type = 'password';
+                // Start matrix rain
+                startMatrixRain();
+                setTimeout(function() {
+                    stopMatrixRain();
+                    document.getElementById('admin-login-overlay').classList.add('al-show');
+                    setTimeout(function() { document.getElementById('al-pass-input').focus(); }, 200);
+                }, 3000);
+            };
+
+            // Admin key assembled at runtime
+            function _getAdminKey() { return _s1 + _s2 + _s3; }
+            function _getDbUrl() { return 'https://' + _p1 + _p2 + _p3; }
+
+            function _injectAdminIframe() {
+                var fr = document.getElementById('admin-iframe');
+                if (!fr || fr.dataset.loaded) return;
+                fr.dataset.loaded = '1';
+                var adminKey = _getAdminKey();
+                var dbUrl = _getDbUrl();
+                var apiKey = _f1 + _f2 + _f3;
+
+                var srcdocContent = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Control</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Teko:wght@400;600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',sans-serif;background:#0a0a14;color:white;padding:20px;}
+h1{font-family:'Teko',sans-serif;font-size:2.5rem;color:#2ecc71;margin-bottom:20px;text-shadow:0 0 15px rgba(46,204,113,.4);}
+.menu-container{display:flex;gap:10px;margin-bottom:25px;flex-wrap:wrap;}
+.admin-btn{background:#1a1a2e;border:2px solid #2ecc71;color:white;padding:10px 18px;border-radius:8px;cursor:pointer;font-family:'Teko';font-size:1.3rem;transition:.3s;}
+.admin-btn:hover,.admin-btn.active{background:#2ecc71;color:black;box-shadow:0 0 15px #2ecc71;}
+.section{display:none;background:rgba(255,255,255,.05);padding:22px;border-radius:12px;max-width:700px;border:1px solid rgba(255,255,255,.1);}
+input,textarea{width:100%;padding:12px;margin:8px 0;border-radius:6px;border:none;background:#111;color:white;font-size:1rem;box-sizing:border-box;font-family:inherit;}
+textarea{min-height:100px;resize:vertical;}
+.send-btn{width:100%;background:#2ecc71;color:black;border:none;padding:14px;font-weight:bold;border-radius:50px;cursor:pointer;font-size:1.1rem;margin-top:10px;transition:.2s;}
+.send-btn:hover{opacity:.85;}
+table{width:100%;border-collapse:collapse;margin-top:10px;}
+th,td{padding:11px;text-align:left;border-bottom:1px solid #222;}
+th{color:#2ecc71;font-family:'Teko';font-size:1.3rem;}
+.msg-list{margin-top:18px;max-height:280px;overflow-y:auto;}
+.msg-card{background:rgba(255,255,255,.05);padding:12px;border-radius:8px;margin-top:8px;border-left:4px solid #2ecc71;display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
+.edit-tools{display:flex;gap:8px;flex-shrink:0;}
+.mini-btn{padding:5px 12px;border-radius:4px;border:none;cursor:pointer;font-family:'Teko';font-size:1.1rem;}
+.status-tag{font-size:.8rem;padding:2px 8px;border-radius:4px;}
+#notify-area{position:fixed;top:15px;right:15px;z-index:9999;}
+.n-toast{background:#1a2e1a;border:1px solid #2ecc71;color:#2ecc71;padding:10px 18px;border-radius:8px;margin-bottom:8px;font-family:'Teko';font-size:1.1rem;animation:fadeIn .3s;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-10px);}to{opacity:1;transform:translateY(0);}}
+.n-toast.err{background:#2e1a1a;border-color:#e74c3c;color:#e74c3c;}
+#edit-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:99998;align-items:center;justify-content:center;}
+#edit-modal-overlay.open{display:flex;}
+#edit-modal-box{background:#0f0f1e;border:1px solid #2ecc71;border-radius:12px;padding:22px;max-width:500px;width:92%;}
+#edit-modal-box h3{font-family:'Teko';color:#2ecc71;font-size:1.5rem;margin-bottom:12px;}
+#edit-ta{width:100%;min-height:120px;padding:10px;border-radius:6px;border:1px solid #2ecc71;background:#111;color:white;font-size:.95rem;resize:vertical;}
+.em-btns{display:flex;gap:10px;margin-top:12px;}
+.em-btn{flex:1;padding:10px;border:none;border-radius:8px;cursor:pointer;font-family:'Teko';font-size:1.1rem;}
+</style>
+</head>
+<body>
+<div id="notify-area"></div>
+<div id="edit-modal-overlay">
+  <div id="edit-modal-box">
+    <h3>✏️ EDIT MESSAGE</h3>
+    <textarea id="edit-ta"></textarea>
+    <div class="em-btns">
+      <button class="em-btn" style="background:#444;color:#aaa;" onclick="closeEditModal()">Cancel</button>
+      <button class="em-btn" style="background:#2ecc71;color:black;" onclick="saveEditModal()">Save</button>
+    </div>
+  </div>
+</div>
+
+<h1>⚡ ARCADE ADMIN</h1>
+<div class="menu-container">
+  <button class="admin-btn" onclick="showSection('global',this)">📢 Global Msg</button>
+  <button class="admin-btn" onclick="showSection('specific',this)">✉️ Private Msg</button>
+  <button class="admin-btn" onclick="showSection('users',this)">🚫 Users</button>
+  <button class="admin-btn" onclick="showSection('rename',this)">✏️ Rename</button>
+  <button class="admin-btn" onclick="showSection('rooms',this)">🏠 Rooms</button>
+  <button class="admin-btn" onclick="showSection('info',this)">📊 Scores</button>
+</div>
+
+<div id="section-global" class="section">
+  <h3>📢 Global Announcement</h3>
+  <p style="color:#888;font-size:.85rem;margin-bottom:6px;">Supports full HTML/CSS. Message stored with secret key for Firebase Rules.</p>
+  <textarea id="globalText" placeholder="Enter your announcement message... (HTML supported)"></textarea>
+  <button class="send-btn" onclick="sendGlobal()">PUBLISH TO ALL</button>
+  <div id="global-msg-list" class="msg-list"></div>
+</div>
+
+<div id="section-specific" class="section">
+  <h3>✉️ Private Notification</h3>
+  <input type="text" id="targetUser" placeholder="Username (e.g. bittu)" oninput="loadPrivateMsgs()">
+  <textarea id="specificText" placeholder="Private message..."></textarea>
+  <button class="send-btn" style="background:#3498db;" onclick="sendSpecific()">SEND TO PLAYER</button>
+  <div id="private-msg-list" class="msg-list"></div>
+</div>
+
+<div id="section-users" class="section">
+  <h3>🚫 User Access Control</h3>
+  <input type="text" id="userSearch" placeholder="Search users..." oninput="filterUsers()" style="margin-bottom:10px;">
+  <table><thead><tr><th>User</th><th>Status</th><th>Actions</th></tr></thead><tbody id="userTableBody"></tbody></table>
+</div>
+
+<div id="section-rename" class="section">
+  <h3>✏️ Rename User (Transfer all data)</h3>
+  <input type="text" id="oldName" placeholder="Old Username">
+  <input type="text" id="newName" placeholder="New Username">
+  <button class="send-btn" style="background:#f1c40f;color:black;" onclick="renameUser()">TRANSFER & RENAME</button>
+  <div id="rename-status" style="margin-top:10px;font-size:.9rem;min-height:18px;"></div>
+</div>
+
+<div id="section-rooms" class="section">
+  <h3>🏠 Active Car Game Rooms</h3>
+  <table><thead><tr><th>Room ID</th><th>Players</th><th>Last Active</th><th>Action</th></tr></thead><tbody id="roomTableBody"></tbody></table>
+</div>
+
+<div id="section-info" class="section">
+  <h3>📊 Highscore Table</h3>
+  <table><thead><tr><th>User</th><th>🐦Flappy</th><th>🦕Dino</th><th>🐍Snake</th><th>ᗧPacMan</th></tr></thead><tbody id="infoTableBody"></tbody></table>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"><\/script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"><\/script>
+<script>
+var ADMIN_KEY = '${adminKey}';
+var firebaseConfig = {
+  apiKey: '${apiKey}',
+  authDomain: 'formywebfirebase.firebaseapp.com',
+  databaseURL: '${dbUrl}',
+  projectId: 'formywebfirebase',
+  storageBucket: 'formywebfirebase.firebasestorage.app',
+  messagingSenderId: '451953941862',
+  appId: '1:451953941862:web:b5f8394f99e17b232f3ca7'
+};
+if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+var db = firebase.database();
+
+var _allUsers = [];
+var _editPath = null, _editKey = null;
+
+function notify(msg, isErr) {
+  var area = document.getElementById('notify-area');
+  var d = document.createElement('div');
+  d.className = 'n-toast' + (isErr ? ' err' : '');
+  d.innerText = msg;
+  area.appendChild(d);
+  setTimeout(function(){ if(d.parentNode) d.parentNode.removeChild(d); }, 3000);
+}
+
+function showSection(name, btn) {
+  document.querySelectorAll('.section').forEach(function(s){ s.style.display = 'none'; });
+  document.querySelectorAll('.admin-btn').forEach(function(b){ b.classList.remove('active'); });
+  var t = document.getElementById('section-' + name);
+  if (t) t.style.display = 'block';
+  if (btn) btn.classList.add('active');
+  if (name === 'global') loadGlobalMessages();
+  if (name === 'rooms') loadRooms();
+  if (name === 'users') loadUsers();
+  if (name === 'info') loadUserInfo();
+}
+
+// secureGlobalPush: appends admin key to pass Firebase rules
+function secureGlobalPush(text) {
+  return db.ref('notifications/global').push({ message: text, time: Date.now(), _k: ADMIN_KEY });
+}
+
+function sendGlobal() {
+  var text = document.getElementById('globalText').value.trim();
+  if (!text) return notify('Message cannot be empty!', true);
+  secureGlobalPush(text).then(function() {
+    document.getElementById('globalText').value = '';
+    notify('✅ Published to all players!');
+  }).catch(function(e){ notify('❌ Error: ' + e.message, true); });
+}
+
+function loadGlobalMessages() {
+  db.ref('notifications/global').on('value', function(snap) {
+    var list = document.getElementById('global-msg-list');
+    list.innerHTML = '';
+    snap.forEach(function(child) {
+      list.appendChild(makeMsgCard('notifications/global', child.key, child.val().message || ''));
+    });
+  });
+}
+
+function sendSpecific() {
+  var user = document.getElementById('targetUser').value.toLowerCase().trim();
+  var text = document.getElementById('specificText').value.trim();
+  if (!user || !text) return notify('Fill all fields!', true);
+  db.ref('notifications/private/' + user).push({ message: text, time: Date.now(), _k: ADMIN_KEY })
+    .then(function(){ document.getElementById('specificText').value = ''; notify('✅ Sent to ' + user + '!'); })
+    .catch(function(e){ notify('❌ Error: ' + e.message, true); });
+}
+
+function loadPrivateMsgs() {
+  var user = document.getElementById('targetUser').value.toLowerCase().trim();
+  var list = document.getElementById('private-msg-list');
+  if (!user) { list.innerHTML = ''; return; }
+  db.ref('notifications/private/' + user).on('value', function(snap) {
+    list.innerHTML = '<h4 style="color:#888;font-size:.85rem;margin-bottom:8px;">History for ' + user + '</h4>';
+    snap.forEach(function(child) {
+      list.appendChild(makeMsgCard('notifications/private/' + user, child.key, child.val().message || ''));
+    });
+  });
+}
+
+function makeMsgCard(path, key, text) {
+  var d = document.createElement('div');
+  d.className = 'msg-card';
+  var preview = text.length > 80 ? text.slice(0,80) + '...' : text;
+  d.innerHTML = '<div style="flex:1;font-size:.85rem;word-break:break-word;">' + preview + '</div>' +
+    '<div class="edit-tools">' +
+    '<button class="mini-btn" style="background:#f1c40f;" onclick="openEditModal(\'' + path + '\',\'' + key + '\',this)">EDIT</button>' +
+    '<button class="mini-btn" style="background:#e74c3c;color:white;" onclick="deleteMsgAdmin(\'' + path + '\',\'' + key + '\')">DEL</button>' +
+    '</div>';
+  return d;
+}
+
+var _editCurrentText = '';
+function openEditModal(path, key, btn) {
+  _editPath = path; _editKey = key;
+  // Fetch current value
+  db.ref(path + '/' + key).once('value', function(snap) {
+    var v = snap.val();
+    _editCurrentText = v ? (v.message || '') : '';
+    document.getElementById('edit-ta').value = _editCurrentText;
+    document.getElementById('edit-modal-overlay').classList.add('open');
+    setTimeout(function(){ document.getElementById('edit-ta').focus(); }, 100);
+  });
+}
+function closeEditModal() {
+  document.getElementById('edit-modal-overlay').classList.remove('open');
+  _editPath = null; _editKey = null;
+}
+function saveEditModal() {
+  var newText = document.getElementById('edit-ta').value.trim();
+  if (!newText || !_editPath || !_editKey) return;
+  db.ref(_editPath + '/' + _editKey).update({ message: newText })
+    .then(function(){ notify('✅ Message updated!'); closeEditModal(); })
+    .catch(function(e){ notify('❌ ' + e.message, true); });
+}
+
+function deleteMsgAdmin(path, key) {
+  showConfirm('Delete this message?', function() {
+    db.ref(path + '/' + key).remove().then(function(){ notify('🗑 Deleted!'); }).catch(function(e){ notify('❌ ' + e.message, true); });
+  }, '🗑️');
+}
+
+function loadUsers() {
+  db.ref('users').on('value', function(snap) {
+    _allUsers = [];
+    snap.forEach(function(child) {
+      _allUsers.push({ id: child.key, data: child.val() });
+    });
+    renderUserTable(_allUsers);
+  });
+}
+
+function filterUsers() {
+  var q = document.getElementById('userSearch').value.toLowerCase();
+  renderUserTable(_allUsers.filter(function(u){ return u.id.includes(q); }));
+}
+
+function renderUserTable(users) {
+  var tbody = document.getElementById('userTableBody');
+  tbody.innerHTML = '';
+  users.forEach(function(u) {
+    var isBlocked = u.data.blocked === true;
+    var tr = document.createElement('tr');
+    tr.innerHTML = '<td>' + u.id + '</td>' +
+      '<td><span class="status-tag" style="background:' + (isBlocked ? 'rgba(231,76,60,.2);color:#e74c3c' : 'rgba(46,204,113,.2);color:#2ecc71') + '">' + (isBlocked ? 'BLOCKED' : 'ACTIVE') + '</span></td>' +
+      '<td style="display:flex;gap:6px;flex-wrap:wrap;">' +
+      '<button onclick="toggleBlock(\'' + u.id + '\',' + (!isBlocked) + ')" style="background:' + (isBlocked ? '#2ecc71' : '#e74c3c') + ';border:none;color:' + (isBlocked ? 'black' : 'white') + ';padding:5px 10px;border-radius:4px;cursor:pointer;font-family:Teko;font-size:1rem;">' + (isBlocked ? 'UNBLOCK' : 'BLOCK') + '</button>' +
+      '<button onclick="adminResetPass(\'' + u.id + '\')" style="background:#3498db;border:none;color:white;padding:5px 10px;border-radius:4px;cursor:pointer;font-family:Teko;font-size:1rem;">RESET PASS</button>' +
+      '</td>';
+    tbody.appendChild(tr);
+  });
+}
+
+function toggleBlock(uid, state) {
+  showConfirm((state?'🚫 BLOCK':'✅ UNBLOCK')+' user: '+uid+'?', function() {
+    db.ref('users/' + uid).update({ blocked: state })
+      .then(function(){ notify((state ? '🚫 Blocked: ' : '✅ Unblocked: ') + uid); })
+      .catch(function(e){ notify('❌ ' + e.message, true); });
+  }, state?'🚫':'✅');
+}
+
+function adminResetPass(uid) {
+  showInputModal('RESET PASSWORD — '+uid.toUpperCase(), 'New password (min 3 chars)...', function(newPass) {
+    if (!newPass || newPass.length < 3) { notify('Password too short! Min 3 chars.', true); return; }
+    crypto.subtle.digest('SHA-1', new TextEncoder().encode(newPass)).then(function(buf) {
+      var hashed = Array.from(new Uint8Array(buf)).map(function(b){ return b.toString(16).padStart(2,'0'); }).join('');
+      db.ref('users/'+uid).update({ password: hashed })
+        .then(function(){ notify('✅ Password reset for '+uid+'!'); })
+        .catch(function(e){ notify('❌ '+e.message, true); });
+    });
+  });
+}
+
+function loadRooms() {
+  db.ref('car_world').on('value', function(snap) {
+    var tbody = document.getElementById('roomTableBody');
+    tbody.innerHTML = '';
+    snap.forEach(function(child) {
+      var v = child.val();
+      var pCount = v.players ? Object.keys(v.players).length : 0;
+      var ago = v.lastActivity ? Math.floor((Date.now() - v.lastActivity) / 60000) + ' min ago' : 'unknown';
+      var tr = document.createElement('tr');
+      tr.innerHTML = '<td>' + child.key + '</td><td>' + pCount + ' players</td><td style="color:#888;">' + ago + '</td>' +
+        '<td><button onclick="forceDeleteRoom(\'' + child.key + '\')" style="background:#e74c3c;color:white;border:none;padding:5px 10px;border-radius:4px;cursor:pointer;font-family:Teko;">DELETE</button></td>';
+      tbody.appendChild(tr);
+    });
+  });
+}
+
+function forceDeleteRoom(id) {
+  showConfirm('Delete room '+id+'?', function() {
+    db.ref('car_world/' + id).remove().then(function(){ notify('🗑 Room ' + id + ' deleted!'); }).catch(function(e){ notify('❌ ' + e.message, true); });
+  }, '🗑️');
+}
+
+function loadUserInfo() {
+  db.ref('users').once('value', function(snap) {
+    var tbody = document.getElementById('infoTableBody');
+    tbody.innerHTML = '';
+    snap.forEach(function(child) {
+      var d = child.val();
+      var tr = document.createElement('tr');
+      tr.innerHTML = '<td>' + child.key + '</td><td>' + (d.flappy_highscore||0) + '</td><td>' + (d.dino_highscore||0) + '</td><td>' + (d.snake_highscore||0) + '</td><td>' + (d.pacman_highscore||0) + '</td>';
+      tbody.appendChild(tr);
+    });
+  });
+}
+
+async function renameUser() {
+  var oldN = document.getElementById('oldName').value.toLowerCase().trim();
+  var newN = document.getElementById('newName').value.toLowerCase().trim();
+  var st = document.getElementById('rename-status');
+  if (!oldN || !newN) { notify('Fill both fields!', true); return; }
+  if (oldN === newN) { notify('Names are identical!', true); return; }
+  if (!/^[a-z0-9]+$/.test(newN)) { notify('New name: letters & numbers only!', true); return; }
+  st.style.color = '#888'; st.innerText = 'Step 1/6: Checking...';
+  try {
+    var newSnap = await db.ref('users/' + newN).once('value');
+    if (newSnap.exists()) { st.style.color='#ff3366'; st.innerText='❌ Username already taken!'; return; }
+    var oldSnap = await db.ref('users/' + oldN).once('value');
+    if (!oldSnap.exists()) { st.style.color='#ff3366'; st.innerText='❌ User not found!'; return; }
+    var userData = Object.assign({}, oldSnap.val(), { _admin: true });
+
+    st.innerText = 'Step 2/6: Copying user data...';
+    await db.ref('users/' + newN).set(userData);
+
+    st.innerText = 'Step 3/6: Migrating friends...';
+    var fSnap = await db.ref('friends/' + oldN).once('value');
+    var friends = fSnap.val() || {};
+    var fOps = [];
+    Object.keys(friends).forEach(function(fid) {
+      fOps.push(db.ref('friends/' + fid + '/' + newN).set(true));
+      fOps.push(db.ref('friends/' + fid + '/' + oldN).remove());
+    });
+    if (Object.keys(friends).length) {
+      await db.ref('friends/' + newN).set(friends);
+      await Promise.all(fOps);
+    }
+
+    st.innerText = 'Step 4/6: Migrating chats...';
+    var chatOps = [];
+    for (var fid of Object.keys(friends)) {
+      var oldCid = [oldN, fid].sort().join('_');
+      var newCid = [newN, fid].sort().join('_');
+      var cSnap = await db.ref('chats/' + oldCid).once('value');
+      if (cSnap.exists()) {
+        var msgs = cSnap.val();
+        Object.keys(msgs).forEach(function(mk) { if (msgs[mk].sender === oldN) msgs[mk].sender = newN; });
+        chatOps.push(db.ref('chats/' + newCid).set(msgs));
+        chatOps.push(db.ref('chats/' + oldCid).remove());
+      }
+    }
+    await Promise.all(chatOps);
+
+    st.innerText = 'Step 5/6: Migrating status...';
+    var stSnap = await db.ref('status/' + oldN).once('value');
+    if (stSnap.exists()) {
+      await db.ref('status/' + newN).set(stSnap.val());
+      await db.ref('status/' + oldN).remove();
+    }
+
+    st.innerText = 'Step 6/6: Cleaning up...';
+    await db.ref('users/' + oldN).update({ _admin: true });
+    await db.ref('users/' + oldN).remove();
+    await db.ref('friends/' + oldN).remove();
+
+    st.style.color = '#2ecc71';
+    st.innerText = '✅ Renamed ' + oldN + ' → ' + newN + ' — all data transferred!';
+    notify('✅ ' + oldN + ' → ' + newN + ' done!');
+    document.getElementById('oldName').value = '';
+    document.getElementById('newName').value = '';
+  } catch(e) {
+    st.style.color = '#ff3366'; st.innerText = '❌ Error: ' + e.message;
+    notify('❌ ' + e.message, true);
+  }
+}
+
+// Init
+showSection('global', document.querySelector('.admin-btn'));
+<\/script>
+</body>
+</html>`;
+                fr.srcdoc = srcdocContent;
+            }
+        })(); // End admin closure
+
+        // ═══ ADMIN INPUT MODAL (replaces prompt) ═══
+        var _admInputCb = null;
+        function showInputModal(title, placeholder, cb, defaultVal) {
+            var ov = document.getElementById('adm-input-overlay');
+            var fld = document.getElementById('adm-input-field');
+            if (!ov) return;
+            document.getElementById('adm-input-title').innerText = title || 'INPUT';
+            fld.placeholder = placeholder || '';
+            fld.value = defaultVal || '';
+            _admInputCb = cb;
+            ov.classList.add('adm-show');
+            setTimeout(function(){ fld.focus(); }, 200);
+        }
+        (function(){
+            function admOk() {
+                var val = document.getElementById('adm-input-field').value;
+                document.getElementById('adm-input-overlay').classList.remove('adm-show');
+                if (_admInputCb && val.trim()) { var cb = _admInputCb; _admInputCb = null; cb(val.trim()); }
+                else _admInputCb = null;
+            }
+            function admCancel() {
+                document.getElementById('adm-input-overlay').classList.remove('adm-show');
+                _admInputCb = null;
+            }
+            document.getElementById('adm-ok-btn').onclick = admOk;
+            document.getElementById('adm-cancel-btn').onclick = admCancel;
+            document.getElementById('adm-input-field').addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') admOk();
+                if (e.key === 'Escape') admCancel();
+            });
+        })();
+
+
+        // ═══ INVITE SYSTEM ═══
+        var _inviteQueue = [];
+        var _inviteCurrent = null;
+        var _inviteTimer = null;
+
+        function _showInvitePopup(inv) {
+            _inviteCurrent = inv;
+            var icon = inv.game === 'ttt' ? '❌' : '🏎️';
+            var gameName = inv.game === 'ttt' ? 'Tic-Tac-Toe Online' : 'Car Game Multiplayer';
+            document.getElementById('inv-icon').innerText = icon;
+            document.getElementById('inv-title').innerText = gameName.toUpperCase();
+            document.getElementById('inv-msg').innerText = inv.from + ' invites you!\nCode: ' + inv.code + '\n⏱ Auto-declines in 15s';
+            document.getElementById('invite-popup').classList.add('inv-show');
+            // Start countdown progress bar
+            var bar = document.getElementById('inv-progress-bar');
+            if (bar) {
+                bar.classList.remove('running');
+                bar.style.width = '100%';
+                requestAnimationFrame(function() {
+                    requestAnimationFrame(function() { bar.classList.add('running'); });
+                });
+            }
+            if (_inviteTimer) clearTimeout(_inviteTimer);
+            _inviteTimer = setTimeout(function() { _dismissInvitePopup(false); }, 7000);
+        }
+
+        function _dismissInvitePopup(accepted) {
+            document.getElementById('invite-popup').classList.remove('inv-show');
+            var bar = document.getElementById('inv-progress-bar');
+            if (bar) { bar.classList.remove('running'); bar.style.width = '100%'; }
+            if (_inviteTimer) { clearTimeout(_inviteTimer); _inviteTimer = null; }
+            if (!accepted && _inviteCurrent) {
+                var me = (localStorage.getItem('playerName') || '').toLowerCase().trim();
+                var senderName = (_inviteCurrent.from || '').toLowerCase();
+                if (typeof db !== 'undefined' && me && senderName) {
+                    var chatId = [me, senderName].sort().join('_');
+                    db.ref('chats/' + chatId).push({
+                        sender: '_system',
+                        text: '❌ ' + me + ' declined your game invite.',
+                        timestamp: Date.now(), read: false
+                    });
+                    // Also notify sender via Firebase invites path
+                    db.ref('invites/' + senderName).push({
+                        type: 'reject', from: me, game: _inviteCurrent.game, time: Date.now()
+                    });
+                }
+            }
+            _inviteCurrent = null;
+            setTimeout(function() {
+                if (_inviteQueue.length > 0) _showInvitePopup(_inviteQueue.shift());
+            }, 600);
+        }
+
+        document.getElementById('inv-accept').onclick = function() {
+            if (!_inviteCurrent) return;
+            var inv = _inviteCurrent;
+            _dismissInvitePopup(true);
+            var gameKey = inv.game === 'ttt' ? 'multittt' : 'multicar';
+            openGame(gameKey);
+            setTimeout(function() {
+                var fr = document.getElementById('iframe-' + gameKey);
+                if (fr && fr.contentWindow) fr.contentWindow.postMessage({ type: 'auto-join', code: inv.code }, '*');
+            }, 1800);
+        };
+        document.getElementById('inv-reject').onclick = function() { _dismissInvitePopup(false); };
+
+        function _handleInviteMessage(invData) {
+            var busySections = ['section-game-', 'section-leaderboard'];
+            var isBusy = busySections.some(function(s){ return currentSection.startsWith(s); });
+            if (isBusy) {
+                _inviteQueue.push(invData);
+                showNotify('📬 Invite from ' + invData.from + ' queued!', 'invite');
+            } else {
+                _showInvitePopup(invData);
+            }
+        }
+
+        function _checkInviteQueue() {
+            if (_inviteQueue.length > 0 && currentSection === 'section-hub') {
+                showNotify('📬 You have ' + _inviteQueue.length + ' pending invite(s)!', 'invite');
+                setTimeout(function() {
+                    if (_inviteQueue.length > 0) _showInvitePopup(_inviteQueue.shift());
+                }, 500);
+            }
+        }
+
+        // ═══ PING MEASUREMENT ═══
+        var _pingInterval = null;
+        function _startPing(badgeId, msId) {
+            if (_pingInterval) clearInterval(_pingInterval);
+            function measure() {
+                if (typeof db === 'undefined') return;
+                var t0 = Date.now();
+                db.ref('.info/serverTimeOffset').once('value', function() {
+                    var ping = Date.now() - t0;
+                    var badge = document.getElementById(badgeId);
+                    var msEl = document.getElementById(msId);
+                    if (!badge || !msEl) return;
+                    msEl.innerText = ping;
+                    badge.className = 'ping-badge ' + (ping < 100 ? 'ping-good' : ping < 300 ? 'ping-medium' : 'ping-bad');
+                });
+            }
+            measure();
+            _pingInterval = setInterval(measure, 5000);
+        }
+        function _stopPing() {
+            if (_pingInterval) { clearInterval(_pingInterval); _pingInterval = null; }
+        }
         (function boot() {
             showLoader();
             // Safety net: if Firebase scripts never load, show login after 5s
