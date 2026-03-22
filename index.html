@@ -26,7 +26,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
-    <link rel="preconnect" href="https://formywebfirebase-default-rtdb.firebaseio.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Teko:wght@400;600&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -40,9 +39,7 @@
             -webkit-tap-highlight-color: transparent;
         }
         button, a, [onclick], .game-btn, .l-btn, .hub-friends-btn,
-        .hub-lb-btn, .notif-btn, .hub-profile-btn, .lb-game-tab,
-        .rank-item, .friend-item, .inv-btn, .prof-action-btn,
-        .prof-search-btn, .pc-close-btn, .uc-btn, .lb-back-btn {
+        .hub-lb-btn, .notif-btn, .lb-game-tab, .rank-item, .friend-item {
             touch-action: manipulation;
         }
 
@@ -72,7 +69,6 @@
             height: 100%;
             overflow: hidden;
             overscroll-behavior: none;
-            -webkit-overflow-scrolling: touch;
         }
 
         body {
@@ -80,8 +76,6 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             color: var(--text-main);
             -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-            text-rendering: optimizeSpeed;
         }
 
         /* SPA SECTIONS */
@@ -95,7 +89,6 @@
             will-change: transform;
             z-index: 1;
             contain: layout paint style;
-            -webkit-overflow-scrolling: touch;
         }
 
         .spa-section.hidden-right {
@@ -249,15 +242,15 @@
 
         .login-card {
             background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             padding: 3rem;
             border-radius: 20px;
             border: 1px solid rgba(255, 255, 255, 0.1);
             width: 100%;
             max-width: 380px;
             text-align: center;
-            box-shadow: 0 0 30px rgba(0, 243, 255, 0.08);
+            box-shadow: 0 0 50px rgba(0, 243, 255, 0.1);
             animation: fadeInUp 0.6s ease;
         }
 
@@ -487,8 +480,10 @@
             position: fixed;
             top: 20px;
             left: 20px;
-            background: rgba(30, 27, 58, 0.92);
-            border: 1px solid rgba(255, 255, 255, 0.25);
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
             color: var(--text-main);
             padding: 10px 20px;
             border-radius: 30px;
@@ -496,7 +491,7 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            transition: transform 0.18s, background 0.18s;
+            transition: all 0.3s ease;
             z-index: 200;
             cursor: pointer;
             pointer-events: auto;
@@ -526,7 +521,9 @@
             position: fixed;
             top: 20px;
             right: 20px;
-            background: rgba(40, 35, 10, 0.92);
+            background: rgba(255, 215, 0, 0.1);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
             border: 1px solid rgba(255, 215, 0, 0.3);
             color: #ffcc00;
             padding: 10px 20px;
@@ -535,7 +532,7 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            transition: transform 0.18s, background 0.18s;
+            transition: all 0.3s ease;
             z-index: 200;
             cursor: pointer;
         }
@@ -551,8 +548,10 @@
             position: fixed;
             top: 65px;
             left: 10px;
-            background: rgba(30, 27, 58, 0.92);
-            border: 1px solid rgba(255, 255, 255, 0.25);
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
             color: var(--text-main);
             padding: 10px 20px;
             border-radius: 30px;
@@ -564,26 +563,9 @@
             z-index: 200;
             cursor: pointer;
         }
-        .hub-profile-btn {
-            position: fixed;
-            top: 110px;
-            left: 10px;
-            background: rgba(0, 20, 30, 0.92);
-            border: 1px solid rgba(0,243,255,0.25);
-            color: #00f3ff;
-            padding: 10px 20px;
-            border-radius: 30px;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.3s ease;
-            z-index: 200;
-            cursor: pointer;
-            font-size: 0.9rem;
-        }
-        .hub-profile-btn:hover { background: rgba(0,243,255,0.15); border-color: #00f3ff; }
 
+        .hub-profile-btn { position:fixed; top:110px; left:10px; background:rgba(0,20,30,0.92); border:1px solid rgba(0,243,255,0.25); color:#00f3ff; padding:10px 20px; border-radius:30px; font-weight:bold; display:flex; align-items:center; gap:8px; transition:transform 0.18s; z-index:200; cursor:pointer; font-size:0.9rem; touch-action:manipulation; }
+        .hub-profile-btn:hover { background:rgba(0,243,255,0.15); border-color:#00f3ff; }
         .notif-btn:hover {
             background: #32a852;
             border-color: transparent;
@@ -634,16 +616,16 @@
         /* hub-container: solid dark bg, single thin border — no blur, no heavy shadow */
         .hub-container {
             background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 24px;
             padding: 2.5rem;
             width: 100%;
             max-width: 600px;
             text-align: center;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-            animation: fadeInUp 0.5s ease-out;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            animation: fadeInUp 0.6s ease-out;
         }
 
         .hub-container h1 {
@@ -697,11 +679,9 @@
             font-size: 2.5rem;
         }
 
-        .game-btn {
-            will-change: transform;
-        }
         .game-btn:hover {
-            transform: scale(1.04);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
             z-index: 10;
         }
 
@@ -855,100 +835,85 @@
 
         /* LEADERBOARD */
         #section-leaderboard {
-            background: linear-gradient(135deg,#0a0a18 0%,#0f0c29 50%,#1a0a2e 100%);
+            background: var(--bg-gradient);
             overflow-y: auto;
         }
+
         .lb-inner {
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 20px 16px 100px;
+            padding: 20px 20px 120px; /* bottom padding clears rank bar */
         }
-        .lb-title-wrap {
-            text-align: center;
-            margin-bottom: 18px;
-        }
+
         #section-leaderboard h1 {
             font-family: 'Teko', sans-serif;
-            font-size: 3.2rem;
-            background: linear-gradient(45deg,#ffd700,#ff9500,#ffd700);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            text-shadow: none;
-            filter: drop-shadow(0 0 18px rgba(255,215,0,0.5));
-            margin: 0;
-            letter-spacing: 4px;
+            font-size: 4rem;
+            color: #ffd700;
+            margin-bottom: 10px;
         }
-        .lb-subtitle { color: rgba(255,255,255,0.35); font-size:0.78rem; letter-spacing:2px; margin-top:2px; }
+
+        /* Solid bg — no blur, no shadow */
         .board-container {
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.08);
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 20px;
             width: 100%;
-            max-width: 480px;
-            padding: 18px;
-            box-shadow: 0 0 30px rgba(0,0,0,0.4);
+            max-width: 500px;
+            padding: 20px;
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
         }
-        .game-selector { display:flex; justify-content:center; margin-bottom:18px; flex-wrap:wrap; gap:8px; }
-        .lb-game-tab {
-            padding: 7px 16px;
-            border-radius: 20px;
-            border: 1px solid rgba(255,255,255,0.15);
-            background: rgba(255,255,255,0.05);
-            color: rgba(255,255,255,0.5);
-            font-family: 'Teko',sans-serif;
-            font-size: 1.05rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            letter-spacing: 0.5px;
+
+        .game-selector {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
         }
-        .lb-game-tab:hover { border-color: #00f3ff; color: #00f3ff; }
-        .lb-game-tab.active {
-            background: linear-gradient(45deg,rgba(0,243,255,0.15),rgba(0,102,255,0.15));
-            border-color: #00f3ff;
-            color: #00f3ff;
-            box-shadow: 0 0 12px rgba(0,243,255,0.2);
-        }
+
         #section-leaderboard select {
-            padding: 8px 18px;
-            font-size: 1.1rem;
-            background: rgba(0,0,0,0.5);
+            padding: 10px 20px;
+            font-size: 1.2rem;
+            background: #222;
             color: white;
-            border: 1px solid rgba(0,243,255,0.4);
+            border: 1px solid #00f3ff;
             border-radius: 10px;
             outline: none;
             cursor: pointer;
         }
+
         .rank-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 14px;
-            margin-bottom: 8px;
+            display: flex; align-items: center; gap: 12px;
+            padding: 12px 14px; margin-bottom: 8px;
             background: rgba(255,255,255,0.04);
-            border-radius: 12px;
-            transition: all 0.2s;
+            border-radius: 12px; transition: all 0.2s;
             border: 1px solid rgba(255,255,255,0.06);
-            cursor: pointer;
-            position: relative;
+            cursor: pointer; position: relative;
         }
-        .rank-item:hover {
-            transform: translateX(4px);
-            border-color: rgba(0,243,255,0.3);
-            background: rgba(0,243,255,0.06);
-        }
-        .rank-item.rank-me {
-            border-color: rgba(46,204,113,0.5) !important;
-            background: rgba(46,204,113,0.08) !important;
-        }
-        .rank-item.rank-me::after {
-            content: 'YOU';
-            position: absolute; right: 12px;
-            font-size: 0.65rem; color: #2ecc71;
-            font-family: 'Teko',sans-serif; letter-spacing:1px;
-        }
+        .rank-item:hover { transform: translateX(4px); border-color: rgba(0,243,255,0.3); background: rgba(0,243,255,0.06); }
+        .rank-item.rank-me { border-color: rgba(46,204,113,0.5) !important; background: rgba(46,204,113,0.08) !important; }
+        /* Profile card */
+        #profile-card-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.75); backdrop-filter:blur(8px); z-index:99990; align-items:center; justify-content:center; }
+        #profile-card-overlay.pc-show { display:flex; }
+        #profile-card { background:linear-gradient(135deg,#0f0c29,#24243e); border:1px solid rgba(255,255,255,0.12); border-radius:20px; padding:28px 24px; max-width:340px; width:92%; box-shadow:0 0 60px rgba(0,0,0,0.8); animation:pcSlideIn 0.3s ease; }
+        @keyframes pcSlideIn { from{transform:scale(0.88) translateY(20px);opacity:0;} to{transform:scale(1) translateY(0);opacity:1;} }
+        .pc-avatar { width:72px; height:72px; border-radius:50%; background:linear-gradient(135deg,#00f3ff,#0066ff); display:flex; align-items:center; justify-content:center; font-size:2rem; margin:0 auto 14px; font-family:Teko,sans-serif; }
+        .pc-username { text-align:center; font-family:Teko,sans-serif; font-size:1.8rem; color:white; letter-spacing:2px; }
+        .pc-scores { margin:16px 0; display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+        .pc-score-item { background:rgba(255,255,255,0.05); border-radius:10px; padding:10px; text-align:center; }
+        .pc-score-game { font-size:0.7rem; color:rgba(255,255,255,0.4); letter-spacing:1px; text-transform:uppercase; }
+        .pc-score-val { font-family:Teko,sans-serif; font-size:1.5rem; color:#00f3ff; }
+        .pc-last-login { text-align:center; font-size:0.72rem; color:rgba(255,255,255,0.25); margin-top:6px; }
+        .pc-close-btn { width:100%; margin-top:16px; padding:10px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); border-radius:10px; color:rgba(255,255,255,0.6); cursor:pointer; font-family:Teko,sans-serif; font-size:1.1rem; }
+        #lb-my-rank-bar { position:fixed; bottom:0; left:0; right:0; background:linear-gradient(to top,rgba(10,10,24,0.98),rgba(10,10,24,0.85)); border-top:1px solid rgba(46,204,113,0.3); padding:10px 20px; display:none; align-items:center; gap:12px; font-family:Teko,sans-serif; z-index:100; }
+        #lb-my-rank-bar.show { display:flex; }
+        .lb-my-rank-label { color:rgba(255,255,255,0.5); font-size:0.9rem; }
+        .lb-my-rank-info { color:#2ecc71; font-size:1.2rem; flex:1; }
+        .lb-my-rank-score { color:#00f3ff; font-size:1.2rem; }
+        .skeleton { background:linear-gradient(90deg,rgba(255,255,255,0.05) 0%,rgba(255,255,255,0.1) 50%,rgba(255,255,255,0.05) 100%); background-size:200% 100%; animation:skeletonPulse 1.5s ease-in-out infinite; border-radius:8px; color:transparent!important; }
+        @keyframes skeletonPulse { 0%{background-position:200% 0;} 100%{background-position:-200% 0;} }
 
         .rank-num {
             font-size: 1.5rem;
@@ -981,6 +946,9 @@
             font-family: 'Teko', sans-serif;
         }
 
+        .lb-game-tab { padding:7px 16px; border-radius:20px; border:1px solid rgba(255,255,255,0.15); background:rgba(255,255,255,0.05); color:rgba(255,255,255,0.5); font-family:Teko,sans-serif; font-size:1.05rem; cursor:pointer; transition:all 0.2s; }
+        .lb-game-tab:hover { border-color:#00f3ff; color:#00f3ff; }
+        .lb-game-tab.active { background:rgba(0,243,255,0.12); border-color:#00f3ff; color:#00f3ff; }
         .lb-back-btn {
             margin-top: 20px;
             padding: 10px 30px;
@@ -1158,6 +1126,7 @@
             border-bottom-right-radius: 2px;
         }
 
+        .msg-system { align-self:center; background:rgba(255,255,255,0.06); border-radius:8px; padding:6px 14px; max-width:90%; }
         .msg-system { align-self:center; background:rgba(255,255,255,0.06); border-radius:8px; padding:6px 14px; max-width:90%; }
         .msg-received {
             align-self: flex-start;
@@ -1492,6 +1461,23 @@
         .adm-cancel-btn{font-family:'Teko',sans-serif;font-size:1.05rem;letter-spacing:1px;padding:9px 26px;border-radius:25px;border:1px solid rgba(255,255,255,0.2);cursor:pointer;background:rgba(255,255,255,0.06);color:#aaa;transition:0.2s;}
         .adm-cancel-btn:hover{border-color:#ff3366;color:#ff3366;}
 
+
+        .freq-item { padding:12px 15px; background:rgba(0,243,255,0.05); border:1px solid rgba(0,243,255,0.2); border-radius:10px; margin-bottom:8px; display:flex; align-items:center; justify-content:space-between; gap:10px; }
+        .freq-name { color:white; font-size:0.9rem; flex:1; }
+        .freq-btns { display:flex; gap:6px; flex-shrink:0; }
+        .freq-accept { padding:5px 12px; border:none; border-radius:6px; background:#2ecc71; color:black; cursor:pointer; font-family:Teko,sans-serif; font-size:0.9rem; font-weight:bold; }
+        .freq-reject { padding:5px 12px; border:1px solid rgba(255,51,102,0.4); border-radius:6px; background:transparent; color:#ff3366; cursor:pointer; font-family:Teko,sans-serif; font-size:0.9rem; }
+        .freq-section-title { font-size:0.7rem; color:rgba(255,255,255,0.35); letter-spacing:1px; text-transform:uppercase; margin:10px 0 6px; padding-bottom:4px; border-bottom:1px solid rgba(255,255,255,0.07); }
+        .prof-search-result-item { display:flex; align-items:center; gap:12px; padding:10px 14px; border-radius:12px; border:1px solid rgba(255,255,255,0.06); background:rgba(255,255,255,0.03); margin-bottom:6px; cursor:pointer; transition:all 0.15s; }
+        .prof-search-result-item:hover { background:rgba(0,243,255,0.06); border-color:rgba(0,243,255,0.2); }
+        .psri-avatar { width:40px; height:40px; border-radius:50%; background:linear-gradient(135deg,#00f3ff,#0066ff); display:flex; align-items:center; justify-content:center; font-family:Teko,sans-serif; font-size:1.2rem; color:white; flex-shrink:0; }
+        .psri-info { flex:1; min-width:0; }
+        .psri-name { font-family:Teko,sans-serif; font-size:1.1rem; color:white; }
+        .psri-sub { font-size:0.7rem; color:rgba(255,255,255,0.35); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .psri-add-btn { padding:5px 12px; border-radius:8px; background:rgba(0,243,255,0.1); border:1px solid rgba(0,243,255,0.3); color:#00f3ff; cursor:pointer; font-family:Teko,sans-serif; font-size:0.9rem; transition:0.15s; flex-shrink:0; }
+        .psri-add-btn.added { background:rgba(46,204,113,0.1); border-color:rgba(46,204,113,0.3); color:#2ecc71; }
+        .psri-add-btn.sent { background:rgba(241,196,15,0.1); border-color:rgba(241,196,15,0.3); color:#f1c40f; }
+
         /* ─── FF-STYLE INVITE POPUP ─── */
         #invite-popup {
             visibility: hidden;
@@ -1549,209 +1535,72 @@
         .ping-badge.ping-bad    { color: #e74c3c; border-color: #e74c3c; }
         .ping-dot { width:6px; height:6px; border-radius:50%; background:currentColor; }
 
-        /* ── PROFILE CARD MODAL ── */
-        #profile-card-overlay {
-            display: none; position: fixed; inset: 0;
-            background: rgba(0,0,0,0.75); backdrop-filter: blur(8px);
-            z-index: 99990; align-items: center; justify-content: center;
-        }
-        #profile-card-overlay.pc-show { display: flex; }
-        #profile-card {
-            background: linear-gradient(135deg,#0f0c29,#24243e);
-            border: 1px solid rgba(255,255,255,0.12);
-            border-radius: 20px; padding: 28px 24px;
-            max-width: 340px; width: 92%;
-            box-shadow: 0 0 60px rgba(0,0,0,0.8);
-            animation: pcSlideIn 0.3s ease;
-        }
-        @keyframes pcSlideIn { from { transform:scale(0.88) translateY(20px); opacity:0; } to { transform:scale(1) translateY(0); opacity:1; } }
-        .pc-avatar { width:72px; height:72px; border-radius:50%; background:linear-gradient(135deg,#00f3ff,#0066ff); display:flex; align-items:center; justify-content:center; font-size:2rem; margin:0 auto 14px; font-family:'Teko',sans-serif; box-shadow:0 0 20px rgba(0,243,255,0.3); }
-        .pc-username { text-align:center; font-family:'Teko',sans-serif; font-size:1.8rem; color:white; letter-spacing:2px; }
-        .pc-scores { margin:16px 0; display:grid; grid-template-columns:1fr 1fr; gap:8px; }
-        .pc-score-item { background:rgba(255,255,255,0.05); border-radius:10px; padding:10px; text-align:center; }
-        .pc-score-game { font-size:0.7rem; color:rgba(255,255,255,0.4); letter-spacing:1px; text-transform:uppercase; }
-        .pc-score-val { font-family:'Teko',sans-serif; font-size:1.5rem; color:#00f3ff; }
-        .pc-joined { text-align:center; font-size:0.72rem; color:rgba(255,255,255,0.3); margin-top:8px; }
-        .pc-last-login { text-align:center; font-size:0.72rem; color:rgba(255,255,255,0.25); margin-top:3px; }
-        .pc-close-btn { width:100%; margin-top:16px; padding:10px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); border-radius:10px; color:rgba(255,255,255,0.6); cursor:pointer; font-family:'Teko',sans-serif; font-size:1.1rem; transition:0.2s; }
-        .pc-close-btn:hover { background:rgba(255,255,255,0.1); color:white; }
-        #lb-my-rank-bar { position:fixed; bottom:0; left:0; right:0; background:linear-gradient(to top,rgba(10,10,24,0.98),rgba(10,10,24,0.85)); border-top:1px solid rgba(46,204,113,0.3); padding:10px 20px; display:none; align-items:center; gap:12px; font-family:'Teko',sans-serif; z-index:100; backdrop-filter:blur(10px); }
-        #lb-my-rank-bar.show { display:flex; }
-        .lb-my-rank-label { color:rgba(255,255,255,0.5); font-size:0.9rem; letter-spacing:1px; }
-        .lb-my-rank-info { color:#2ecc71; font-size:1.2rem; flex:1; }
-        .lb-my-rank-score { color:#00f3ff; font-size:1.2rem; }
-        /* ── IN-GAME NOTIFICATION BADGE ── */
-        #in-game-notif-badge { position:fixed; top:12px; right:12px; z-index:99980; display:none; background:linear-gradient(45deg,#ff3366,#ff6b35); color:white; border-radius:20px; padding:6px 14px; font-size:0.8rem; font-family:'Segoe UI',sans-serif; box-shadow:0 0 20px rgba(255,51,102,0.5); animation:notifPulse 1.5s ease-in-out infinite; cursor:pointer; }
+        #in-game-notif-badge { position:fixed; top:12px; right:12px; z-index:99980; display:none; background:linear-gradient(45deg,#ff3366,#ff6b35); color:white; border-radius:20px; padding:6px 14px; font-size:0.8rem; box-shadow:0 0 20px rgba(255,51,102,0.5); animation:notifPulse 1.5s ease-in-out infinite; cursor:pointer; }
         #in-game-notif-badge.show { display:flex; align-items:center; gap:6px; }
-        @keyframes notifPulse { 0%,100% { box-shadow:0 0 10px rgba(255,51,102,0.4); transform:scale(1); } 50% { box-shadow:0 0 25px rgba(255,51,102,0.8); transform:scale(1.05); } }
-
-        /* ── PROFILE SECTION ── */
-        #section-profile {
-            background: linear-gradient(135deg,#0a0a18 0%,#0f0c29 60%,#1a0a2e 100%);
-            overflow-y: auto;
-        }
-        .profile-inner {
-            min-height: 100vh;
-            max-width: 480px;
-            margin: 0 auto;
-            padding: 20px 16px 60px;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-        .profile-back-btn {
-            align-self: flex-start;
-            background: transparent;
-            border: 1px solid rgba(255,255,255,0.2);
-            color: rgba(255,255,255,0.6);
-            padding: 8px 18px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: 0.2s;
-        }
-        .profile-back-btn:hover { border-color: #00f3ff; color: #00f3ff; }
-        /* Avatar card */
-        .prof-avatar-card {
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 20px;
-            padding: 24px;
-            text-align: center;
-        }
-        .prof-avatar-big {
-            width: 88px; height: 88px; border-radius: 50%;
-            background: linear-gradient(135deg,#00f3ff,#0066ff);
-            display: flex; align-items: center; justify-content: center;
-            font-family: 'Teko',sans-serif; font-size: 2.6rem; color: white;
-            margin: 0 auto 12px;
-            box-shadow: 0 0 30px rgba(0,243,255,0.3);
-        }
-        .prof-display-name {
-            font-family: 'Teko',sans-serif; font-size: 2rem;
-            color: white; letter-spacing: 2px;
-        }
-        .prof-last-login {
-            font-size: 0.72rem; color: rgba(255,255,255,0.3);
-            margin-top: 4px; letter-spacing: 0.5px;
-        }
-        /* Stats grid */
-        .prof-stats-grid {
-            display: grid; grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-        .prof-stat-card {
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.07);
-            border-radius: 14px; padding: 14px;
-            text-align: center;
-        }
-        .prof-stat-icon { font-size: 1.4rem; margin-bottom: 4px; }
-        .prof-stat-label { font-size: 0.68rem; color: rgba(255,255,255,0.35); letter-spacing: 1px; text-transform: uppercase; }
-        .prof-stat-val { font-family: 'Teko',sans-serif; font-size: 1.5rem; color: #00f3ff; }
-        /* Section cards */
-        .prof-card {
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.07);
-            border-radius: 16px; padding: 18px;
-        }
-        .prof-card-title {
-            font-family: 'Teko',sans-serif; font-size: 1.1rem;
-            color: rgba(255,255,255,0.5); letter-spacing: 1px;
-            text-transform: uppercase; margin-bottom: 12px;
-        }
-        /* Search bar */
-        .prof-search-wrap {
-            display: flex; gap: 8px;
-        }
-        .prof-search-input {
-            flex: 1; padding: 10px 14px;
-            background: rgba(255,255,255,0.06);
-            border: 1px solid rgba(255,255,255,0.12);
-            border-radius: 10px; color: white;
-            font-size: 0.9rem; outline: none;
-        }
-        .prof-search-input:focus { border-color: rgba(0,243,255,0.4); }
-        .prof-search-btn {
-            padding: 10px 18px; background: rgba(0,243,255,0.1);
-            border: 1px solid rgba(0,243,255,0.3);
-            border-radius: 10px; color: #00f3ff;
-            cursor: pointer; font-family:'Teko',sans-serif;
-            font-size: 1rem; transition: 0.2s;
-        }
-        .prof-search-btn:hover { background: rgba(0,243,255,0.2); }
-        /* Edit fields */
-        .prof-edit-row {
-            display: flex; align-items: center;
-            gap: 10px; margin-bottom: 10px;
-        }
-        .prof-edit-label {
-            font-size: 0.75rem; color: rgba(255,255,255,0.4);
-            letter-spacing: 1px; min-width: 80px;
-        }
-        .prof-action-btn {
-            width: 100%; padding: 12px;
-            background: rgba(255,255,255,0.06);
-            border: 1px solid rgba(255,255,255,0.12);
-            border-radius: 10px; color: rgba(255,255,255,0.7);
-            cursor: pointer; font-family: 'Teko',sans-serif;
-            font-size: 1rem; letter-spacing: 1px;
-            transition: 0.2s; margin-bottom: 8px; text-align: left;
-        }
-        .prof-action-btn:hover { border-color: rgba(0,243,255,0.3); color: #00f3ff; }
-        .prof-action-btn.danger:hover { border-color: rgba(255,51,102,0.5); color: #ff3366; }
-        /* Username change cooldown bar */
-        .prof-cooldown {
-            font-size: 0.75rem; color: #f1c40f;
-            padding: 8px 12px;
-            background: rgba(241,196,15,0.08);
-            border: 1px solid rgba(241,196,15,0.2);
-            border-radius: 8px; margin-top: 6px;
-        }
-        /* Search result card */
-        #prof-search-result {
-            margin-top: 12px;
-            animation: pcSlideIn 0.3s ease;
-        }
-        .prof-search-card {
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 14px; padding: 16px;
-            display: flex; align-items: center; gap: 14px;
-        }
-        .prof-search-avatar {
-            width: 52px; height: 52px; border-radius: 50%;
-            background: linear-gradient(135deg,#00f3ff,#0066ff);
-            display: flex; align-items: center; justify-content: center;
-            font-family:'Teko',sans-serif; font-size: 1.5rem; color: white;
-            flex-shrink: 0;
-        }
-        .prof-search-info { flex: 1; }
-        .prof-search-name { font-family:'Teko',sans-serif; font-size: 1.3rem; color: white; }
-        .prof-search-scores { font-size: 0.72rem; color: rgba(255,255,255,0.4); margin-top: 3px; }
-        /* Username change modal */
-        #uname-change-overlay {
-            display: none; position: fixed; inset: 0;
-            background: rgba(0,0,0,0.8); backdrop-filter: blur(8px);
-            z-index: 99992; align-items: center; justify-content: center;
-        }
-        #uname-change-overlay.uc-show { display: flex; }
-        #uname-change-box {
-            background: linear-gradient(135deg,#0f0c29,#24243e);
-            border: 1px solid rgba(255,255,255,0.12);
-            border-radius: 20px; padding: 28px 24px;
-            max-width: 360px; width: 92%;
-            animation: pcSlideIn 0.3s ease;
-        }
-        .uc-title { font-family:'Teko',sans-serif; font-size:1.6rem; color:#00f3ff; margin-bottom:6px; }
+        @keyframes notifPulse { 0%,100%{box-shadow:0 0 10px rgba(255,51,102,0.4);transform:scale(1);} 50%{box-shadow:0 0 25px rgba(255,51,102,0.8);transform:scale(1.05);} }
+        #section-profile { background:linear-gradient(135deg,#0a0a18,#0f0c29,#1a0a2e); overflow-y:auto; }
+        .profile-inner { min-height:100vh; max-width:480px; margin:0 auto; padding:20px 16px 60px; display:flex; flex-direction:column; gap:16px; }
+        .profile-back-btn { align-self:flex-start; background:transparent; border:1px solid rgba(255,255,255,0.2); color:rgba(255,255,255,0.6); padding:8px 18px; border-radius:20px; cursor:pointer; font-size:0.9rem; }
+        .prof-avatar-card { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:20px; padding:24px; text-align:center; }
+        .prof-avatar-big { width:88px; height:88px; border-radius:50%; background:linear-gradient(135deg,#00f3ff,#0066ff); display:flex; align-items:center; justify-content:center; font-family:Teko,sans-serif; font-size:2.6rem; color:white; margin:0 auto 12px; }
+        .prof-display-name { font-family:Teko,sans-serif; font-size:2rem; color:white; letter-spacing:2px; }
+        .prof-last-login { font-size:0.72rem; color:rgba(255,255,255,0.3); margin-top:4px; }
+        .prof-meta-row { display:flex; gap:20px; justify-content:center; padding:10px 0; }
+        .prof-meta-item { text-align:center; }
+        .prof-meta-val { font-family:Teko,sans-serif; font-size:1.3rem; color:white; }
+        .prof-meta-label { font-size:0.65rem; color:rgba(255,255,255,0.35); letter-spacing:1px; text-transform:uppercase; }
+        .prof-bio-card { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07); border-radius:16px; padding:16px; }
+        .prof-bio-title { font-size:0.68rem; color:rgba(255,255,255,0.35); letter-spacing:1px; text-transform:uppercase; margin-bottom:8px; }
+        .prof-bio-text { color:rgba(255,255,255,0.75); font-size:0.9rem; line-height:1.5; font-style:italic; cursor:pointer; }
+        .prof-bio-text.empty { color:rgba(255,255,255,0.25); font-style:normal; font-size:0.82rem; }
+        .prof-bio-textarea { width:100%; background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.15); border-radius:10px; color:white; font-size:0.88rem; padding:10px; resize:none; outline:none; font-family:'Segoe UI',sans-serif; box-sizing:border-box; min-height:80px; }
+        .prof-bio-textarea:focus { border-color:rgba(0,243,255,0.4); }
+        .prof-bio-controls { display:flex; justify-content:space-between; align-items:center; margin-top:8px; }
+        .prof-bio-count { font-size:0.7rem; color:rgba(255,255,255,0.3); }
+        .prof-bio-save { padding:6px 16px; background:rgba(0,243,255,0.1); border:1px solid rgba(0,243,255,0.3); border-radius:8px; color:#00f3ff; cursor:pointer; font-size:0.82rem; font-family:Teko,sans-serif; }
+        .prof-bio-error { font-size:0.75rem; color:#ff3366; margin-top:4px; min-height:14px; }
+        .prof-stats-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+        .prof-stat-card { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.07); border-radius:14px; padding:14px; text-align:center; }
+        .prof-stat-icon { font-size:1.4rem; margin-bottom:4px; }
+        .prof-stat-label { font-size:0.68rem; color:rgba(255,255,255,0.35); letter-spacing:1px; text-transform:uppercase; }
+        .prof-stat-val { font-family:Teko,sans-serif; font-size:1.5rem; color:#00f3ff; }
+        .prof-card { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.07); border-radius:16px; padding:18px; }
+        .prof-card-title { font-family:Teko,sans-serif; font-size:1.1rem; color:rgba(255,255,255,0.5); letter-spacing:1px; text-transform:uppercase; margin-bottom:12px; }
+        .prof-search-wrap { display:flex; gap:8px; }
+        .prof-search-input { flex:1; padding:10px 14px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); border-radius:10px; color:white; font-size:0.9rem; outline:none; }
+        .prof-search-input:focus { border-color:rgba(0,243,255,0.4); }
+        .prof-search-btn { padding:10px 18px; background:rgba(0,243,255,0.1); border:1px solid rgba(0,243,255,0.3); border-radius:10px; color:#00f3ff; cursor:pointer; font-family:Teko,sans-serif; font-size:1rem; }
+        .prof-action-btn { width:100%; padding:12px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); border-radius:10px; color:rgba(255,255,255,0.7); cursor:pointer; font-family:Teko,sans-serif; font-size:1rem; transition:0.2s; margin-bottom:8px; text-align:left; }
+        .prof-action-btn:hover { border-color:rgba(0,243,255,0.3); color:#00f3ff; }
+        .prof-cooldown { font-size:0.75rem; color:#f1c40f; padding:8px 12px; background:rgba(241,196,15,0.08); border:1px solid rgba(241,196,15,0.2); border-radius:8px; margin-top:6px; }
+        #uname-change-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); backdrop-filter:blur(8px); z-index:99992; align-items:center; justify-content:center; }
+        #uname-change-overlay.uc-show { display:flex; }
+        #uname-change-box { background:linear-gradient(135deg,#0f0c29,#24243e); border:1px solid rgba(255,255,255,0.12); border-radius:20px; padding:28px 24px; max-width:360px; width:92%; animation:pcSlideIn 0.3s ease; }
+        .uc-title { font-family:Teko,sans-serif; font-size:1.6rem; color:#00f3ff; margin-bottom:6px; }
         .uc-sub { font-size:0.78rem; color:rgba(255,255,255,0.4); margin-bottom:16px; line-height:1.5; }
         .uc-input { width:100%; padding:10px 14px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.15); border-radius:10px; color:white; font-size:0.95rem; outline:none; box-sizing:border-box; margin-bottom:10px; }
-        .uc-input:focus { border-color:rgba(0,243,255,0.4); }
         .uc-btns { display:flex; gap:10px; margin-top:8px; }
-        .uc-btn { flex:1; padding:10px; border:none; border-radius:10px; cursor:pointer; font-family:'Teko',sans-serif; font-size:1.05rem; transition:0.2s; }
+        .uc-btn { flex:1; padding:10px; border:none; border-radius:10px; cursor:pointer; font-family:Teko,sans-serif; font-size:1.05rem; }
         .uc-btn-send { background:linear-gradient(45deg,#00f3ff,#0066ff); color:white; }
         .uc-btn-cancel { background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); color:rgba(255,255,255,0.5); }
         .uc-status { font-size:0.8rem; margin-top:8px; min-height:18px; }
+        .chat-date-sep { text-align:center; margin:8px 0; position:relative; }
+        .chat-date-sep::before { content:''; position:absolute; top:50%; left:0; right:0; border-top:1px solid rgba(255,255,255,0.08); }
+        .chat-date-sep span { position:relative; background:#0d0d0d; padding:0 10px; font-size:0.7rem; color:rgba(255,255,255,0.3); }
+        .freq-item { padding:12px 15px; background:rgba(0,243,255,0.05); border:1px solid rgba(0,243,255,0.2); border-radius:10px; margin-bottom:8px; display:flex; align-items:center; justify-content:space-between; gap:10px; }
+        .freq-name { color:white; font-size:0.9rem; flex:1; }
+        .freq-btns { display:flex; gap:6px; }
+        .freq-accept { padding:5px 12px; border:none; border-radius:6px; background:#2ecc71; color:black; cursor:pointer; font-family:Teko,sans-serif; font-size:0.9rem; }
+        .freq-reject { padding:5px 12px; border:1px solid rgba(255,51,102,0.4); border-radius:6px; background:transparent; color:#ff3366; cursor:pointer; font-family:Teko,sans-serif; font-size:0.9rem; }
+        .prof-search-result-item { display:flex; align-items:center; gap:12px; padding:10px 14px; border-radius:12px; border:1px solid rgba(255,255,255,0.06); background:rgba(255,255,255,0.03); margin-bottom:6px; cursor:pointer; transition:all 0.15s; }
+        .prof-search-result-item:hover { background:rgba(0,243,255,0.06); border-color:rgba(0,243,255,0.2); }
+        .psri-avatar { width:40px; height:40px; border-radius:50%; background:linear-gradient(135deg,#00f3ff,#0066ff); display:flex; align-items:center; justify-content:center; font-family:Teko,sans-serif; font-size:1.2rem; color:white; flex-shrink:0; }
+        .psri-info { flex:1; min-width:0; }
+        .psri-name { font-family:Teko,sans-serif; font-size:1.1rem; color:white; }
+        .psri-sub { font-size:0.7rem; color:rgba(255,255,255,0.35); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .psri-add-btn { padding:5px 12px; border-radius:8px; background:rgba(0,243,255,0.1); border:1px solid rgba(0,243,255,0.3); color:#00f3ff; cursor:pointer; font-family:Teko,sans-serif; font-size:0.9rem; flex-shrink:0; }
+        .psri-add-btn.added { background:rgba(46,204,113,0.1); border-color:rgba(46,204,113,0.3); color:#2ecc71; }
+        .psri-add-btn.sent { background:rgba(241,196,15,0.1); border-color:rgba(241,196,15,0.3); color:#f1c40f; }
 
         /* ROTATE OVERLAY */
         #rotate-overlay {
@@ -1847,25 +1696,21 @@
     <!-- GLOBAL NOTIFICATION SYSTEM -->
     <div id="notify-container"></div>
     <div id="in-game-notif-badge" onclick="_goBackFromGameNotif()">🔔 <span id="in-game-notif-text">New message!</span></div>
-    <!-- PROFILE CARD MODAL -->
     <div id="profile-card-overlay" onclick="closeProfileCard()">
         <div id="profile-card" onclick="event.stopPropagation()">
             <div class="pc-avatar" id="pc-avatar">?</div>
             <div class="pc-username" id="pc-username">Loading...</div>
             <div class="pc-scores" id="pc-scores"></div>
-            <div class="pc-joined" id="pc-joined"></div>
             <div class="pc-last-login" id="pc-last-login"></div>
             <button class="pc-close-btn" onclick="closeProfileCard()">✕ CLOSE</button>
         </div>
     </div>
-    <!-- OWN RANK BAR (fixed at bottom of leaderboard) -->
     <div id="lb-my-rank-bar">
         <span class="lb-my-rank-label">YOUR RANK</span>
         <span class="lb-my-rank-info" id="lb-my-rank-info">Not ranked</span>
         <span class="lb-my-rank-score" id="lb-my-rank-score"></span>
     </div>
-
-    <div id="offline-banner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:999999;background:rgba(231,76,60,0.95);color:white;text-align:center;padding:10px 16px;font-size:0.9rem;font-family:'Segoe UI',sans-serif;backdrop-filter:blur(8px);box-shadow:0 2px 20px rgba(231,76,60,0.5);">⚡ You're offline — Multiplayer & scores won't sync until reconnected.</div>
+    <div id="offline-banner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:999999;background:rgba(231,76,60,0.95);color:white;text-align:center;padding:10px 16px;font-size:0.9rem;font-family:'Segoe UI',sans-serif;box-shadow:0 2px 20px rgba(231,76,60,0.5);">⚡ You're offline — Multiplayer &amp; scores won't sync. <u style="cursor:pointer;text-decoration:underline;" onclick="location.reload()">Tap to retry.</u></div>
     <!-- FF-STYLE INVITE POPUP -->
     <div id="invite-popup">
         <div class="inv-header">
@@ -1973,6 +1818,7 @@
             <h1 id="login-header">LOGIN</h1>
             <p id="login-sub">Enter the Arcade World</p>
             <form id="login-form" autocomplete="on" onsubmit="processAuth();return false;" style="display:contents;">
+            <form id="login-form" autocomplete="on" onsubmit="processAuth();return false;" style="display:contents;">
             <input type="text" id="login-username" name="username" placeholder="Username" autocomplete="username">
             <div style="position:relative;">
                 <input type="password" id="login-password" name="password" placeholder="Password" autocomplete="current-password">
@@ -2030,7 +1876,7 @@
             <div class="hub-container">
                 <h1 id="hub-greeting">ARCADE HUB</h1>
                 <p class="subtitle" id="hub-subtitle">Select a Category</p>
-                <p id="hub-last-login" style="font-size:0.72rem;color:rgba(255,255,255,0.35);margin:-8px 0 8px;letter-spacing:0.5px;"></p>
+                <p id="hub-last-login" style="font-size:0.72rem;color:rgba(255,255,255,0.35);margin:-8px 0 8px;"></p>
                 <div id="hub-main" class="menu-grid">
                     <div onclick="showHubSection('study')" class="game-btn btn-study"><span>&#128218;</span> Study</div>
                     <div onclick="showHubSection('multi')" class="game-btn btn-multi"><span>&#9876;&#65039;</span>
@@ -2597,14 +2443,15 @@ th { text-align: left; color: #2ecc71; padding: 8px; }
 td { padding: 8px; border-bottom: 1px solid #333; }
 </style>
     <!-- LEADERBOARD -->
-    <div id="section-leaderboard" class="spa-section hidden-right">
+    <div id="section-leaderboard" class="spa-section hidden-right" style="background:linear-gradient(135deg,#0a0a18,#0f0c29,#1a0a2e);">
         <div class="lb-inner">
-            <div class="lb-title-wrap">
-                <h1>🏆 LEADERBOARD</h1>
-                <div class="lb-subtitle">TOP PLAYERS · ARCADE HUB</div>
+            <button class="lb-back-btn" onclick="MapsTo('section-hub','left')" style="align-self:flex-start;margin-bottom:16px;">&#8592; Back</button>
+            <div style="text-align:center;margin-bottom:18px;">
+                <h1 style="font-family:Teko,sans-serif;font-size:3rem;color:#ffd700;filter:drop-shadow(0 0 12px rgba(255,215,0,0.4));margin:0;letter-spacing:4px;">🏆 LEADERBOARD</h1>
+                <div style="color:rgba(255,255,255,0.3);font-size:0.75rem;letter-spacing:2px;margin-top:2px;">TOP PLAYERS · ARCADE HUB</div>
             </div>
-            <div class="board-container">
-                <div class="game-selector">
+            <div class="board-container" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:20px;width:100%;max-width:480px;padding:18px;">
+                <div class="game-selector" style="display:flex;justify-content:center;flex-wrap:wrap;gap:8px;margin-bottom:18px;">
                     <button class="lb-game-tab" onclick="lbSelectGame('flappy_highscore',this)">🐦 Flappy</button>
                     <button class="lb-game-tab" onclick="lbSelectGame('dino_highscore',this)">🦕 Dino</button>
                     <button class="lb-game-tab" onclick="lbSelectGame('snake_highscore',this)">🐍 Snake</button>
@@ -2613,7 +2460,6 @@ td { padding: 8px; border-bottom: 1px solid #333; }
                 <div id="lb-loading" style="text-align:center;color:rgba(255,255,255,0.3);padding:20px;font-size:0.85rem;letter-spacing:1px;">TAP A GAME TO VIEW RANKINGS</div>
                 <div id="lb-score-list"></div>
             </div>
-            <button class="lb-back-btn" onclick="MapsTo('section-hub','left')">&#8592; Back to Hub</button>
         </div>
     </div>
 
@@ -2622,45 +2468,46 @@ td { padding: 8px; border-bottom: 1px solid #333; }
     <div id="section-profile" class="spa-section hidden-right">
         <div class="profile-inner">
             <button class="profile-back-btn" onclick="MapsTo('section-hub','left')">← Back</button>
-
-            <!-- My Profile Card -->
             <div class="prof-avatar-card" id="my-profile-card">
                 <div class="prof-avatar-big" id="my-prof-avatar">?</div>
                 <div class="prof-display-name" id="my-prof-name">Loading...</div>
+                <div class="prof-meta-row">
+                    <div class="prof-meta-item"><div class="prof-meta-val" id="my-friends-count">—</div><div class="prof-meta-label">Friends</div></div>
+                    <div class="prof-meta-item"><div class="prof-meta-val" id="my-rank-display">—</div><div class="prof-meta-label">Best Score</div></div>
+                </div>
                 <div class="prof-last-login" id="my-prof-lastlogin"></div>
             </div>
-
-            <!-- My Scores -->
+            <div class="prof-bio-card">
+                <div class="prof-bio-title">💬 About Me</div>
+                <div id="my-bio-display" class="prof-bio-text empty">Tap to add a bio...</div>
+                <textarea class="prof-bio-textarea" id="my-bio-input" maxlength="200" placeholder="Write something about yourself... (max 100 words)" oninput="updateBioCount()" style="display:none;"></textarea>
+                <div id="my-bio-error" class="prof-bio-error"></div>
+                <div class="prof-bio-controls" id="my-bio-controls" style="display:none;">
+                    <span class="prof-bio-count"><span id="my-bio-wordcount">0</span>/100 words</span>
+                    <button class="prof-bio-save" onclick="saveBio()">SAVE</button>
+                </div>
+            </div>
             <div class="prof-stats-grid" id="my-prof-stats"></div>
-
-            <!-- Actions -->
             <div class="prof-card">
                 <div class="prof-card-title">⚙️ Account</div>
-                <button class="prof-action-btn" onclick="openUnameChangeModal()">
-                    ✏️ Request Username Change <span style="font-size:0.7rem;color:rgba(255,255,255,0.3);float:right;">Once per 7 days</span>
-                </button>
+                <button class="prof-action-btn" onclick="openUnameChangeModal()">✏️ Request Username Change <span style="font-size:0.7rem;color:rgba(255,255,255,0.3);float:right;">Once per 7 days</span></button>
                 <div id="prof-cooldown-msg"></div>
             </div>
-
-            <!-- Search other users -->
             <div class="prof-card">
                 <div class="prof-card-title">🔍 Search Player</div>
                 <div class="prof-search-wrap">
-                    <input class="prof-search-input" id="prof-search-input"
-                        placeholder="Enter username..."
-                        onkeypress="if(event.key==='Enter')searchUserProfile()">
-                    <button class="prof-search-btn" onclick="searchUserProfile()">SEARCH</button>
+                    <input class="prof-search-input" id="prof-search-input" placeholder="Search players..." oninput="searchUserProfile()" autocomplete="off">
+                    <button class="prof-search-btn" id="prof-search-btn" onclick="searchUserProfile()">GO</button>
                 </div>
                 <div id="prof-search-result"></div>
             </div>
         </div>
     </div>
-
     <!-- USERNAME CHANGE MODAL -->
     <div id="uname-change-overlay" onclick="closeUnameModal()">
         <div id="uname-change-box" onclick="event.stopPropagation()">
             <div class="uc-title">✏️ Request Username Change</div>
-            <div class="uc-sub">Enter your desired new username. A request will be sent to admin via email. Admin will review and manually change it. This can only be done once every 7 days.</div>
+            <div class="uc-sub">Enter desired new username. Admin will review and change it manually. Once per 7 days only.</div>
             <input class="uc-input" id="uc-new-name" placeholder="New username (letters & numbers only)" maxlength="20">
             <input class="uc-input" id="uc-reason" placeholder="Reason (optional)">
             <div class="uc-status" id="uc-status"></div>
@@ -2678,10 +2525,15 @@ td { padding: 8px; border-bottom: 1px solid #333; }
             <button class="btn-back-chat" onclick="MapsTo('section-hub','left')">&#8592; Back</button>
             <div class="user-status" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">Your Username: <span id="chat-display-username">...</span><span class="ping-badge ping-good" id="chat-ping-badge"><span class="ping-dot"></span><span id="chat-ping-ms">--</span>ms</span></div>
             <div class="add-friend-box">
-                <input type="text" id="friendInput" class="search-input" placeholder="Add Friend (Username)">
+                <input type="text" id="friendInput" class="search-input" placeholder="Send Friend Request">
                 <button class="chat-btn btn-add" onclick="addFriend()">+</button>
             </div>
             <p id="add-status" style="font-size:.8rem;color:#aaa;margin-top:-10px;"></p>
+            <div id="freq-incoming-wrap" style="display:none;">
+                <div class="freq-section-title">📥 Friend Requests</div>
+                <div id="freq-incoming-list"></div>
+            </div>
+            <div class="freq-section-title" style="margin-top:6px;">👥 Friends</div>
             <div id="friends-list">
                 <p style="color:#666;padding:10px;">Loading friends...</p>
             </div>
@@ -3080,11 +2932,7 @@ td { padding: 8px; border-bottom: 1px solid #333; }
 
         /* LIVE SCORE */
         #score-display {
-            font-size: 4rem;
-            color: white;
-            text-shadow: 2px 2px 0 #000;
-            margin-top: 20px;
-            z-index: 10;
+            display: none; /* Score now drawn on canvas — no DOM repaint = no blink */
         }
 
         /* START SCREEN */
@@ -3186,10 +3034,10 @@ td { padding: 8px; border-bottom: 1px solid #333; }
             left: 0;
             width: 100%;
             height: 100%;
-            background: white;
+            background: transparent;
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.1s;
+            transition: none;
         }
 
         @keyframes float {
@@ -3383,7 +3231,7 @@ td { padding: 8px; border-bottom: 1px solid #333; }
                     if (p.x + pipeW <= 0) {
                         this.position.shift();
                         currentScore++;
-                        uiScore.innerText = currentScore;
+                        // Score drawn on canvas in drawScore() — no DOM mutation needed
                     }
 
                     // COLLISION
@@ -3421,10 +3269,17 @@ td { padding: 8px; border-bottom: 1px solid #333; }
 
             gameState.current = gameState.over;
 
-            // Flash Screen
-            flashEl.style.background = &quot;rgba(255,50,50,0.4)&quot;;
-            flashEl.style.opacity = &quot;0.5&quot;;
-            setTimeout(() => { flashEl.style.opacity = &quot;0&quot;; }, 150);
+            // Flash Screen — set color+transition first, then trigger opacity
+            flashEl.style.transition = &quot;none&quot;;
+            flashEl.style.background = &quot;rgba(255,50,50,0.6)&quot;;
+            flashEl.style.opacity = &quot;0.7&quot;;
+            requestAnimationFrame(function() {
+                requestAnimationFrame(function() {
+                    flashEl.style.transition = &quot;opacity 0.3s ease-out&quot;;
+                    flashEl.style.opacity = &quot;0&quot;;
+                    setTimeout(function() { flashEl.style.background = &quot;transparent&quot;; flashEl.style.transition = &quot;none&quot;; }, 350);
+                });
+            });
 
             // Update Local High Score
             if (currentScore > highScore) {
@@ -3457,6 +3312,25 @@ td { padding: 8px; border-bottom: 1px solid #333; }
             gameState.current = gameState.getReady;
         }
 
+        // Draw score directly on canvas — eliminates DOM repaint white blink
+        function drawScore() {
+            if (gameState.current === gameState.over) return; // game-over box shows score
+            var scale = Math.min(canvas.width, canvas.height) / 400;
+            var fontSize = Math.round(52 * scale);
+            ctx.save();
+            ctx.font = 'bold ' + fontSize + 'px Teko, Arial, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'top';
+            // Black outline
+            ctx.strokeStyle = 'rgba(0,0,0,0.8)';
+            ctx.lineWidth = Math.max(3, scale * 4);
+            ctx.strokeText(currentScore, canvas.width / 2, Math.round(18 * scale));
+            // White fill
+            ctx.fillStyle = 'white';
+            ctx.fillText(currentScore, canvas.width / 2, Math.round(18 * scale));
+            ctx.restore();
+        }
+
         function loop() {
             if (canvas.width !== window.innerWidth || canvas.height !== window.innerHeight) {
                 canvas.width = window.innerWidth;
@@ -3467,6 +3341,7 @@ td { padding: 8px; border-bottom: 1px solid #333; }
             pipes.update();
             bird.draw();
             bird.update();
+            drawScore(); // on canvas — no DOM = no blink
             frames++;
             requestAnimationFrame(loop);
         }
@@ -6971,7 +6846,6 @@ function _exitFs(cb){if(document.fullscreenElement||document.webkitFullscreenEle
             }
         }
         function leaveGame(goBack) {
-            // Clear auto-delete interval
             if (window._tttActivityInterval) { clearInterval(window._tttActivityInterval); window._tttActivityInterval = null; }
             if (roomId) {
                 db.ref('games/' + roomId + '/players/' + mySymbol).remove().then(() => {
@@ -7526,10 +7400,17 @@ function updateChunks() {
                 handleMobileRotation();
                 // Start ping for host
                 (function carPingHost(){
-                    function mp(){var t0=Date.now();db.ref('.info/serverTimeOffset').once('value',function(){
-                        var p=Date.now()-t0,b=document.getElementById('car-ping-badge'),m=document.getElementById('car-ping-ms');
-                        if(b&&m){m.innerText=p;b.className='ping-badge '+(p<100?'ping-good':p<300?'ping-medium':'ping-bad');}
-                    });}
+                    var _ph=[];
+                    function mp(){var t0=performance.now();
+                        fetch('https://formywebfirebase-default-rtdb.firebaseio.com/.json?shallow=true',{method:'GET',cache:'no-store'})
+                        .then(function(){var ping=Math.round(performance.now()-t0);_ph.push(ping);if(_ph.length>5)_ph.shift();
+                            var avg=Math.round(_ph.reduce(function(a,b){return a+b;},0)/_ph.length);
+                            var b=document.getElementById('car-ping-badge'),m=document.getElementById('car-ping-ms');
+                            if(b&&m){m.innerText=avg;b.className='ping-badge '+(avg<80?'ping-good':avg<200?'ping-medium':'ping-bad');}
+                        }).catch(function(){var b=document.getElementById('car-ping-badge'),m=document.getElementById('car-ping-ms');
+                            if(b&&m){m.innerText='999+';b.className='ping-badge ping-bad';}
+                        });
+                    }
                     mp(); setInterval(mp,5000);
                 })();
                 // SYNC FIX: Using one persistent listener to detect players and then start
@@ -7993,7 +7874,7 @@ function drawMinimap() {
             let last = 0;
             return function (...a) { const n = performance.now(); if (n - last >= ms) { last = n; requestAnimationFrame(() => fn.apply(this, a)); } }
         }
-        window.addEventListener('resize', _throttle(() => {/* reserved for future layout needs */ }, 120), { passive: true });
+        window.addEventListener('resize', _throttle(() => {/* reserved for future layout needs */ }, 120));
 
         // ─── SPA NAVIGATION ───
         let spaHistory = [];
@@ -8026,7 +7907,6 @@ function drawMinimap() {
 
             // Full lifecycle cleanup for the section we're leaving
             LC.leave(currentSection);
-            // Close any open modals when navigating
             var _pcov = document.getElementById('profile-card-overlay');
             if (_pcov) _pcov.classList.remove('pc-show');
             if (_gameIframe[currentSection]) { _unmountGame(_gameIframe[currentSection]); _fsActive = false; }
@@ -8052,12 +7932,8 @@ function drawMinimap() {
             history.pushState({ spa: targetId }, '', '#' + targetId);
 
             if (targetId === 'section-chat') LC.timer('section-chat', setTimeout(initChat, 300));
-            if (targetId === 'section-profile') LC.timer('section-profile', setTimeout(function(){
-                var _pn = (localStorage.getItem('playerName')||'').toLowerCase().trim();
-                if (_pn) _loadMyProfile(_pn);
-            }, 200));
-            var _bar = document.getElementById('lb-my-rank-bar');
-            if (_bar && targetId !== 'section-leaderboard') _bar.classList.remove('show');
+            var _lbar = document.getElementById('lb-my-rank-bar');
+            if (_lbar && targetId !== 'section-leaderboard') _lbar.classList.remove('show');
             if (targetId === 'section-hub') { LC.timer('section-hub', setTimeout(initHub, 300)); if (currentSection && currentSection.startsWith('section-game')) _setUserStatus('online'); setTimeout(_checkInviteQueue, 800); }
             hideLoader();
             setTimeout(_updateRotateOverlay, 370);
@@ -8086,11 +7962,10 @@ function drawMinimap() {
             currentSection = prev;
             if (prev === 'section-hub') {
                 LC.timer('section-hub', setTimeout(initHub, 300));
+                // Reset game status to online when returning to hub
                 _setUserStatus('online');
                 setTimeout(_checkInviteQueue, 800);
             }
-            // Reset status when leaving any game (even via back)
-            if (cur && cur.id && cur.id.startsWith('section-game-')) _setUserStatus('online');
             setTimeout(_updateRotateOverlay, 370);
         }
 
@@ -8187,7 +8062,6 @@ function drawMinimap() {
         function loginSuccess(u) {
             localStorage.setItem('isLoggedIn', 'true');
             localStorage.setItem('playerName', u);
-            // Update lastLogin in Firebase (replaces old value — no new fields)
             try { db.ref('users/' + u).update({ lastLogin: firebase.database.ServerValue.TIMESTAMP }); } catch(e){}
             setTimeout(() => { initHub(); MapsTo('section-hub', 'right'); }, 800);
         }
@@ -8243,11 +8117,9 @@ function drawMinimap() {
             LC.fn('section-hub', () => { hubInit = false; }); // auto-reset on LC.leave()
             const pid = pn.toLowerCase().trim();
             document.getElementById('hub-greeting').innerHTML = 'Hi, ' + pn;
-            // Show last login time
             db.ref('users/' + pid + '/lastLogin').once('value', function(snap) {
                 if (snap.val()) {
-                    var d = new Date(snap.val());
-                    var ist = d.toLocaleString('en-IN', { timeZone:'Asia/Kolkata', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit', hour12:true });
+                    var ist = new Date(snap.val()).toLocaleString('en-IN', { timeZone:'Asia/Kolkata', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit', hour12:true });
                     var el = document.getElementById('hub-last-login');
                     if (el) el.innerText = 'Last login: ' + ist;
                 }
@@ -8289,9 +8161,7 @@ function drawMinimap() {
             const ls = localStorage.getItem('lastReadNotif') || 0;
             const dot = document.getElementById('notif-dot');
             LC.fb('section-hub', db.ref('notifications/global'), 'value', snap => {
-                const d = snap.val(); if (d) Object.values(d).forEach(n => {
-                    if (n.time > ls) { dot.style.display = 'block'; _showInGameNotif('📢 New announcement!'); }
-                });
+                const d = snap.val(); if (d) Object.values(d).forEach(n => { if (n.time > ls) dot.style.display = 'block'; });
             });
             LC.fb('section-hub', db.ref('notifications/private/' + pid), 'value', snap => {
                 const d = snap.val(); if (d) Object.values(d).forEach(n => { if (n.time > ls) dot.style.display = 'block'; });
@@ -8344,18 +8214,17 @@ function drawMinimap() {
             document.getElementById('hub-subtitle').innerText = 'Select a Category';
         }
         function logout() {
-            // Set current user offline BEFORE clearing localStorage
             var _logoutUser = localStorage.getItem('playerName');
             if (_logoutUser && typeof db !== 'undefined') {
                 try {
-                    var _sr = db.ref('status/' + _logoutUser);
+                    var _sr = db.ref('status/' + _logoutUser.toLowerCase().trim());
                     _sr.onDisconnect().cancel();
                     _sr.set({ state: 'offline', last_changed: firebase.database.ServerValue.TIMESTAMP });
                 } catch(e) {}
             }
             LC.leaveAll();
-            localStorage.removeItem('isLoggedIn');
-            localStorage.removeItem('playerName');
+            localStorage.clear();
+            try { sessionStorage.clear(); } catch(e) {}
             MapsTo('section-login', 'left');
         }
         async function openChangePass() {
@@ -8561,48 +8430,38 @@ function drawMinimap() {
         // ─── LEADERBOARD ───
         var _lbCurrentGame = '';
         function lbSelectGame(gk, btn) {
-            document.querySelectorAll('.lb-game-tab').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.lb-game-tab').forEach(function(b){ b.classList.remove('active'); });
             if (btn) btn.classList.add('active');
             _lbCurrentGame = gk;
             loadLeaderboard();
         }
         function loadLeaderboard() {
-            const gk = _lbCurrentGame || document.getElementById('lb-game-select') && document.getElementById('lb-game-select').value;
-            const list = document.getElementById('lb-score-list');
-            const loading = document.getElementById('lb-loading');
-            const myRankBar = document.getElementById('lb-my-rank-bar');
-            const myName = (localStorage.getItem('playerName') || '').toLowerCase().trim();
+            var gk = _lbCurrentGame;
+            var list = document.getElementById('lb-score-list');
+            var loading = document.getElementById('lb-loading');
+            var myRankBar = document.getElementById('lb-my-rank-bar');
+            var myName = (localStorage.getItem('playerName') || '').toLowerCase().trim();
             if (!gk) return;
-            list.innerHTML = '';
-            loading.innerText = 'Loading...';
-            loading.style.display = 'block';
+            list.innerHTML = [1,2,3,4,5].map(function(){ return '<div class="rank-item skeleton" style="height:48px;margin-bottom:8px;">&nbsp;</div>'; }).join('');
+            loading.style.display = 'none';
             if (myRankBar) myRankBar.classList.remove('show');
-
             db.ref('users').orderByChild(gk).limitToLast(20).once('value').then(function(snapshot) {
-                loading.style.display = 'none';
                 var scores = [];
                 snapshot.forEach(function(child) {
                     var d = child.val();
                     if (d[gk] && d[gk] > 0) scores.push({ id: child.key, name: child.key.charAt(0).toUpperCase() + child.key.slice(1), score: d[gk] });
                 });
                 scores.reverse();
-                if (scores.length === 0) {
-                    list.innerHTML = '<div style="text-align:center;padding:24px;color:rgba(255,255,255,0.3);font-size:0.85rem;letter-spacing:1px;">NO SCORES YET — BE THE FIRST!</div>';
-                    return;
-                }
-
-                // Medal icons
+                list.innerHTML = '';
+                if (scores.length === 0) { list.innerHTML = '<div style="text-align:center;padding:24px;color:rgba(255,255,255,0.3);font-size:0.85rem;">NO SCORES YET</div>'; return; }
                 var medals = ['🥇','🥈','🥉'];
                 var myRank = -1, myScore = 0;
-
                 scores.forEach(function(p, i) {
-                    var r = i + 1;
-                    var isMe = p.id === myName;
+                    var r = i + 1, isMe = p.id === myName;
                     if (isMe) { myRank = r; myScore = p.score; }
                     var div = document.createElement('div');
                     div.className = 'rank-item' + (isMe ? ' rank-me' : '');
                     div.setAttribute('data-uid', p.id);
-                    // Build rank item using DOM to avoid quote escaping issues
                     var rankSpan = document.createElement('span');
                     rankSpan.style.cssText = 'font-size:' + (r<=3?'1.4rem':'0.9rem') + ';min-width:28px;text-align:center;';
                     rankSpan.innerHTML = r <= 3 ? medals[r-1] : '#'+r;
@@ -8612,59 +8471,47 @@ function drawMinimap() {
                     var scoreSpan = document.createElement('span');
                     scoreSpan.style.cssText = 'font-family:Teko,sans-serif;font-size:1.3rem;color:#00f3ff;';
                     scoreSpan.innerText = p.score.toLocaleString();
-                    div.appendChild(rankSpan);
-                    div.appendChild(nameSpan);
-                    div.appendChild(scoreSpan);
+                    div.appendChild(rankSpan); div.appendChild(nameSpan); div.appendChild(scoreSpan);
+                    if (isMe) {
+                        var youBadge = document.createElement('span');
+                        youBadge.style.cssText = 'font-size:0.6rem;color:#2ecc71;font-family:Teko,sans-serif;background:rgba(46,204,113,0.15);border:1px solid rgba(46,204,113,0.3);border-radius:4px;padding:1px 5px;flex-shrink:0;';
+                        youBadge.innerText = 'YOU';
+                        div.appendChild(youBadge);
+                    }
                     div.onclick = function() { openProfileCard(p.id); };
                     list.appendChild(div);
                 });
-
-                // Show own rank bar if not in top 20
                 if (myRankBar && myName) {
                     if (myRank > 0) {
                         document.getElementById('lb-my-rank-info').innerText = '#' + myRank + ' · ' + (myName.charAt(0).toUpperCase()+myName.slice(1));
                         document.getElementById('lb-my-rank-score').innerText = myScore.toLocaleString() + ' pts';
                         myRankBar.classList.add('show');
-                    } else {
-                        // Check if user has a score at all
-                        db.ref('users/' + myName + '/' + gk).once('value', function(s) {
-                            if (s.val() && s.val() > 0) {
-                                document.getElementById('lb-my-rank-info').innerText = 'Not in top 20 · ' + (myName.charAt(0).toUpperCase()+myName.slice(1));
-                                document.getElementById('lb-my-rank-score').innerText = s.val().toLocaleString() + ' pts';
-                                myRankBar.classList.add('show');
-                            }
-                        });
                     }
                 }
             });
         }
         function openProfileCard(uid) {
             var overlay = document.getElementById('profile-card-overlay');
-            var avatarEl = document.getElementById('pc-avatar');
-            var usernameEl = document.getElementById('pc-username');
-            var scoresEl = document.getElementById('pc-scores');
-            var joinedEl = document.getElementById('pc-joined');
-            var lastLoginEl = document.getElementById('pc-last-login');
             if (!overlay) return;
-            // Reset
-            avatarEl.innerText = '?';
-            usernameEl.innerText = 'Loading...';
-            scoresEl.innerHTML = '';
-            joinedEl.innerText = '';
-            lastLoginEl.innerText = '';
+            document.getElementById('pc-avatar').innerText = '?';
+            document.getElementById('pc-username').innerHTML = '<span class="skeleton" style="display:inline-block;width:120px;height:28px;">&nbsp;</span>';
+            document.getElementById('pc-scores').innerHTML = [0,1,2,3].map(function(){ return '<div class="pc-score-item skeleton" style="height:55px;">&nbsp;</div>'; }).join('');
+            document.getElementById('pc-last-login').innerText = '';
             overlay.classList.add('pc-show');
             db.ref('users/' + uid).once('value', function(snap) {
-                if (!snap.exists()) { usernameEl.innerText = 'User not found'; return; }
+                if (!snap.exists()) { document.getElementById('pc-username').innerText = 'User not found'; return; }
                 var d = snap.val();
                 var displayName = uid.charAt(0).toUpperCase() + uid.slice(1);
-                avatarEl.innerText = displayName.charAt(0).toUpperCase();
-                usernameEl.innerText = displayName;
+                document.getElementById('pc-avatar').innerText = displayName.charAt(0);
+                document.getElementById('pc-username').innerText = displayName;
                 var games = [
                     { key:'flappy_highscore', label:'🐦 Flappy', color:'#00f3ff' },
                     { key:'dino_highscore',   label:'🦕 Dino',   color:'#2ecc71' },
                     { key:'snake_highscore',  label:'🐍 Snake',  color:'#f1c40f' },
                     { key:'pacman_highscore', label:'ᗧ Pac-Man', color:'#e74c3c' }
                 ];
+                var scoresEl = document.getElementById('pc-scores');
+                scoresEl.innerHTML = '';
                 games.forEach(function(g) {
                     var val = d[g.key] || 0;
                     var item = document.createElement('div');
@@ -8673,16 +8520,18 @@ function drawMinimap() {
                         '<div class="pc-score-val" style="color:' + g.color + ';">' + (val > 0 ? val.toLocaleString() : '—') + '</div>';
                     scoresEl.appendChild(item);
                 });
-                if (d.lastLogin) {
+                var llEl = document.getElementById('pc-last-login');
+                if (d.lastLogin && llEl) {
                     var ist = new Date(d.lastLogin).toLocaleString('en-IN', { timeZone:'Asia/Kolkata', month:'short', day:'numeric', year:'numeric' });
-                    lastLoginEl.innerText = 'Last seen: ' + ist;
+                    llEl.innerText = 'Last seen: ' + ist;
+                }
+                if (d.bio && llEl) {
+                    llEl.style.cssText = 'text-align:center;font-size:0.78rem;margin-top:8px;font-style:italic;padding:0 8px;word-break:break-word;';
+                    llEl.innerHTML = '<span style="color:#00f3ff;">&ldquo;</span><span style="color:white;">' + d.bio + '</span><span style="color:#00f3ff;">&rdquo;</span>';
                 }
             });
         }
-        function closeProfileCard() {
-            var overlay = document.getElementById('profile-card-overlay');
-            if (overlay) overlay.classList.remove('pc-show');
-        }
+        function closeProfileCard() { var overlay = document.getElementById('profile-card-overlay'); if (overlay) overlay.classList.remove('pc-show'); }
 
         // ─── CHAT ───
         // All Firebase listeners registered via LC('section-chat').
@@ -8703,8 +8552,37 @@ function drawMinimap() {
             });
             _startPing('chat-ping-badge', 'chat-ping-ms');
 
-            // ── INVITE LISTENER in chat ──
             var _chatPid = myName.toLowerCase().trim();
+            // ── FRIEND REQUEST LISTENER ──
+            var _freqWrap = document.getElementById('freq-incoming-wrap');
+            var _freqList = document.getElementById('freq-incoming-list');
+            LC.fb('section-chat', db.ref('friend_requests/' + _chatPid), 'value', function(snap) {
+                if (!_freqList) return;
+                _freqList.innerHTML = '';
+                if (!snap.exists()) { if (_freqWrap) _freqWrap.style.display = 'none'; return; }
+                if (_freqWrap) _freqWrap.style.display = 'block';
+                var _freqCount = 0;
+                snap.forEach(function(child) {
+                    if (_freqCount >= 10) return;
+                    _freqCount++;
+                    var fromUser = child.key;
+                    var div = document.createElement('div');
+                    div.className = 'freq-item';
+                    div.innerHTML = '<span class="freq-name">👤 ' + fromUser + '</span>' +
+                        '<div class="freq-btns">' +
+                        '<button class="freq-accept" onclick="acceptFriendRequest(\'' + fromUser + '\')">✓ Accept</button>' +
+                        '<button class="freq-reject" onclick="rejectFriendRequest(\'' + fromUser + '\')">✕</button>' +
+                        '</div>';
+                    _freqList.appendChild(div);
+                });
+                if (snap.numChildren() > 10) {
+                    var moreDiv = document.createElement('div');
+                    moreDiv.style.cssText = 'font-size:0.72rem;color:rgba(255,255,255,0.3);text-align:center;padding:4px;';
+                    moreDiv.innerText = '+' + (snap.numChildren()-10) + ' more requests';
+                    _freqList.appendChild(moreDiv);
+                }
+            });
+            // ── INVITE LISTENER in chat ──
             LC.fb('section-chat', db.ref('invites/' + _chatPid), 'child_added', function(snap) {
                 var inv = snap.val();
                 if (!inv) return;
@@ -8756,12 +8634,37 @@ function drawMinimap() {
             });
         }
         function addFriend() {
-            const input = document.getElementById('friendInput'), tu = input.value.trim(), st = document.getElementById('add-status'), mn = localStorage.getItem('playerName');
-            if (!tu) return; if (tu === mn) { st.innerText = "Can't add yourself."; st.style.color = 'red'; return; }
-            db.ref('users/' + tu).once('value').then(snap => {
-                if (snap.exists()) { db.ref('friends/' + mn + '/' + tu).set(true); db.ref('friends/' + tu + '/' + mn).set(true); st.innerText = 'Added!'; st.style.color = '#00f3ff'; input.value = ''; }
-                else { st.innerText = 'User not found (Remove Capital Letters!)'; st.style.color = 'red'; }
+            var input = document.getElementById('friendInput');
+            var tu = input.value.trim().toLowerCase();
+            var st = document.getElementById('add-status');
+            var mn = (localStorage.getItem('playerName') || '').toLowerCase().trim();
+            if (!tu) return;
+            if (tu === mn) { st.innerText = "Can't add yourself."; st.style.color = '#ff3366'; return; }
+            if (!/^[a-z0-9]+$/.test(tu)) { st.innerText = 'Letters & numbers only.'; st.style.color = '#ff3366'; return; }
+            st.innerText = 'Checking...'; st.style.color = '#888';
+            db.ref('friends/' + mn + '/' + tu).once('value').then(function(fs) {
+                if (fs.exists()) { st.innerText = 'Already friends!'; st.style.color = '#2ecc71'; return; }
+                db.ref('users/' + tu).once('value').then(function(snap) {
+                    if (!snap.exists()) { st.innerText = 'User not found.'; st.style.color = '#ff3366'; return; }
+                    db.ref('friend_requests/' + tu + '/' + mn).once('value').then(function(req) {
+                        if (req.exists()) { st.innerText = 'Request already sent!'; st.style.color = '#f1c40f'; return; }
+                        db.ref('friend_requests/' + tu + '/' + mn).set({ from: mn, time: Date.now() })
+                            .then(function() { st.innerText = '✓ Request sent to ' + tu + '!'; st.style.color = '#00f3ff'; input.value = ''; });
+                    });
+                });
             });
+        }
+        function acceptFriendRequest(fromUser) {
+            var mn = (localStorage.getItem('playerName') || '').toLowerCase().trim();
+            db.ref('friends/' + mn + '/' + fromUser).set(true);
+            db.ref('friends/' + fromUser + '/' + mn).set(true);
+            db.ref('friend_requests/' + mn + '/' + fromUser).remove();
+            showNotify('✅ You and ' + fromUser + ' are now friends!', 'success');
+        }
+        function rejectFriendRequest(fromUser) {
+            var mn = (localStorage.getItem('playerName') || '').toLowerCase().trim();
+            db.ref('friend_requests/' + mn + '/' + fromUser).remove();
+            showNotify(fromUser + '\'s request declined.', 'info');
         }
         function openChatWith(fn) {
             const mn = localStorage.getItem('playerName'); currentChatFriend = fn; localStorage.setItem('lastReadChat', Date.now());
@@ -8784,16 +8687,29 @@ function drawMinimap() {
             const mn = localStorage.getItem('playerName'), mc = document.getElementById('chat-messages');
             mc.innerHTML = '';
             db.ref('chats/' + currentChatId).off();
+            var _lastMsgDate = '';
             LC.fb('section-chat', db.ref('chats/' + currentChatId), 'child_added', snap => {
-                const d = snap.val(), id = snap.key, div = document.createElement('div'); div.id = 'msg-' + id;
+                const d = snap.val(), id = snap.key;
+                if (d.timestamp) {
+                    const msgDate = new Date(d.timestamp).toDateString();
+                    if (msgDate !== _lastMsgDate) {
+                        _lastMsgDate = msgDate;
+                        const sep = document.createElement('div'); sep.className = 'chat-date-sep';
+                        const today = new Date().toDateString(), yesterday = new Date(Date.now()-86400000).toDateString();
+                        const label = msgDate===today?'Today':msgDate===yesterday?'Yesterday':new Date(d.timestamp).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
+                        sep.innerHTML = '<span>' + label + '</span>'; mc.appendChild(sep);
+                    }
+                }
+                const div = document.createElement('div'); div.id = 'msg-' + id;
                 const isSystem = d.sender === '_system';
                 const isMine = !isSystem && d.sender === mn;
                 div.className = 'message ' + (isSystem ? 'msg-system' : isMine ? 'msg-sent' : 'msg-received');
                 if (!isSystem && !isMine && !d.read) db.ref('chats/' + currentChatId + '/' + id).update({ read: true });
                 const sh = isMine ? `<span class="msg-status ${d.read ? 'tick-read' : 'tick-sent'}">&#10003;&#10003;</span>` : '';
+                function _lfy(t) { var e=t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); return e.replace(/(https?:\/\/[^\s]+)/g,'<a href="$1" target="_blank" rel="noopener noreferrer" style="color:#00f3ff;text-decoration:underline;word-break:break-all;">$1</a>'); }
                 div.innerHTML = isSystem
-                    ? `<span style="color:#888;font-style:italic;font-size:0.82rem;">📢 ${d.text}</span>`
-                    : `<span>${d.text}</span><span class="msg-time">${fmtTime(d.timestamp)} ${sh}</span>`;
+                    ? '<span style="color:#888;font-style:italic;font-size:0.82rem;">📢 ' + _lfy(d.text) + '</span>'
+                    : '<span>' + _lfy(d.text) + '</span><span class="msg-time">' + fmtTime(d.timestamp) + ' ' + sh + '</span>';
                 mc.appendChild(div); requestAnimationFrame(() => { mc.scrollTop = mc.scrollHeight; });
             });
             LC.fb('section-chat', db.ref('chats/' + currentChatId), 'child_changed', snap => {
@@ -8804,19 +8720,52 @@ function drawMinimap() {
         function sendMessage() {
             const mn = localStorage.getItem('playerName'), input = document.getElementById('msgInput'), text = input.value.trim();
             if (!text || !currentChatId) return;
-            db.ref('chats/' + currentChatId).push({ sender: mn, text, timestamp: Date.now(), read: false });
+            db.ref('chats/' + currentChatId).push({ sender: mn, text, timestamp: Date.now(), read: false })
+                .then(() => _pruneChat(currentChatId));
             input.value = ''; requestAnimationFrame(() => input.focus());
         }
+        function _pruneChat(chatId) {
+            if (!chatId) return;
+            var cutoff14d = Date.now() - 14 * 24 * 60 * 60 * 1000;
+            db.ref('chats/' + chatId).orderByChild('timestamp').once('value', function(snap) {
+                if (!snap.exists()) return;
+                var keys = [], toDelete = [];
+                snap.forEach(function(child) {
+                    var d = child.val();
+                    if (d.timestamp && d.timestamp < cutoff14d) {
+                        toDelete.push(child.key); // older than 14 days
+                    } else {
+                        keys.push(child.key);
+                    }
+                });
+                // Delete 14d+ old messages
+                toDelete.forEach(function(k) { db.ref('chats/' + chatId + '/' + k).remove(); });
+                // Keep only last 50 of remaining
+                if (keys.length > 50) {
+                    var excess = keys.slice(0, keys.length - 50);
+                    excess.forEach(function(k) { db.ref('chats/' + chatId + '/' + k).remove(); });
+                }
+            });
+        }
         function fmtTime(ts) {
-            const d = new Date(ts), n = new Date(), t = d.toDateString() === n.toDateString();
-            if (t) return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
-            return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
+            const d = new Date(ts), n = new Date();
+            const time = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+            if (d.toDateString() === n.toDateString()) return time;
+            const yesterday = new Date(n); yesterday.setDate(n.getDate()-1);
+            if (d.toDateString() === yesterday.toDateString()) return 'Yesterday ' + time;
+            return String(d.getDate()).padStart(2,'0') + '/' + String(d.getMonth()+1).padStart(2,'0') + '/' + d.getFullYear() + ' ' + time;
         }
         function handleChatKey(e) { if (e.key === 'Enter') sendMessage(); }
 
 
-        // ══ PROFILE SYSTEM ══════════════════════════════════════
+        // ══ ABUSIVE WORDS FILTER ══
+        var _badWords = ['fuck','shit','bitch','cunt','bastard','whore','slut','nigger','faggot','retard','motherfucker','asshole','dickhead','bullshit'];
+        function _containsBadWords(text) {
+            var lower = text.toLowerCase().replace(/[^a-z\s]/g, ' ');
+            return _badWords.some(function(w) { return lower.indexOf(w) >= 0; });
+        }
 
+        // ══ PROFILE SYSTEM ══
         function openMyProfile() {
             var pn = (localStorage.getItem('playerName') || '').toLowerCase().trim();
             if (!pn) return;
@@ -8826,22 +8775,36 @@ function drawMinimap() {
         }
 
         function _loadMyProfile(pid) {
-            var avatarEl  = document.getElementById('my-prof-avatar');
-            var nameEl    = document.getElementById('my-prof-name');
-            var loginEl   = document.getElementById('my-prof-lastlogin');
-            var statsEl   = document.getElementById('my-prof-stats');
+            var avatarEl = document.getElementById('my-prof-avatar');
+            var nameEl   = document.getElementById('my-prof-name');
+            var loginEl  = document.getElementById('my-prof-lastlogin');
+            var statsEl  = document.getElementById('my-prof-stats');
             if (!avatarEl) return;
+            if (statsEl) statsEl.innerHTML = '';
             avatarEl.innerText = pid.charAt(0).toUpperCase();
             nameEl.innerText   = pid.charAt(0).toUpperCase() + pid.slice(1);
-            statsEl.innerHTML  = '';
-
+            db.ref('friends/' + pid).once('value', function(fSnap) {
+                var fc = document.getElementById('my-friends-count');
+                if (fc) fc.innerText = fSnap.exists() ? Object.keys(fSnap.val()).length : 0;
+            });
             db.ref('users/' + pid).once('value', function(snap) {
                 if (!snap.exists()) return;
                 var d = snap.val();
-                if (d.lastLogin) {
-                    var ist = new Date(d.lastLogin).toLocaleString('en-IN',
-                        { timeZone:'Asia/Kolkata', month:'short', day:'numeric', year:'numeric', hour:'2-digit', minute:'2-digit', hour12:true });
-                    loginEl.innerText = 'Last login: ' + ist;
+                if (d.lastLogin && loginEl) {
+                    var ist = new Date(d.lastLogin).toLocaleString('en-IN', { timeZone:'Asia/Kolkata', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit', hour12:true });
+                    loginEl.innerText = 'Last active: ' + ist;
+                }
+                var bioDisplay = document.getElementById('my-bio-display');
+                var bioInput   = document.getElementById('my-bio-input');
+                var bioCtrls   = document.getElementById('my-bio-controls');
+                if (bioDisplay) {
+                    if (d.bio) { bioDisplay.innerText = d.bio; bioDisplay.className = 'prof-bio-text'; }
+                    else { bioDisplay.innerText = 'Tap to add a bio...'; bioDisplay.className = 'prof-bio-text empty'; }
+                    bioDisplay.onclick = function() {
+                        bioDisplay.style.display = 'none';
+                        if (bioInput) { bioInput.value = d.bio || ''; bioInput.style.display = 'block'; bioInput.focus(); updateBioCount(); }
+                        if (bioCtrls) bioCtrls.style.display = 'flex';
+                    };
                 }
                 var games = [
                     { key:'flappy_highscore', icon:'🐦', label:'Flappy',  color:'#00f3ff' },
@@ -8849,82 +8812,132 @@ function drawMinimap() {
                     { key:'snake_highscore',  icon:'🐍', label:'Snake',   color:'#f1c40f' },
                     { key:'pacman_highscore', icon:'ᗧ',  label:'Pac-Man', color:'#e74c3c' }
                 ];
-                games.forEach(function(g) {
-                    var val = d[g.key] || 0;
-                    var card = document.createElement('div');
-                    card.className = 'prof-stat-card';
-                    card.innerHTML =
-                        '<div class="prof-stat-icon">' + g.icon + '</div>' +
-                        '<div class="prof-stat-label">' + g.label + '</div>' +
-                        '<div class="prof-stat-val" style="color:' + g.color + ';">' +
-                            (val > 0 ? val.toLocaleString() : '—') + '</div>';
-                    statsEl.appendChild(card);
-                });
+                if (statsEl) {
+                    statsEl.innerHTML = '';
+                    games.forEach(function(g) {
+                        var val = d[g.key] || 0;
+                        var card = document.createElement('div');
+                        card.className = 'prof-stat-card';
+                        card.innerHTML = '<div class="prof-stat-icon">' + g.icon + '</div><div class="prof-stat-label">' + g.label + '</div><div class="prof-stat-val" style="color:' + g.color + ';">' + (val > 0 ? val.toLocaleString() : '—') + '</div>';
+                        statsEl.appendChild(card);
+                    });
+                }
+                var rankEl = document.getElementById('my-rank-display');
+                if (rankEl) {
+                    var best = Math.max(d.flappy_highscore||0, d.dino_highscore||0, d.snake_highscore||0, d.pacman_highscore||0);
+                    rankEl.innerText = best > 0 ? best.toLocaleString() : '—';
+                }
             });
         }
 
-        // ── Search user profile ──────────────────────────────────
+        function updateBioCount() {
+            var inp = document.getElementById('my-bio-input');
+            var countEl = document.getElementById('my-bio-wordcount');
+            if (!inp || !countEl) return;
+            var words = inp.value.trim() === '' ? [] : inp.value.trim().split(/\s+/);
+            var wc = words.length;
+            countEl.innerText = wc;
+            countEl.style.color = wc > 100 ? '#ff3366' : 'rgba(255,255,255,0.3)';
+            var errEl = document.getElementById('my-bio-error');
+            if (errEl) errEl.innerText = '';
+        }
+
+        function saveBio() {
+            var pid = (localStorage.getItem('playerName') || '').toLowerCase().trim();
+            var inp = document.getElementById('my-bio-input');
+            var bioDisplay = document.getElementById('my-bio-display');
+            var bioCtrls = document.getElementById('my-bio-controls');
+            var errEl = document.getElementById('my-bio-error');
+            if (!inp || !pid) return;
+            var text = inp.value.trim();
+            var words = text === '' ? [] : text.split(/\s+/);
+            if (words.length > 100) { if (errEl) errEl.innerText = '❌ Max 100 words!'; return; }
+            if (_containsBadWords(text)) { if (errEl) errEl.innerText = '❌ Abusive words found! Keep it clean.'; return; }
+            db.ref('users/' + pid).update({ bio: text || null }, function(err) {
+                if (err) { if (errEl) errEl.innerText = '❌ Error saving.'; return; }
+                if (bioDisplay) {
+                    bioDisplay.style.display = 'block';
+                    if (text) { bioDisplay.innerText = text; bioDisplay.className = 'prof-bio-text'; }
+                    else { bioDisplay.innerText = 'Tap to add a bio...'; bioDisplay.className = 'prof-bio-text empty'; }
+                }
+                if (inp) inp.style.display = 'none';
+                if (bioCtrls) bioCtrls.style.display = 'none';
+                showNotify('✅ Bio saved!', 'success');
+            });
+        }
+
+        // FF-style prefix search
         function searchUserProfile() {
             var raw = document.getElementById('prof-search-input').value.trim().toLowerCase();
             var result = document.getElementById('prof-search-result');
             if (!raw) { result.innerHTML = ''; return; }
-            if (!/^[a-z0-9]+$/.test(raw)) {
-                result.innerHTML = '<p style="color:rgba(255,255,255,0.3);font-size:0.8rem;margin-top:8px;">Invalid username format.</p>';
-                return;
-            }
-            result.innerHTML = '<p style="color:rgba(255,255,255,0.3);font-size:0.8rem;margin-top:8px;letter-spacing:1px;">Searching...</p>';
-            db.ref('users/' + raw).once('value', function(snap) {
-                if (!snap.exists()) {
-                    result.innerHTML = '<p style="color:rgba(255,51,102,0.7);font-size:0.85rem;margin-top:10px;">❌ User \"' + raw + '\" not found.</p>';
-                    return;
+            if (raw.length < 2) { result.innerHTML = '<p style="font-size:0.8rem;color:rgba(255,255,255,0.3);margin-top:8px;">Type at least 2 characters...</p>'; return; }
+            if (!/^[a-z0-9]+$/.test(raw)) { result.innerHTML = '<p style="font-size:0.8rem;color:rgba(255,51,102,0.7);margin-top:8px;">Letters & numbers only.</p>'; return; }
+            result.innerHTML = '<p style="font-size:0.8rem;color:rgba(255,255,255,0.3);margin-top:8px;letter-spacing:1px;">Searching...</p>';
+            var myName = (localStorage.getItem('playerName')||'').toLowerCase().trim();
+            db.ref('users').orderByKey().startAt(raw).endAt(raw + '\uf8ff').limitToFirst(10).once('value', function(snap) {
+                result.innerHTML = '';
+                if (!snap.exists()) { result.innerHTML = '<p style="font-size:0.82rem;color:rgba(255,51,102,0.7);margin-top:10px;text-align:center;">No players found for "' + raw + '"</p>'; return; }
+                var count = 0;
+                snap.forEach(function(child) {
+                    count++;
+                    var uid = child.key;
+                    if (uid === myName) return;
+                    var d = child.val();
+                    var displayName = uid.charAt(0).toUpperCase() + uid.slice(1);
+                    var scoreStr = '🐦' + (d.flappy_highscore||0) + '  🦕' + (d.dino_highscore||0) + '  🐍' + (d.snake_highscore||0);
+                    db.ref('friends/' + myName + '/' + uid).once('value', function(fSnap) {
+                        db.ref('friend_requests/' + uid + '/' + myName).once('value', function(rSnap) {
+                            var isFriend = fSnap.exists(), reqSent = rSnap.exists();
+                            var btnLabel = isFriend ? '✓ Friends' : reqSent ? '⏳ Sent' : '+ Add';
+                            var btnClass = isFriend ? 'added' : reqSent ? 'sent' : '';
+                            var row = document.createElement('div');
+                            row.className = 'prof-search-result-item';
+                            row.innerHTML = '<div class="psri-avatar">' + displayName.charAt(0) + '</div>' +
+                                '<div class="psri-info"><div class="psri-name">' + displayName + '</div>' +
+                                '<div class="psri-sub">' + scoreStr + (d.bio ? '  ·  ' + d.bio.slice(0,30) : '') + '</div></div>';
+                            if (!isFriend) {
+                                var addBtn = document.createElement('button');
+                                addBtn.className = 'psri-add-btn ' + btnClass;
+                                addBtn.innerText = btnLabel;
+                                if (!reqSent) {
+                                    addBtn.onclick = function(e) {
+                                        e.stopPropagation();
+                                        db.ref('friend_requests/' + uid + '/' + myName).set({ from: myName, time: Date.now() })
+                                            .then(function() { addBtn.innerText = '⏳ Sent'; addBtn.className = 'psri-add-btn sent'; showNotify('✓ Request sent to ' + displayName + '!', 'success'); });
+                                    };
+                                }
+                                row.appendChild(addBtn);
+                            }
+                            row.onclick = function() { openProfileCard(uid); };
+                            result.appendChild(row);
+                        });
+                    });
+                });
+                if (count === 0 || result.children.length === 0) {
+                    setTimeout(function() {
+                        if (result.children.length === 0) result.innerHTML = '<p style="font-size:0.82rem;color:rgba(255,51,102,0.7);margin-top:10px;text-align:center;">No other players found for "' + raw + '"</p>';
+                    }, 1500);
                 }
-                var d = snap.val();
-                var displayName = raw.charAt(0).toUpperCase() + raw.slice(1);
-                var games = [
-                    { key:'flappy_highscore', icon:'🐦' },
-                    { key:'dino_highscore',   icon:'🦕' },
-                    { key:'snake_highscore',  icon:'🐍' },
-                    { key:'pacman_highscore', icon:'ᗧ'  }
-                ];
-                var scoreStr = games.map(function(g) {
-                    return g.icon + ' ' + (d[g.key] || 0);
-                }).join('  ·  ');
-                var lastSeen = '';
-                if (d.lastLogin) {
-                    lastSeen = ' · Last seen: ' + new Date(d.lastLogin).toLocaleString('en-IN',
-                        { timeZone:'Asia/Kolkata', month:'short', day:'numeric' });
-                }
-                result.innerHTML =
-                    '<div class="prof-search-card" id="prof-search-inner">' +
-                    '<div class="prof-search-avatar">' + displayName.charAt(0) + '</div>' +
-                    '<div class="prof-search-info">' +
-                    '<div class="prof-search-name">' + displayName + '</div>' +
-                    '<div class="prof-search-scores">' + scoreStr + lastSeen + '</div>' +
-                    '</div></div>';
             });
         }
 
-        // ── Username change request ─────────────────────────────
         function _checkUnameCooldown(pid) {
             var msgEl = document.getElementById('prof-cooldown-msg');
             if (!msgEl) return;
             db.ref('users/' + pid + '/lastUnameRequest').once('value', function(snap) {
                 if (!snap.val()) { msgEl.innerHTML = ''; return; }
-                var diff = Date.now() - snap.val();
-                var days7 = 7 * 24 * 60 * 60 * 1000;
+                var diff = Date.now() - snap.val(), days7 = 7*24*60*60*1000;
                 if (diff < days7) {
                     var rem = Math.ceil((days7 - diff) / (24*60*60*1000));
-                    msgEl.innerHTML = '<div class="prof-cooldown">⏳ Next request available in ' + rem + ' day' + (rem>1?'s':'') + '</div>';
-                } else {
-                    msgEl.innerHTML = '';
-                }
+                    msgEl.innerHTML = '<div class="prof-cooldown">⏳ Next request in ' + rem + ' day' + (rem>1?'s':'') + '</div>';
+                } else { msgEl.innerHTML = ''; }
             });
         }
 
         function openUnameChangeModal() {
             var pid = (localStorage.getItem('playerName') || '').toLowerCase().trim();
             if (!pid) return;
-            // Check cooldown first
             db.ref('users/' + pid + '/lastUnameRequest').once('value', function(snap) {
                 if (snap.val() && (Date.now() - snap.val()) < 7*24*60*60*1000) {
                     var rem = Math.ceil((7*24*60*60*1000 - (Date.now()-snap.val())) / (24*60*60*1000));
@@ -8935,77 +8948,40 @@ function drawMinimap() {
                 document.getElementById('uc-reason').value = '';
                 document.getElementById('uc-status').innerText = '';
                 document.getElementById('uname-change-overlay').classList.add('uc-show');
-                setTimeout(function(){ document.getElementById('uc-new-name').focus(); }, 200);
             });
         }
-
-        function closeUnameModal() {
-            document.getElementById('uname-change-overlay').classList.remove('uc-show');
-        }
+        function closeUnameModal() { document.getElementById('uname-change-overlay').classList.remove('uc-show'); }
 
         async function submitUnameRequest() {
-            var pid      = (localStorage.getItem('playerName') || '').toLowerCase().trim();
-            var newName  = document.getElementById('uc-new-name').value.trim().toLowerCase();
-            var reason   = document.getElementById('uc-reason').value.trim();
+            var pid = (localStorage.getItem('playerName') || '').toLowerCase().trim();
+            var newName = document.getElementById('uc-new-name').value.trim().toLowerCase();
+            var reason  = document.getElementById('uc-reason').value.trim();
             var statusEl = document.getElementById('uc-status');
             if (!newName) { statusEl.style.color='#ff3366'; statusEl.innerText='Enter a new username.'; return; }
             if (!/^[a-z0-9]+$/.test(newName)) { statusEl.style.color='#ff3366'; statusEl.innerText='Letters & numbers only.'; return; }
             if (newName.length < 3) { statusEl.style.color='#ff3366'; statusEl.innerText='At least 3 characters.'; return; }
             if (newName === pid) { statusEl.style.color='#ff3366'; statusEl.innerText='New name is same as current.'; return; }
-
             statusEl.style.color='#888'; statusEl.innerText='Checking availability...';
-            // Check if new username is already taken
-            var existSnap = await db.ref('users/' + newName).once('value');
-            if (existSnap.exists()) {
-                statusEl.style.color='#ff3366';
-                statusEl.innerText='❌ Username \"' + newName + '\" is already taken!';
-                return;
-            }
-            statusEl.innerText='Sending request...';
-
-            var ist = new Date().toLocaleString('en-IN', {
-                timeZone:'Asia/Kolkata', weekday:'short', year:'numeric',
-                month:'short', day:'numeric', hour:'2-digit', minute:'2-digit', hour12:true
-            });
-            var body =
-                '════════════════════════════════\n' +
-                '  🎮  ARCADE HUB — Username Change Request  \n' +
-                '════════════════════════════════\n\n' +
-                '👤 Current Username : ' + pid + '\n' +
-                '✏️  Requested Name  : ' + newName + '\n' +
-                '💬 Reason          : ' + (reason || 'Not specified') + '\n' +
-                '🕐 Time (IST)      : ' + ist + '\n\n' +
-                '──────────────────────────────────\n' +
-                'Action needed: Rename \"' + pid + '\" → \"' + newName + '\" in admin panel\n' +
-                '──────────────────────────────────\n' +
-                '🌐 bittuhere.github.io';
-
             try {
+                var existSnap = await db.ref('users/' + newName).once('value');
+                if (existSnap.exists()) { statusEl.style.color='#ff3366'; statusEl.innerText='❌ Username "' + newName + '" is already taken!'; return; }
+                statusEl.innerText='Sending request...';
+                var ist = new Date().toLocaleString('en-IN', { timeZone:'Asia/Kolkata', weekday:'short', year:'numeric', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit', hour12:true });
+                var body = '════════════════════════════════\n  🎮  ARCADE HUB — Username Change Request  \n════════════════════════════════\n\n' +
+                    '👤 Current Username : ' + pid + '\n✏️  Requested Name  : ' + newName + '\n💬 Reason          : ' + (reason || 'Not specified') + '\n🕐 Time (IST)      : ' + ist + '\n\n──────────────────────────────────\nAction: Rename "' + pid + '" → "' + newName + '" in admin panel\n──────────────────────────────────';
                 var res = await fetch('https://formsubmit.co/ajax/anurag670singh@gmail.com', {
-                    method: 'POST',
-                    headers: { 'Content-Type':'application/json', 'Accept':'application/json' },
-                    body: JSON.stringify({
-                        email: pid + '@arcadehub.player',
-                        _subject: '🎮 [Arcade Hub] Username Change Request: ' + pid + ' → ' + newName,
-                        message: body,
-                        _captcha: 'false'
-                    })
+                    method:'POST', headers:{'Content-Type':'application/json','Accept':'application/json'},
+                    body: JSON.stringify({ email: pid+'@arcadehub.player', _subject: '🎮 [Arcade Hub] Username Change: ' + pid + ' → ' + newName, message: body, _captcha:'false' })
                 });
                 var data = await res.json();
                 if (data.success === 'true' || data.success === true) {
-                    // Save lastUnameRequest timestamp
                     db.ref('users/' + pid).update({ lastUnameRequest: Date.now() });
-                    statusEl.style.color='#2ecc71';
-                    statusEl.innerText='✅ Request sent! Admin will review within 24h.';
+                    statusEl.style.color='#2ecc71'; statusEl.innerText='✅ Request sent! Admin will review within 24h.';
                     _checkUnameCooldown(pid);
                     setTimeout(closeUnameModal, 2000);
                 } else { throw new Error('Send failed'); }
-            } catch(e) {
-                statusEl.style.color='#ff3366';
-                statusEl.innerText='❌ Error: ' + e.message + '. Try again.';
-            }
+            } catch(e) { statusEl.style.color='#ff3366'; statusEl.innerText='❌ Error: ' + e.message; }
         }
-        // ════════════════════════════════════════════════════════
 
         // ─── GAME SECTIONS ───
         // Only Dino and Multiplayer Car use requestFullscreen + landscape lock in your zip
@@ -9024,8 +9000,8 @@ function drawMinimap() {
         }
         window.addEventListener('resize', function () { _updateRotateOverlay(); });
         (screen.orientation
-            ? screen.orientation.addEventListener('change', _updateRotateOverlay, { passive: true })
-            : window.addEventListener('orientationchange', _updateRotateOverlay, { passive: true }));
+            ? screen.orientation.addEventListener('change', _updateRotateOverlay)
+            : window.addEventListener('orientationchange', _updateRotateOverlay));
 
         // ─── SCORE SYNC TOAST ───
         var _syncTimer = null;
@@ -9704,46 +9680,33 @@ showSection('global', document.querySelector('.admin-btn'));
             }
         }
 
-        // ═══ PING MEASUREMENT ═══
+        // ═══ REAL PING via HTTP fetch (not cached serverTimeOffset) ═══
         var _pingInterval = null;
+        var _pingHistory = [];
         function _startPing(badgeId, msId) {
             if (_pingInterval) clearInterval(_pingInterval);
+            _pingHistory = [];
             function measure() {
-                if (typeof db === 'undefined') return;
-                var t0 = Date.now();
-                db.ref('.info/serverTimeOffset').once('value', function() {
-                    var ping = Date.now() - t0;
-                    var badge = document.getElementById(badgeId);
-                    var msEl = document.getElementById(msId);
+                var t0 = performance.now();
+                fetch('https://formywebfirebase-default-rtdb.firebaseio.com/.json?shallow=true',{method:'GET',cache:'no-store'})
+                .then(function() {
+                    var ping = Math.round(performance.now() - t0);
+                    _pingHistory.push(ping); if (_pingHistory.length > 5) _pingHistory.shift();
+                    var avg = Math.round(_pingHistory.reduce(function(a,b){return a+b;},0) / _pingHistory.length);
+                    var badge = document.getElementById(badgeId), msEl = document.getElementById(msId);
                     if (!badge || !msEl) return;
-                    msEl.innerText = ping;
-                    badge.className = 'ping-badge ' + (ping < 100 ? 'ping-good' : ping < 300 ? 'ping-medium' : 'ping-bad');
+                    msEl.innerText = avg;
+                    badge.className = 'ping-badge ' + (avg < 80 ? 'ping-good' : avg < 200 ? 'ping-medium' : 'ping-bad');
+                }).catch(function() {
+                    var badge = document.getElementById(badgeId), msEl = document.getElementById(msId);
+                    if (badge && msEl) { msEl.innerText = '999+'; badge.className = 'ping-badge ping-bad'; }
                 });
             }
             measure();
             _pingInterval = setInterval(measure, 5000);
         }
-        function _stopPing() {
-            if (_pingInterval) { clearInterval(_pingInterval); _pingInterval = null; }
-        }
-        // ── OFFLINE DETECTION ──
-        (function setupOfflineDetection() {
-            var banner = document.getElementById('offline-banner');
-            function setOnline()  { if (banner) banner.style.display = 'none'; }
-            function setOffline() { if (banner) banner.style.display = 'block'; }
-            window.addEventListener('online',  setOnline);
-            window.addEventListener('offline', setOffline);
-            if (!navigator.onLine) setOffline();
-            // Firebase connection state
-            if (typeof db !== 'undefined') {
-                db.ref('.info/connected').on('value', function(snap) {
-                    if (snap.val() === false) setOffline(); else setOnline();
-                });
-            }
-        })();
+        function _stopPing() { if (_pingInterval) { clearInterval(_pingInterval); _pingInterval = null; } _pingHistory = []; }
 
-
-        // ── IN-GAME NOTIFICATION BADGE ──
         var _inGameNotifCount = 0;
         function _showInGameNotif(text) {
             if (!currentSection || !currentSection.startsWith('section-game-')) return;
@@ -9762,6 +9725,28 @@ showSection('global', document.querySelector('.admin-btn'));
             _setUserStatus('online');
             MapsTo('section-hub', 'left');
         }
+
+        (function setupOfflineDetection() {
+            var banner = document.getElementById('offline-banner');
+            var _offlineTimer = null;
+            function setOnline() { if (_offlineTimer) { clearTimeout(_offlineTimer); _offlineTimer = null; } if (banner) banner.style.display = 'none'; }
+            function setOfflineDelayed() {
+                if (_offlineTimer) return;
+                _offlineTimer = setTimeout(function() { if (!navigator.onLine && banner) banner.style.display = 'block'; _offlineTimer = null; }, 2500);
+            }
+            window.addEventListener('online',  setOnline, { passive: true });
+            window.addEventListener('offline', function() {
+                if (_offlineTimer) { clearTimeout(_offlineTimer); _offlineTimer = null; }
+                if (banner) banner.style.display = 'block';
+            }, { passive: true });
+            if (typeof db !== 'undefined') {
+                var _firstFired = false;
+                db.ref('.info/connected').on('value', function(snap) {
+                    if (!_firstFired) { _firstFired = true; return; }
+                    if (snap.val() === false) setOfflineDelayed(); else setOnline();
+                });
+            }
+        })();
 
         (function boot() {
             showLoader();
