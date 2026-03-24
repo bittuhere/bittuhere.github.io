@@ -91,24 +91,27 @@
             position: fixed;
             inset: 0;
             overflow-y: auto;
-            transition: transform 0.28s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            will-change: transform;
+            transition: transform 0.28s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.25s ease;
+            will-change: transform, opacity;
             z-index: 1;
             contain: layout paint style;
         }
 
         .spa-section.hidden-right {
             transform: translateX(100%);
+            opacity: 0;
             pointer-events: none;
         }
 
         .spa-section.hidden-left {
             transform: translateX(-100%);
+            opacity: 0;
             pointer-events: none;
         }
 
         .spa-section.active {
             transform: translateX(0);
+            opacity: 1;
             pointer-events: auto;
         }
 

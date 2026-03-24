@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>404 — Page Not Found | Arcade Hub</title>
+    <meta name="robots" content="noindex">
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Teko:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0; padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+        html, body {
+            height: 100%;
+            overflow: hidden;
+            background: #0d0b22;
+            font-family: 'Segoe UI', sans-serif;
+            color: white;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ── STARFIELD ── */
+        canvas#stars {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            opacity: 0.5;
+        }
+
+        /* ── MAIN ── */
+        .container {
+            position: relative;
+            z-index: 1;
+            min-height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 24px 20px;
+            text-align: center;
+        }
+
+        /* Glitchy 404 */
+        .big-404 {
+            font-family: 'Teko', sans-serif;
+            font-size: clamp(5rem, 22vw, 11rem);
+            line-height: 1;
+            letter-spacing: 4px;
+            background: linear-gradient(135deg, #00f3ff, #ff00ff, #00f3ff);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: shimmer 3s linear infinite, glitch 4s ease-in-out infinite;
+            filter: drop-shadow(0 0 30px rgba(0,243,255,0.4));
+            margin-bottom: 4px;
+        }
+        @keyframes shimmer {
+            0%   { background-position: 0% center; }
+            100% { background-position: 200% center; }
+        }
+        @keyframes glitch {
+            0%, 90%, 100% { transform: translateX(0); }
+            92%  { transform: translateX(-4px) skewX(-1deg); }
+            94%  { transform: translateX(4px)  skewX(1deg); }
+            96%  { transform: translateX(-2px); }
+            98%  { transform: translateX(2px); }
+        }
+
+        .label {
+            font-family: 'Teko', sans-serif;
+            font-size: clamp(1.2rem, 4vw, 1.8rem);
+            letter-spacing: 6px;
+            color: rgba(255,255,255,0.5);
+            text-transform: uppercase;
+            margin-bottom: 16px;
+        }
+
+        /* Neon card */
+        .card {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 20px;
+            padding: 28px 28px 24px;
+            max-width: 420px;
+            width: 100%;
+            margin-bottom: 28px;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .card-icon { font-size: 2.4rem; margin-bottom: 10px; }
+        .card-title {
+            font-family: 'Teko', sans-serif;
+            font-size: 1.5rem;
+            color: #00f3ff;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+        .card-msg {
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.45);
+            line-height: 1.6;
+        }
+
+        /* Buttons */
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+            width: 100%;
+            max-width: 420px;
+        }
+        .btn {
+            flex: 1;
+            min-width: 140px;
+            padding: 13px 20px;
+            border-radius: 30px;
+            border: none;
+            font-family: 'Teko', sans-serif;
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+            cursor: pointer;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: transform 0.15s, box-shadow 0.15s;
+            touch-action: manipulation;
+        }
+        .btn:active { transform: scale(0.96); }
+        .btn-primary {
+            background: linear-gradient(45deg, #00f3ff, #0066ff);
+            color: white;
+            box-shadow: 0 0 20px rgba(0,243,255,0.3);
+        }
+        .btn-primary:hover { box-shadow: 0 0 30px rgba(0,243,255,0.5); transform: translateY(-2px); }
+        .btn-secondary {
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.15);
+            color: rgba(255,255,255,0.7);
+        }
+        .btn-secondary:hover { background: rgba(255,255,255,0.12); transform: translateY(-2px); }
+
+        /* Footer */
+        .footer {
+            margin-top: 28px;
+            font-size: 0.72rem;
+            color: rgba(255,255,255,0.2);
+            letter-spacing: 1px;
+        }
+        .footer a {
+            color: rgba(0,243,255,0.5);
+            text-decoration: none;
+        }
+        .footer a:hover { color: #00f3ff; }
+
+        /* Countdown */
+        #countdown {
+            font-size: 0.78rem;
+            color: rgba(255,255,255,0.3);
+            margin-top: 14px;
+            letter-spacing: 0.5px;
+        }
+        #countdown span {
+            color: #00f3ff;
+            font-family: 'Teko', sans-serif;
+            font-size: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="stars"></canvas>
+
+<div class="container">
+    <div class="big-404">404</div>
+    <div class="label">Page Not Found</div>
+
+    <div class="card">
+        <div class="card-icon">🕹️</div>
+        <div class="card-title">Oops! This level doesn't exist.</div>
+        <div class="card-msg">
+            The page you're looking for has either been moved, deleted, or never existed.
+            Let's get you back to the game!
+        </div>
+    </div>
+
+    <div class="btn-group">
+        <a href="https://bittuhere.github.io/" class="btn btn-primary">
+            🏠 Go to Hub
+        </a>
+        <a href="javascript:history.back()" class="btn btn-secondary">
+            ← Go Back
+        </a>
+    </div>
+
+    <div id="countdown">Auto-redirecting in <span id="sec">10</span>s</div>
+
+    <div class="footer">
+        <a href="https://bittuhere.github.io/">bittuhere.github.io</a>
+        &nbsp;·&nbsp; Arcade Hub
+    </div>
+</div>
+
+<script>
+    // ── Starfield ──
+    (function() {
+        var canvas = document.getElementById('stars');
+        var ctx = canvas.getContext('2d');
+        var stars = [];
+
+        function resize() {
+            canvas.width  = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resize();
+        window.addEventListener('resize', resize, { passive: true });
+
+        for (var i = 0; i < 120; i++) {
+            stars.push({
+                x: Math.random(),
+                y: Math.random(),
+                r: Math.random() * 1.5 + 0.3,
+                o: Math.random() * 0.6 + 0.2,
+                speed: Math.random() * 0.0002 + 0.00005
+            });
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            stars.forEach(function(s) {
+                s.y += s.speed;
+                if (s.y > 1) s.y = 0;
+                ctx.beginPath();
+                ctx.arc(s.x * canvas.width, s.y * canvas.height, s.r, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(255,255,255,' + s.o + ')';
+                ctx.fill();
+            });
+            requestAnimationFrame(draw);
+        }
+        draw();
+    })();
+
+    // ── Countdown redirect ──
+    (function() {
+        var n = 10;
+        var el = document.getElementById('sec');
+        var iv = setInterval(function() {
+            n--;
+            el.innerText = n;
+            if (n <= 0) {
+                clearInterval(iv);
+                window.location.href = 'https://bittuhere.github.io/';
+            }
+        }, 1000);
+    })();
+</script>
+
+</body>
+</html>
