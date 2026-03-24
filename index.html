@@ -20,6 +20,18 @@
 <meta name="description" content="Arcade Hub by bittuhere. Play Flappy Bird, Dino Game, Snake, Pac-Man, Multiplayer Car Game, Tic Tac Toe online. Free browser games.">
 <meta name="keywords" content="arcade hub, bittuhere, arcadehub, online games, multiplayer games, flappy bird, dino game">
 <meta name="author" content="bittuhere">
+ <link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0d0b22">
+<link rel="apple-touch-icon" href="favicon.ico">
+
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js');
+    });
+  }
+</script>
+
 
 <!-- Open Graph (WhatsApp/social sharing mein preview) -->
     <meta property="og:title" content="Arcade Hub — bittuhere">
