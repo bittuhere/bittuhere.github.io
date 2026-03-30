@@ -16,13 +16,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
     <meta name="google-site-verification" content="rNY8TOAZ2F90cDmywRgpcIvI58KzEdFR1NMKVMqktlY" />
     <!-- Basic SEO -->
-<title>Arcade Hub | Free Online Games</title>
+<title>Arcade Hub by bittuhere | Free Online Games</title>
 <meta name="description" content="Arcade Hub by bittuhere. Play Flappy Bird, Dino Game, Snake, Pac-Man, Multiplayer Car Game, Tic Tac Toe online. Free browser games.">
-<meta name="keywords" content="arcade hub, bittuhere, arcadehub, online games, multiplayer games, flappy bird, dino game">
+<meta name="keywords" content="arcade hub, bittuhere, arcadehub, BittuPlay, BitArcade, online games, multiplayer games, flappy bird, dino game, snake game, pac-man">
 <meta name="author" content="bittuhere">
  <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0d0b22">
-<link rel="apple-touch-icon" href="favicon.ico">
+<link rel="apple-touch-icon" href="/favicon.png">
 
 <script>
   if ('serviceWorker' in navigator) {
@@ -48,7 +48,7 @@
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"WebSite","name":"Arcade Hub","alternateName":["Arcade Hub","bittuhere","arcadehub"],"url":"https://bittuhere.github.io/","description":"Free online arcade games — Flappy Bird, Dino, Snake, Pac-Man, Multiplayer Car Game, Tic Tac Toe","author":{"@type":"Person","name":"bittuhere","url":"https://bittuhere.github.io/"}}
+{"@context":"https://schema.org","@type":"WebSite","name":"Arcade Hub","alternateName":["Arcade Hub","bittuhere","arcadehub","BittuPlay","BitArcade"],"url":"https://bittuhere.github.io/","description":"Free online arcade games — Flappy Bird, Dino, Snake, Pac-Man, Multiplayer Car Game, Tic Tac Toe","author":{"@type":"Person","name":"bittuhere","url":"https://bittuhere.github.io/"}}
 </script>
 
 <!-- Canonical URL -->
@@ -141,11 +141,13 @@
 
         .spa-section.game-frame {
             overflow: hidden;
+            background: #000; /* prevent purple bleed during transition */
         }
 
         .game-section-wrapper {
             position: fixed;
             inset: 0;
+            background: #000;
         }
 
         .game-section-wrapper iframe {
@@ -537,17 +539,34 @@
             box-shadow: 0 0 15px #00f3ff;
             transform: translateY(-2px);
         }
+        @keyframes friendBtnShake {
+            0%,100%{transform:translateX(0);}
+            20%{transform:translateX(-3px) rotate(-2deg);}
+            40%{transform:translateX(3px) rotate(2deg);}
+            60%{transform:translateX(-2px);}
+            80%{transform:translateX(2px);}
+        }
+        .hub-friends-btn.has-notif {
+            border-color: #ff3366;
+            box-shadow: 0 0 12px rgba(255,51,102,0.4);
+            animation: friendBtnShake 0.5s ease-in-out 3;
+        }
 
+        @keyframes notifRing {
+            0%,100% { transform:scale(1); box-shadow:0 0 0 0 rgba(255,0,0,0.7); }
+            50%     { transform:scale(1.3); box-shadow:0 0 0 6px rgba(255,0,0,0); }
+        }
         #chat-notif-dot {
             position: absolute;
-            top: -2px;
-            right: -2px;
-            width: 12px;
-            height: 12px;
-            background: red;
+            top: -4px;
+            right: -4px;
+            width: 14px;
+            height: 14px;
+            background: #ff3366;
             border-radius: 50%;
             border: 2px solid #0f0c29;
             display: none;
+            animation: notifRing 1.2s ease-in-out infinite;
         }
 
         .hub-lb-btn {
@@ -597,8 +616,8 @@
             cursor: pointer;
         }
 
-        .hub-profile-btn { position:fixed; top:110px; left:10px; background:rgba(0,20,30,0.92); border:1px solid rgba(0,243,255,0.25); color:#00f3ff; padding:10px 20px; border-radius:30px; font-weight:bold; display:flex; align-items:center; gap:8px; transition:transform 0.18s; z-index:200; cursor:pointer; font-size:0.9rem; touch-action:manipulation; }
-        .hub-profile-btn:hover { background:rgba(0,243,255,0.15); border-color:#00f3ff; }
+        .hub-profile-btn { position:fixed; top:65px; right:10px; background:rgba(0,20,30,0.92); border:1px solid rgba(0,243,255,0.25); color:#00f3ff; padding:10px 20px; border-radius:30px; font-weight:bold; display:flex; align-items:center; gap:8px; transition:transform 0.18s; z-index:200; cursor:pointer; font-size:0.9rem; touch-action:manipulation; }
+        .hub-profile-btn:hover { background:rgba(0,243,255,0.15); border-color:#00f3ff; transform:translateY(-2px); }
         .notif-btn:hover {
             background: #32a852;
             border-color: transparent;
@@ -608,14 +627,15 @@
 
         .red-dot {
             position: absolute;
-            top: 2px;
-            right: 2px;
-            width: 12px;
-            height: 12px;
-            background: red;
+            top: 0px;
+            right: 0px;
+            width: 14px;
+            height: 14px;
+            background: #ff3366;
             border-radius: 50%;
             border: 2px solid #1a1a1a;
             display: none;
+            animation: notifRing 1.2s ease-in-out infinite;
         }
 
         #notif-modal {
@@ -712,15 +732,23 @@
             font-size: 2.5rem;
         }
 
+        .game-btn {
+            will-change: transform;
+        }
         .game-btn:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            transform: scale(1.04);
             z-index: 10;
         }
 
         .game-btn:active {
-            transform: scale(0.97);
+            transform: scale(0.94);
         }
+        @keyframes btnTap {
+            0%  { transform:scale(1); }
+            40% { transform:scale(0.93); }
+            100%{ transform:scale(1); }
+        }
+        .game-btn:active { animation:btnTap 0.18s ease; }
 
         .full-width {
             grid-column: span 2;
@@ -1837,7 +1865,6 @@
             <h1 id="login-header">LOGIN</h1>
             <p id="login-sub">Enter the Arcade World</p>
             <form id="login-form" autocomplete="on" onsubmit="processAuth();return false;" style="display:contents;">
-            <form id="login-form" autocomplete="on" onsubmit="processAuth();return false;" style="display:contents;">
             <input type="text" id="login-username" name="username" placeholder="Username" autocomplete="username">
             <div style="position:relative;">
                 <input type="password" id="login-password" name="password" placeholder="Password" autocomplete="current-password">
@@ -1910,9 +1937,7 @@
                     <div class="game-list-grid">
                         <div onclick="openGame('fair')" class="game-btn btn-fair"><span>&#128221;</span> Fair Copies
                         </div>
-                        <a href="https://drive.google.com/drive/folders/1KZU6Rb1B59zPtJ-eX7tsFM4d-MZAxjjN"
-                            target="_blank" class="game-btn" style="background:var(--study);"><span>&#128193;</span>
-                            Annual Exam Answers</a>
+<!-- Annual Exam Answers removed -->
                     </div>
                 </div>
                 <div id="hub-multi" class="hub-hidden">
@@ -2049,7 +2074,7 @@
 <script>
 (function() {
     // --- Admin Panel JavaScript (namespaced to avoid conflicts) ---
-    console.log("Admin Panel JS Loaded");
+    // Admin panel initialized
 
     // Store all users data
     let adminAllUsers = [];
@@ -2390,7 +2415,7 @@ window.adminResetPass = function(uid) {
         showNotify('✅ User renamed: ' + oldN + ' → ' + newN, 'success');
 
     } catch (err) {
-        console.error('Rename failed:', err);
+        // rename error handled above
         st.style.color = '#ff3366';
         st.innerText = '❌ Error: ' + err.message;
         showNotify('❌ Rename failed: ' + err.message, 'error');
@@ -2493,16 +2518,18 @@ td { padding: 8px; border-bottom: 1px solid #333; }
                 <div class="prof-meta-row">
                     <div class="prof-meta-item"><div class="prof-meta-val" id="my-friends-count">—</div><div class="prof-meta-label">Friends</div></div>
                     <div class="prof-meta-item"><div class="prof-meta-val" id="my-rank-display">—</div><div class="prof-meta-label">Best Score</div></div>
+                    <div class="prof-meta-item"><div class="prof-meta-val" id="my-games-played">—</div><div class="prof-meta-label">Games Played</div></div>
                 </div>
                 <div class="prof-last-login" id="my-prof-lastlogin"></div>
+                <div id="my-level-badge" style="margin-top:8px;font-size:0.85rem;color:rgba(255,255,255,0.5);letter-spacing:1px;"></div>
             </div>
             <div class="prof-bio-card">
                 <div class="prof-bio-title">💬 About Me</div>
                 <div id="my-bio-display" class="prof-bio-text empty">Tap to add a bio...</div>
-                <textarea class="prof-bio-textarea" id="my-bio-input" maxlength="200" placeholder="Write something about yourself... (max 100 words)" oninput="updateBioCount()" style="display:none;"></textarea>
+                <textarea class="prof-bio-textarea" id="my-bio-input" maxlength="100" placeholder="Write something about yourself... (max 100 characters)" oninput="updateBioCount()" style="display:none;"></textarea>
                 <div id="my-bio-error" class="prof-bio-error"></div>
                 <div class="prof-bio-controls" id="my-bio-controls" style="display:none;">
-                    <span class="prof-bio-count"><span id="my-bio-wordcount">0</span>/100 words</span>
+                    <span class="prof-bio-count"><span id="my-bio-wordcount">0</span>/100 chars</span>
                     <button class="prof-bio-save" onclick="saveBio()">SAVE</button>
                 </div>
             </div>
@@ -5240,188 +5267,53 @@ function _exitFs(cb){if(document.fullscreenElement||document.webkitFullscreenEle
     </div>
     <div id="section-game-fair" class="spa-section hidden-right game-frame">
         <div class="game-section-wrapper">
-            <iframe id="iframe-fair" srcdoc="<!DOCTYPE html>
+            <iframe <iframe id="iframe-fair" style="width:100%;height:100%;border:none;" srcdoc="<!DOCTYPE html>
 <html lang=&quot;en&quot;>
-
 <head>
     <script>
-        // SECURITY CHECK
-        // If user is not logged in, kick them to login.html
         if (localStorage.getItem('isLoggedIn') !== 'true') {
             window.parent.postMessage('spa-back','*');
         }
     </script>
     <meta charset=&quot;UTF-8&quot;>
-    <meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;>
-    <title>Coming Soon | Fair</title>
+    <meta name=&quot;viewport&quot; content=&quot;width=device-width,initial-scale=1,maximum-scale=1&quot;>
+    <title>Fair Copies</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Teko:wght@400;600&amp;display=swap');
-
-        :root {
-            --bg-gradient: linear-gradient(135deg, #0f1805 0%, #000000 100%);
-            --primary: #2ecc71;
-            /* Neon Green */
-            --accent: #27ae60;
-            --text: #ffffff;
-            --glass: rgba(255, 255, 255, 0.05);
-        }
-
-        body {
-            margin: 0;
-            padding: 0;
-            background: var(--bg-gradient);
-            color: var(--text);
-            font-family: 'Teko', sans-serif;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            text-align: center;
-        }
-
-        /* CARD CONTAINER */
-        .container {
-            background: var(--glass);
-            backdrop-filter: blur(10px);
-            padding: 3rem;
-            border-radius: 20px;
-            border: 1px solid rgba(46, 204, 113, 0.2);
-            /* Green border */
-            box-shadow: 0 0 50px rgba(46, 204, 113, 0.1);
-            max-width: 500px;
-            width: 90%;
-            animation: popUp 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        /* ANIMATED GEAR ICON */
-        .icon-container {
-            font-size: 5rem;
-            margin-bottom: 1rem;
-            color: var(--primary);
-            display: inline-block;
-            animation: spin 8s linear infinite;
-            text-shadow: 0 0 20px var(--primary);
-        }
-
-        /* HEADINGS */
-        h1 {
-            font-size: 4rem;
-            margin: 0;
-            line-height: 1;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            background: linear-gradient(to bottom, #fff, #aaa);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        p {
-            font-family: 'Segoe UI', sans-serif;
-            font-size: 1.1rem;
-            color: #888;
-            margin-top: 10px;
-            margin-bottom: 30px;
-        }
-
-        /* FAKE NOTIFY INPUT */
-        .notify-box {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 30px;
-            justify-content: center;
-        }
-
-        input {
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid #444;
-            padding: 10px 15px;
-            border-radius: 5px;
-            color: white;
-            outline: none;
-            width: 60%;
-        }
-
-        .notify-btn {
-            background: var(--primary);
-            border: none;
-            color: black;
-            font-weight: bold;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-family: 'Segoe UI', sans-serif;
-            transition: 0.3s;
-        }
-
-        .notify-btn:hover {
-            background: white;
-            box-shadow: 0 0 15px white;
-        }
-
-        /* BACK BUTTON */
-        .btn-back {
-            text-decoration: none;
-            color: var(--primary);
-            font-size: 1.2rem;
-            border: 1px solid var(--primary);
-            padding: 10px 30px;
-            border-radius: 50px;
-            transition: all 0.3s;
-            display: inline-block;
-            font-family: 'Segoe UI', sans-serif;
-            text-transform: uppercase;
-            font-size: 0.9rem;
-            letter-spacing: 1px;
-            font-weight: bold;
-        }
-
-        .btn-back:hover {
-            background: var(--primary);
-            color: black;
-            box-shadow: 0 0 20px var(--primary);
-            transform: translateY(-2px);
-        }
-
-        /* ANIMATIONS */
-        @keyframes spin {
-            from {
-                transform: rotate(0deg);
-            }
-
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-        @keyframes popUp {
-            from {
-                opacity: 0;
-                transform: scale(0.8);
-            }
-
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
+        *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+        body{background:#0a0f05;color:#fff;font-family:'Segoe UI',sans-serif;height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+        #spabk{position:fixed;top:10px;left:10px;z-index:99999;background:rgba(0,0,0,0.85);color:#2ecc71;border:1px solid #2ecc71;padding:8px 18px;border-radius:20px;cursor:pointer;font-family:Segoe UI,sans-serif;font-size:.9rem;backdrop-filter:blur(5px);}
+        header{padding:60px 20px 16px;text-align:center;background:linear-gradient(135deg,#0a0f05,#0d1a07);border-bottom:1px solid rgba(46,204,113,0.15);flex-shrink:0;}
+        header h1{font-size:1.8rem;color:#2ecc71;letter-spacing:3px;text-transform:uppercase;margin:0;}
+        header p{font-size:0.75rem;color:rgba(255,255,255,0.35);letter-spacing:1px;margin-top:4px;}
+        #frame-wrap{flex:1;position:relative;overflow:hidden;}
+        #drive-frame{width:100%;height:100%;border:none;background:#0a0f05;}
+        #loading-bar{position:absolute;top:0;left:0;height:3px;background:linear-gradient(90deg,#2ecc71,#00f3ff);width:0%;transition:width 0.4s ease;z-index:10;}
+        #loading-bar.done{width:100%;opacity:0;transition:width 0.4s ease, opacity 0.3s ease 0.5s;}
     </style>
 </head>
-
-<body><style>#spabk{position:fixed;top:10px;left:10px;z-index:99999;background:rgba(0,0,0,0.8);color:#00f3ff;border:1px solid #00f3ff;padding:8px 18px;border-radius:20px;cursor:pointer;font-family:Segoe UI,sans-serif;font-size:.9rem;backdrop-filter:blur(5px);}#spabk:hover{background:#00f3ff;color:#000;}</style><button id=&quot;spabk&quot; onclick=&quot;window.parent.postMessage('spa-back','*')&quot;>← Hub</button>
-
-    <div class=&quot;container&quot;>
-        <div class=&quot;icon-container&quot;>⚙️</div>
-
-        <h1>Coming Soon</h1>
-        <p>We are working for Fair Copies! <br> Stay tuned for updates.</p>
-        <button class=&quot;btn-back&quot; onclick=&quot;window.parent.postMessage('spa-back','*')&quot;>← Back to Menu</button>
-    </div>
-
+<body>
+<button id=&quot;spabk&quot; onclick=&quot;window.parent.postMessage('spa-back','*')&quot;>← Hub</button>
+<header>
+    <h1>📋 Fair Copies</h1>
+    <p>TAP ANY FILE TO VIEW OR DOWNLOAD</p>
+</header>
+<div id=&quot;frame-wrap&quot;>
+    <div id=&quot;loading-bar&quot; id=&quot;lb2&quot;></div>
+    <iframe id=&quot;drive-frame&quot;
+        src=&quot;https://drive.google.com/embeddedfolderview?id=1vGp2vyRvAAFxzF4cfrA4qHtGTjLlDrS9#list&quot;
+        onload=&quot;document.getElementById('loading-bar').className='done';&quot;
+        allow=&quot;autoplay&quot;>
+    </iframe>
+</div>
+<script>
+    // Animate loading bar on start
+    setTimeout(function(){
+        var lb = document.getElementById('loading-bar');
+        if(lb) lb.style.width='70%';
+    }, 100);
+</script>
 </body>
-
-</html>" sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
+</html>"></iframe>
         </div>
     </div>
     <div id="section-game-rps" class="spa-section hidden-right game-frame">
@@ -6953,814 +6845,846 @@ function _exitFs(cb){if(document.fullscreenElement||document.webkitFullscreenEle
     </div>
     <div id="section-game-multicar" class="spa-section hidden-right game-frame">
         <div class="game-section-wrapper">
-            <iframe id="iframe-multicar" srcdoc="<!DOCTYPE html>
+            <iframe <iframe <iframe <iframe id="iframe-multicar" style="width:100%;height:100%;border:none;" srcdoc="id=&quot;iframe-multicar&quot; style=&quot;width:100%;height:100%;border:none;&quot; srcdoc=&quot;id=&quot;iframe-multicar&quot; style=&quot;width:100%;height:100%;border:none;&quot; srcdoc=&quot;<!DOCTYPE html>
 <html lang=&quot;en&quot;>
 <head>
     <script>
        // SECURITY CHECK &amp; FIREBASE VERIFICATION
         const storedName = localStorage.getItem('playerName');
-        
-        // Basic Local Check
-        if (localStorage.getItem('isLoggedIn') !== 'true' || !storedName) {
-            window.parent.postMessage('spa-back','*');
-        } else {
-            // Extra Protection: Check if user actually exists in Firebase
-            const checkId = storedName.toLowerCase().trim();
-            if (typeof db !== 'undefined' && db) {
-                db.ref('users/' + checkId).once('value', snap => {
-                    if (!snap.exists()) {
-                        window.parent.postMessage({type:'notify',msg:'⛔ Access denied! Please re-login.',nt:'error'},'*');
-                        localStorage.removeItem('isLoggedIn');
-                        localStorage.removeItem('playerName');
-                        window.parent.postMessage('spa-back','*');
-                    }
-                });
-            }
+        const isLoggedIn  = localStorage.getItem('isLoggedIn');
+        if (!storedName || isLoggedIn !== 'true') {
+            document.write('<div style=&quot;display:flex;align-items:center;justify-content:center;height:100vh;background:#0d0b22;color:#ff3366;font-family:Teko,sans-serif;font-size:2rem;text-align:center;&quot;>🔒 NOT LOGGED IN<br><span style=&quot;font-size:1rem;color:#888;&quot;>Return to Arcade Hub</span></div>');
+            throw new Error('Not authenticated');
         }
+        // Periodic check
+        setInterval(() => {
+            if (localStorage.getItem('isLoggedIn') !== 'true') {
+                window.parent.postMessage('spa-back','*');
+            }
+        }, 5000);
     </script>
     <meta charset=&quot;UTF-8&quot;>
     <meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no&quot;>
     <title>City Drift Online</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Teko:wght@500;700&amp;display=swap');
-        
-        * { touch-action: none; -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
-        body { margin: 0; overflow: hidden; background: #87CEEB; font-family: 'Teko', sans-serif; color: #333; user-select: none; }
-        
-        #game-container { position: fixed; inset: 0; z-index: 1; }
-
-        /* --- SIDEBARS --- */
-        #code-sidebar {
-            position: absolute; top: 80px; right: -250px; width: 220px;
-            background: rgba(0,0,0,0.9); border: 2px solid #2ecc71;
-            padding: 15px; border-radius: 10px 0 0 10px; transition: 0.5s;
-            pointer-events: auto; z-index: 1200; color: white;
-        }
-        #code-sidebar.open { right: 0; }
-        #invite-toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(10px);background:#111;color:#2ecc71;border:1px solid #2ecc71;padding:10px 24px;border-radius:25px;font-family:Teko,sans-serif;font-size:1.2rem;letter-spacing:2px;z-index:99999;opacity:0;pointer-events:none;transition:opacity .3s,transform .3s;white-space:nowrap;}
-        #invite-toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
-        .side-btn { 
-            position: absolute; left: -40px; top: 0; width: 40px; height: 50px;
-            background: #2ecc71; color: white; display: flex; align-items: center;
-            justify-content: center; cursor: pointer; border-radius: 5px 0 0 5px; font-size: 1.5rem;
-        }
-
-        .invite-toggle-btn {
-            position: absolute; top: 15px; right: 15px; background: transparent;
-            border: none; color: #2ecc71; font-size: 2.2rem; cursor: pointer;
-            z-index: 1500; text-shadow: 0 0 5px white; pointer-events: auto;
-        }
-        .sidebar-menu {
-            position: fixed; top: 0; right: 0; width: 280px; height: 100%;
-            background: rgba(10, 10, 10, 0.95); border-left: 2px solid #2ecc71;
-            transform: translateX(100%); transition: transform 0.4s ease;
-            z-index: 1600; display: flex; flex-direction: column; padding: 20px;
-            pointer-events: auto; overflow-y: auto; box-sizing: border-box;
-            -webkit-overflow-scrolling: touch; touch-action: pan-y; overscroll-behavior: contain;
-            scroll-behavior: smooth;
-        }
-        .sidebar-menu.active { transform: translateX(0); }
-        .sidebar-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; padding-bottom: 10px; margin-bottom: 15px; flex-shrink: 0; }
-        .close-btn { background: transparent; border: none; color: #ff0055; font-size: 2.2rem; cursor: pointer; }
-        #invite-list { overflow-y: auto; flex: 1 1 0; min-height: 0; -webkit-overflow-scrolling: touch; touch-action: pan-y; overscroll-behavior: contain; }
-
-        /* --- CHAT (Moved to top-left to avoid pedals) --- */
-        #chat-sidebar {
-            position: absolute; top: 15px; left: 15px; width: 250px;
-            height: 150px; background: rgba(255,255,255,0.2); border-radius: 8px;
-            display: flex; flex-direction: column; pointer-events: auto; z-index: 1100;
-            border: 1px solid rgba(0,0,0,0.1); backdrop-filter: blur(10px); overflow: hidden;
-        }
-        #chat-messages { flex: 1 1 0; min-height: 0; overflow-y: auto; padding: 5px; font-size: 0.9rem; font-family: sans-serif; color: #000; -webkit-overflow-scrolling: touch; touch-action: pan-y; overscroll-behavior: contain; }
-        #chat-input { background: rgba(255,255,255,0.5); border: none; border-top: 1px solid rgba(0,0,0,0.1); padding: 5px 10px; color: #000; font-family: 'Teko'; font-size: 1.1rem; outline: none; flex-shrink: 0; width: 100%; box-sizing: border-box; }
-
-        /* --- UI OVERLAY --- */
-        #ui-layer { position: absolute; inset: 0; pointer-events: none; display: none; z-index: 1050; }
-        .controls-container { position: absolute; bottom: 20px; left: 20px; right: 20px; display: flex; justify-content: space-between; align-items: flex-end; pointer-events: auto; }
-        .btn-touch { width: 70px; height: 70px; background: rgba(255,255,255,0.3); border: 2px solid #fff; border-radius: 50%; color: #333; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; backdrop-filter: blur(5px); }
-        .pedal { width: 65px; height: 100px; border-radius: 12px; font-size: 1.1rem; font-weight: bold; }
-        .gas { background: rgba(46, 204, 113, 0.4); border-color: #2ecc71; }
-        .brake { background: rgba(231, 76, 60, 0.4); border-color: #e74c3c; }
-
-        #lobby { position: absolute; inset: 0; background: #87CEEB; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; }
-        .lobby-box { background: white; padding: 25px; border-radius: 20px; text-align: center; width: 90%; max-width: 380px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
-        .btn-p { padding: 8px 20px; font-size: 1.4rem; cursor: pointer; border: none; margin: 5px; font-family: 'Teko'; border-radius: 8px; width: 100%; }
-        .speedo { position: absolute; top: 15px; right: 80px; font-size: 3rem; line-height: 0.8; text-align: right; color: #333; }
-    </style>
-    
-    <script src=&quot;https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js&quot;></script>
-</head>
-<body><style>#spabk{position:fixed;top:10px;left:10px;z-index:99999;background:rgba(0,0,0,0.8);color:#00f3ff;border:1px solid #00f3ff;padding:8px 18px;border-radius:20px;cursor:pointer;font-family:Segoe UI,sans-serif;font-size:.9rem;backdrop-filter:blur(5px);}#spabk:hover{background:#00f3ff;color:#000;}</style><button id=&quot;spabk&quot; onclick=&quot;_exitFs(function(){window.parent.postMessage('spa-back','*')})&quot;>← Hub</button>
-
-    <button class=&quot;invite-toggle-btn&quot; id=&quot;inviteBtn&quot; style=&quot;display:none;&quot; onclick=&quot;toggleInviteSidebar()&quot;>☰</button>
-    <div class=&quot;sidebar-menu&quot; id=&quot;inviteSidebar&quot;>
-        <div class=&quot;sidebar-header&quot;>
-            <span style=&quot;font-size:1.4rem; color:#2ecc71;&quot;>INVITE FRIEND</span>
-            <button class=&quot;close-btn&quot; onclick=&quot;toggleInviteSidebar()&quot;>×</button>
-        </div>
-        <div id=&quot;invite-list&quot;><p style=&quot;color:#666;&quot;>Loading friends...</p></div>
-    </div>
-
-    <div id=&quot;lobby&quot;>
-        <div class=&quot;lobby-box&quot;>
-            <h1 style=&quot;font-size: 2.8rem; margin: 0;&quot;>CITY ONLINE</h1>
-            <button class=&quot;btn-p&quot; style=&quot;background:#2ecc71;color:white&quot; id=&quot;createRoomBtn&quot; onclick=&quot;createRoom()&quot;>CREATE WORLD</button>
-            <div style=&quot;margin: 8px 0; color: #ccc; font-size: 1rem;&quot;>— OR —</div>
-            <input type=&quot;text&quot; id=&quot;roomInput&quot; style=&quot;width:80%; padding:8px; font-size:1.4rem; text-align:center; margin-bottom:8px; border:1px solid #ddd; border-radius:5px;&quot; placeholder=&quot;CODE&quot;>
-            <button class=&quot;btn-p&quot; style=&quot;background:#3498db;color:white&quot; id=&quot;joinRoomBtn&quot; onclick=&quot;joinRoom()&quot;>JOIN ROOM</button>
-            <div id=&quot;status-msg&quot; style=&quot;margin-top:8px; color:#e67e22; font-size: 1.1rem;&quot;></div>
-        </div>
-    </div>
-
-    <div id=&quot;ui-layer&quot;>
-        <div id=&quot;car-ping-wrap&quot; style=&quot;position:fixed;top:60px;left:10px;z-index:1200;pointer-events:none;&quot;><span class=&quot;ping-badge ping-good&quot; id=&quot;car-ping-badge&quot;><span class=&quot;ping-dot&quot;></span><span id=&quot;car-ping-ms&quot;>--</span>ms</span></div>
-        <div id=&quot;chat-sidebar&quot; ontouchstart=&quot;event.stopPropagation()&quot; ontouchmove=&quot;event.stopPropagation()&quot;><div id=&quot;chat-messages&quot;></div><input type=&quot;text&quot; id=&quot;chat-input&quot; placeholder=&quot;Chat...&quot;></div>
-<canvas id=&quot;minimap&quot; style=&quot;
-position:absolute;
-top:15px;
-right:15px;
-width:160px;
-height:160px;
-background:rgba(0,0,0,0.6);
-border:2px solid #2ecc71;
-border-radius:10px;
-z-index:1100;
-pointer-events:auto;
-&quot;></canvas>
-        <div id=&quot;invite-toast&quot;></div>
-        <div id=&quot;code-sidebar&quot;>
-            <div class=&quot;side-btn&quot; onclick=&quot;document.getElementById('code-sidebar').classList.toggle('open')&quot;>🔑</div>
-            <p id=&quot;display-code&quot; style=&quot;font-size:1.8rem; margin:5px 0; font-weight:bold; color:#2ecc71;&quot;>----</p>
-            <button onclick=&quot;copyCode()&quot; style=&quot;width:100%; padding:4px; background:#2ecc71; color:white; border:none; border-radius:4px; font-family:'Teko'; cursor:pointer;&quot;>COPY</button>
-        </div>
-        <div class=&quot;speedo&quot;><span id=&quot;speed-val&quot;>0</span><br><small style=&quot;font-size:0.9rem;&quot;>KM/H</small></div>
-        <div class=&quot;controls-container&quot;>
-            <div style=&quot;display:flex; gap:10px;&quot;><div class=&quot;btn-touch&quot; id=&quot;touch-left&quot;>◀</div><div class=&quot;btn-touch&quot; id=&quot;touch-right&quot;>▶</div></div>
-            <div style=&quot;display:flex; gap:10px;&quot;><div class=&quot;btn-touch pedal brake&quot; id=&quot;touch-brake&quot;>BRK</div><div class=&quot;btn-touch pedal gas&quot; id=&quot;touch-gas&quot;>GAS</div></div>
-            <div id=&quot;bigMapContainer&quot; style=&quot;
-position:fixed;
-top:0;
-right:-100%;
-width:100%;
-max-width:400px;
-height:100%;
-background:rgba(10,10,10,0.95);
-transition:0.4s;
-z-index:1700;
-display:flex;
-flex-direction:column;
-&quot;>
-    <div style=&quot;display:flex;justify-content:flex-start;padding:10px;color:#2ecc71;font-size:1.5rem;gap:20px;&quot;>
-    <span style=&quot;cursor:pointer;color:red;&quot; onclick=&quot;toggleBigMap()&quot;>✖</span>
-    <span>WORLD MAP</span>
-</div>
-    <canvas id=&quot;bigMap&quot; style=&quot;flex:1;background:#111;&quot;></canvas>
-</div>
-        </div>
-    </div>
-
-    <div id=&quot;game-container&quot;></div>
-
     <script src=&quot;https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js&quot;></script>
     <script src=&quot;https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js&quot;></script>
+    <script src=&quot;https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js&quot;></script>
+    <style>
+        *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;touch-action:none;}
+        body{background:#1a1a2e;overflow:hidden;font-family:'Segoe UI',sans-serif;user-select:none;}
+        #game-container{position:fixed;inset:0;z-index:1;}
+        /* LOBBY */
+        #lobby{position:fixed;inset:0;z-index:100;background:linear-gradient(135deg,#0d0b22,#1a0a2e);display:flex;align-items:center;justify-content:center;}
+        .lobby-card{background:rgba(255,255,255,0.05);border:1px solid rgba(0,243,255,0.3);border-radius:20px;padding:30px;max-width:360px;width:92%;text-align:center;backdrop-filter:blur(10px);}
+        .lobby-title{font-size:2.2rem;color:#00f3ff;letter-spacing:3px;margin-bottom:4px;font-weight:700;}
+        .lobby-sub{color:rgba(255,255,255,0.4);font-size:0.8rem;letter-spacing:2px;margin-bottom:24px;}
+        .lobby-input{width:100%;padding:12px;background:rgba(0,0,0,0.4);border:1px solid rgba(0,243,255,0.3);border-radius:10px;color:white;font-size:1.1rem;text-align:center;outline:none;letter-spacing:4px;margin-bottom:10px;}
+        .lobby-input::placeholder{letter-spacing:1px;color:rgba(255,255,255,0.25);}
+        .lobby-btn{width:100%;padding:13px;border:none;border-radius:10px;font-size:1rem;font-weight:bold;cursor:pointer;margin-bottom:8px;transition:0.2s;letter-spacing:1px;}
+        .btn-create{background:linear-gradient(45deg,#00f3ff,#0066ff);color:white;}
+        .btn-join{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.2);color:white;}
+        .btn-back{background:transparent;border:1px solid rgba(255,51,102,0.4);color:#ff3366;font-size:0.85rem;padding:8px;}
+        .lobby-status{font-size:0.85rem;color:#f1c40f;min-height:20px;margin-top:8px;}
+        /* HUD */
+        #hud{position:fixed;inset:0;z-index:50;pointer-events:none;}
+        #back-btn{position:absolute;top:12px;left:12px;background:rgba(0,0,0,0.7);color:#00f3ff;border:1px solid #00f3ff;border-radius:20px;padding:7px 16px;font-size:0.85rem;cursor:pointer;pointer-events:auto;z-index:200;backdrop-filter:blur(5px);}
+        /* PING */
+        #ping-wrap{position:absolute;top:12px;left:120px;pointer-events:none;}
+        .ping-badge{display:inline-flex;align-items:center;gap:4px;font-size:0.72rem;padding:3px 10px;border-radius:10px;background:rgba(0,0,0,0.6);border:1px solid;backdrop-filter:blur(4px);}
+        .ping-dot{width:6px;height:6px;border-radius:50%;background:currentColor;}
+        .ping-good{color:#2ecc71;border-color:#2ecc71;}
+        .ping-medium{color:#f1c40f;border-color:#f1c40f;}
+        .ping-bad{color:#e74c3c;border-color:#e74c3c;}
+        /* SPEEDOMETER */
+        #speedo{position:absolute;bottom:110px;right:16px;text-align:right;pointer-events:none;}
+        #speed-val{font-size:3.5rem;font-weight:900;color:white;line-height:1;text-shadow:0 0 20px rgba(0,243,255,0.6);}
+        #speed-unit{font-size:0.75rem;color:rgba(255,255,255,0.5);letter-spacing:2px;}
+        #gear-display{font-size:1.2rem;color:#00f3ff;margin-top:2px;}
+        /* MINIMAP */
+        #minimap-wrap{position:absolute;bottom:110px;left:16px;pointer-events:none;}
+        #minimap{border-radius:50%;border:2px solid rgba(0,243,255,0.5);box-shadow:0 0 15px rgba(0,243,255,0.2);}
+        /* ROOM INFO */
+        #room-info{position:absolute;top:12px;right:16px;background:rgba(0,0,0,0.7);border:1px solid rgba(255,255,255,0.15);border-radius:12px;padding:8px 14px;text-align:right;backdrop-filter:blur(5px);}
+        #room-code-display{font-size:1.4rem;color:#00f3ff;letter-spacing:3px;font-weight:bold;}
+        #player-count{font-size:0.72rem;color:rgba(255,255,255,0.4);margin-top:2px;}
+        /* TOUCH CONTROLS */
+        #touch-controls{position:fixed;bottom:0;left:0;right:0;height:100px;z-index:60;display:flex;justify-content:space-between;align-items:flex-end;padding:10px 16px;pointer-events:none;}
+        .touch-side{display:flex;gap:10px;pointer-events:auto;}
+        .touch-btn{width:70px;height:70px;border-radius:50%;background:rgba(255,255,255,0.08);border:2px solid rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:1.6rem;cursor:pointer;user-select:none;-webkit-user-select:none;transition:background 0.1s;backdrop-filter:blur(4px);}
+        .touch-btn:active,.touch-btn.pressed{background:rgba(0,243,255,0.25);border-color:#00f3ff;}
+        .touch-btn-gas{background:rgba(46,204,113,0.15);border-color:#2ecc71;}
+        .touch-btn-brake{background:rgba(231,76,60,0.15);border-color:#e74c3c;}
+        /* AI TAG */
+        .ai-badge{position:absolute;background:rgba(255,140,0,0.8);color:white;padding:2px 6px;border-radius:4px;font-size:0.6rem;font-weight:bold;}
+        /* LOADING */
+        #loading-screen{position:fixed;inset:0;z-index:200;background:#0d0b22;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;}
+        .load-ring{width:50px;height:50px;border:3px solid rgba(0,243,255,0.2);border-top-color:#00f3ff;border-radius:50%;animation:spin 0.8s linear infinite;}
+        @keyframes spin{to{transform:rotate(360deg);}}
+        .load-text{color:#00f3ff;font-size:1rem;letter-spacing:3px;}
+    </style>
+</head>
+<body>
 
-    <script>
-        const firebaseConfig = {
-            apiKey: &quot;AIzaSyDCxIwIqiYc2FxT8qq1fbAsm2ym5DaFmsw&quot;,
-            authDomain: &quot;formywebfirebase.firebaseapp.com&quot;,
-            databaseURL: &quot;https://formywebfirebase-default-rtdb.firebaseio.com&quot;,
-            projectId: &quot;formywebfirebase&quot;,
-            storageBucket: &quot;formywebfirebase.firebasestorage.app&quot;,
-            messagingSenderId: &quot;451953941862&quot;,
-            appId: &quot;1:451953941862:web:b5f8394f99e17b232f3ca7&quot;
-        };
-        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
+<!-- LOADING -->
+<div id=&quot;loading-screen&quot;>
+    <div class=&quot;load-ring&quot;></div>
+    <div class=&quot;load-text&quot;>LOADING CITY...</div>
+</div>
 
-        let scene, camera, renderer, car;
-    // ===== INFINITE WORLD SYSTEM =====
-const CHUNK_SIZE = 250;
-const RENDER_DISTANCE = 2;
-const activeChunks = new Map();
-        let otherPlayers = {}; 
-        let minimapCanvas = document.getElementById(&quot;minimap&quot;);
-    let bigMapContainer = document.getElementById(&quot;bigMapContainer&quot;);
-let bigMapCanvas = document.getElementById(&quot;bigMap&quot;);
-let ctx = bigMapCanvas.getContext(&quot;2d&quot;);
+<!-- LOBBY -->
+<div id=&quot;lobby&quot; style=&quot;display:none;&quot;>
+    <div class=&quot;lobby-card&quot;>
+        <div class=&quot;lobby-title&quot;>🏎️ CITY DRIFT</div>
+        <div class=&quot;lobby-sub&quot;>MULTIPLAYER RACING ONLINE</div>
+        <button class=&quot;lobby-btn btn-create&quot; onclick=&quot;createRoom()&quot;>🚀 CREATE ROOM</button>
+        <input class=&quot;lobby-input&quot; id=&quot;roomInput&quot; placeholder=&quot;ROOM CODE&quot; maxlength=&quot;4&quot;>
+        <button class=&quot;lobby-btn btn-join&quot; onclick=&quot;joinRoom()&quot;>🔑 JOIN ROOM</button>
+        <button class=&quot;lobby-btn btn-back&quot; onclick=&quot;window.parent.postMessage('spa-back','*')&quot;>← BACK TO HUB</button>
+        <div class=&quot;lobby-status&quot; id=&quot;lobby-status&quot;></div>
+    </div>
+</div>
 
-minimapCanvas.addEventListener(&quot;click&quot;, toggleBigMap);
-    // 📱 Pinch Zoom Support
-minimapCanvas.addEventListener(&quot;touchstart&quot;, function(e){
-    if(e.touches.length === 2){
-        const dx = e.touches[0].clientX - e.touches[1].clientX;
-        const dy = e.touches[0].clientY - e.touches[1].clientY;
-        initialPinchDistance = Math.sqrt(dx*dx + dy*dy);
-    }
-}, { passive:false });
+<!-- GAME CONTAINER -->
+<div id=&quot;game-container&quot;></div>
 
-minimapCanvas.addEventListener(&quot;touchmove&quot;, function(e){
-    if(e.touches.length === 2){
-        e.preventDefault();
+<!-- HUD -->
+<div id=&quot;hud&quot; style=&quot;display:none;&quot;>
+    <button id=&quot;back-btn&quot; onclick=&quot;window.parent.postMessage('spa-back','*')&quot;>← Hub</button>
+    <div id=&quot;ping-wrap&quot;>
+        <span class=&quot;ping-badge ping-good&quot; id=&quot;car-ping-badge&quot;><span class=&quot;ping-dot&quot;></span><span id=&quot;car-ping-ms&quot;>--</span>ms</span>
+    </div>
+    <div id=&quot;room-info&quot;>
+        <div id=&quot;room-code-display&quot;>----</div>
+        <div id=&quot;player-count&quot;>Waiting...</div>
+    </div>
+    <div id=&quot;speedo&quot;>
+        <div id=&quot;speed-val&quot;>0</div>
+        <div id=&quot;speed-unit&quot;>KM/H</div>
+        <div id=&quot;gear-display&quot;>N</div>
+    </div>
+    <div id=&quot;minimap-wrap&quot;>
+        <canvas id=&quot;minimap&quot; width=&quot;130&quot; height=&quot;130&quot;></canvas>
+    </div>
+</div>
 
-        const dx = e.touches[0].clientX - e.touches[1].clientX;
-        const dy = e.touches[0].clientY - e.touches[1].clientY;
-        const newDistance = Math.sqrt(dx*dx + dy*dy);
+<!-- TOUCH CONTROLS -->
+<div id=&quot;touch-controls&quot; style=&quot;display:none;&quot;>
+    <div class=&quot;touch-side&quot;>
+        <div class=&quot;touch-btn&quot; id=&quot;t-left&quot;>◀</div>
+        <div class=&quot;touch-btn&quot; id=&quot;t-right&quot;>▶</div>
+    </div>
+    <div class=&quot;touch-side&quot;>
+        <div class=&quot;touch-btn touch-btn-brake&quot; id=&quot;t-brake&quot;>🔴</div>
+        <div class=&quot;touch-btn touch-btn-gas&quot; id=&quot;t-gas&quot;>🟢</div>
+    </div>
+</div>
 
-        const diff = newDistance - initialPinchDistance;
+<script>
+// ═══════════════════════════════════════════════════════════
+// FIREBASE CONFIG
+// ═══════════════════════════════════════════════════════════
+const firebaseConfig = {
+    apiKey: &quot;AIzaSyDCxIwIqiYc2FxT8qq1fbAsm2ym5DaFmsw&quot;,
+    authDomain: &quot;formywebfirebase.firebaseapp.com&quot;,
+    databaseURL: &quot;https://formywebfirebase-default-rtdb.firebaseio.com&quot;,
+    projectId: &quot;formywebfirebase&quot;,
+    storageBucket: &quot;formywebfirebase.firebasestorage.app&quot;,
+    messagingSenderId: &quot;451953941862&quot;,
+    appId: &quot;1:451953941862:web:b5f8394f99e17b232f3ca7&quot;
+};
+if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+const playerName = localStorage.getItem('playerName') || 'Driver';
 
-        targetZoom += diff * 0.0005;
+// ═══════════════════════════════════════════════════════════
+// CONSTANTS
+// ═══════════════════════════════════════════════════════════
+const ROAD_W = 14;          // road width
+const BLOCK  = 70;          // block size (road center to road center)
+const GRID   = 5;           // 5x5 road grid
+const MAP_H  = BLOCK*(GRID-1); // 280 units total
+const HALF   = MAP_H/2;     // 140
 
-        targetZoom = Math.max(0.1, Math.min(0.5, targetZoom));
-        
+// Road center positions (-140,-70,0,70,140)
+const ROADS  = Array.from({length:GRID},(_,i)=> -HALF + i*BLOCK);
 
-        initialPinchDistance = newDistance;
-    }
-}, { passive:false });
-    // Zoom using mouse wheel (PC)
-minimapCanvas.addEventListener(&quot;wheel&quot;, function(e){
-    e.preventDefault();
+// Physics constants
+const MAX_SPD   = 0.7;
+const MAX_REV   = 0.22;
+const ACCEL     = 0.018;
+const BRAKE     = 0.04;
+const FRICTION  = 0.018;
+const STEER_MAX = 0.052;
 
-    if(e.deltaY < 0){
-        targetZoom += 0.05;
-    } else {
-        targetZoom -= 0.05;
-    }
+// Colors
+const CAR_COLORS = [0xe74c3c,0x3498db,0x2ecc71,0xf1c40f,0x9b59b6,0xe67e22,0x1abc9c,0xe91e63];
 
-    targetZoom = Math.max(0.1, Math.min(0.5, targetZoom));
-});
+// ═══════════════════════════════════════════════════════════
+// THREE.JS GLOBALS
+// ═══════════════════════════════════════════════════════════
+let scene, camera, renderer, sun;
+let playerCar, roomId, myId, isGameStarted=false;
+let speed=0, carDir=0, steer=0;
+let keys={up:0,down:0,left:0,right:0};
+let buildings=[], otherCars={}, aiCars=[];
+let lastSync=0, lastActivity=0;
+let minimapCtx;
 
-function toggleBigMap() {
-    if (bigMapContainer.style.right === &quot;0px&quot;) {
-        bigMapContainer.style.right = &quot;-100%&quot;;
-    } else {
-        bigMapContainer.style.right = &quot;0&quot;;
-        drawBigMap();
-    }
+// ═══════════════════════════════════════════════════════════
+// INIT THREE.JS
+// ═══════════════════════════════════════════════════════════
+function initThree() {
+    scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x87CEEB);
+    scene.fog = new THREE.FogExp2(0xadd8e6, 0.003);
+
+    camera = new THREE.PerspectiveCamera(65, innerWidth/innerHeight, 0.5, 600);
+    camera.position.set(0, 8, -16);
+
+    renderer = new THREE.WebGLRenderer({antialias:true, powerPreference:'high-performance'});
+    renderer.setSize(innerWidth, innerHeight);
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5));
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.1;
+    document.getElementById('game-container').appendChild(renderer.domElement);
+
+    // Lighting
+    scene.add(new THREE.AmbientLight(0x7ec8e3, 0.7));
+    sun = new THREE.DirectionalLight(0xfff5e0, 1.8);
+    sun.position.set(80, 120, 60);
+    sun.castShadow = true;
+    sun.shadow.mapSize.set(1024, 1024);
+    sun.shadow.camera.near = 1;
+    sun.shadow.camera.far = 500;
+    sun.shadow.camera.left = -200;
+    sun.shadow.camera.right = 200;
+    sun.shadow.camera.top = 200;
+    sun.shadow.camera.bottom = -200;
+    sun.shadow.bias = -0.001;
+    scene.add(sun);
+
+    // Hemisphere light for nice sky/ground gradient
+    scene.add(new THREE.HemisphereLight(0x87CEEB, 0x4a7a2a, 0.5));
+
+    window.addEventListener('resize', ()=>{
+        camera.aspect = innerWidth/innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(innerWidth, innerHeight);
+    });
+
+    buildWorld();
+    spawnAICars();
+    setupControls();
+    minimapCtx = document.getElementById('minimap').getContext('2d');
+    animate();
 }
-let minimapCtx = minimapCanvas.getContext(&quot;2d&quot;);
-    let minimapZoom = 0.2; 
-let targetZoom = minimapZoom;
-let bigMapZoom = 0.3; // Default zoom for Big Map
-let bigMapTargetZoom = 0.3;
-let initialPinchDistance = 0;
 
-        let speed = 0, carDir = 0, roomId, myId;
-        let keys = { up:0, down:0, left:0, right:0 };
-        let buildings = [];
-        const playerName = localStorage.getItem('playerName') || &quot;Driver&quot;;
-        let lastActivitySync = 0; // Throttling ke liye
-        let isGameStarted = false;
-
-        function init3D() {
-            if (scene) return;
-            scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x87CEEB);
-            camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 1500);
-            camera.position.set(0, 7, -14); 
-            
-            renderer = new THREE.WebGLRenderer({ antialias: true });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.2)); 
-            document.getElementById('game-container').appendChild(renderer.domElement);
-
-            scene.add(new THREE.AmbientLight(0xffffff, 1.1));
-            const sun = new THREE.DirectionalLight(0xffffff, 1.3);
-            sun.position.set(50, 100, 50); scene.add(sun);
-
-            
-            car = createVehicle(0xe74c3c, playerName); scene.add(car);
-            setupControls();
-            animate();
-            
-            // Critical: Trigger resize after rendering starts
-            window.dispatchEvent(new Event('resize'));
+// ═══════════════════════════════════════════════════════════
+// WORLD BUILDING
+// ═══════════════════════════════════════════════════════════
+function makeRoadTexture() {
+    const size = 512, blockPx = Math.round(size * BLOCK / (GRID*BLOCK + ROAD_W*2));
+    const cv = document.createElement('canvas');
+    cv.width = cv.height = size;
+    const ctx = cv.getContext('2d');
+    ctx.fillStyle = '#2d2d2d'; ctx.fillRect(0,0,size,size);
+    // draw road lines
+    const roadPx = Math.round(size * ROAD_W / (GRID*BLOCK));
+    const step = Math.round(size / (GRID-1));
+    ROADS.forEach((_, i) => {
+        const pos = Math.round((i/(GRID-1)) * size);
+        // Road stripes
+        ctx.fillStyle = '#fff';
+        for (let d=0; d<size; d+=40) {
+            ctx.fillRect(pos - roadPx/2 + roadPx*0.45, d, 4, 20);
+            ctx.fillRect(d, pos - roadPx/2 + roadPx*0.45, 20, 4);
         }
+        // Road edges
+        ctx.fillStyle='#ffcc00';
+        ctx.fillRect(pos - roadPx/2, 0, 3, size);
+        ctx.fillRect(pos + roadPx/2 - 3, 0, 3, size);
+        ctx.fillRect(0, pos - roadPx/2, size, 3);
+        ctx.fillRect(0, pos + roadPx/2 - 3, size, 3);
+    });
+    return new THREE.CanvasTexture(cv);
+}
 
-
-        function createVehicle(color, name) {
-            const group = new THREE.Group();
-            const body = new THREE.Mesh(new THREE.BoxGeometry(2.6, 0.8, 4.8), new THREE.MeshStandardMaterial({color: color, metalness: 0.6, roughness: 0.35}));
-            body.position.y = 0.6; group.add(body);
-            const cabin = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.7, 2.4), new THREE.MeshStandardMaterial({color: 0x111111, roughness: 0.4}));
-            cabin.position.set(0, 1.1, -0.4); group.add(cabin);
-            const wheelGeo = new THREE.CylinderGeometry(0.45, 0.45, 0.4, 16); wheelGeo.rotateZ(Math.PI / 2);
-            const wheelMat = new THREE.MeshStandardMaterial({ color: 0x111111 });
-            [[1.2, 0.4, 1.7],[-1.2, 0.4, 1.7],[1.2, 0.4, -1.7],[-1.2, 0.4, -1.7]].forEach(p => { const w = new THREE.Mesh(wheelGeo, wheelMat); w.position.set(p[0], p[1], p[2]); group.add(w); });
-            
-            const canvas = document.createElement('canvas'); const ctx = canvas.getContext('2d'); canvas.width = 256; canvas.height = 64; 
-            ctx.fillStyle = 'rgba(255,255,255,0.9)'; ctx.fillRect(0,0,256,64); 
-            ctx.font = 'bold 36px Teko'; ctx.fillStyle = '#222'; ctx.textAlign = 'center'; ctx.fillText(name, 128, 44);
-            const label = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(canvas) })); label.position.y = 3.5; label.scale.set(4, 1, 1); group.add(label);
-            return group;
-        }
-    // ===== CHUNK CREATION =====
-
-function createChunk(cx, cz) {
-
-    const chunkKey = cx + &quot;,&quot; + cz;
-    if (activeChunks.has(chunkKey)) return;
-
-    const chunk = new THREE.Group();
-
+function buildWorld() {
+    const S = MAP_H + ROAD_W*2 + 60;
     // Ground
-    // ===== GROUND =====
-const groundGeo = new THREE.PlaneGeometry(CHUNK_SIZE, CHUNK_SIZE);
-const groundMat = new THREE.MeshStandardMaterial({ color: 0x6ccf3f }); // grass
-const ground = new THREE.Mesh(groundGeo, groundMat);
-ground.rotation.x = -Math.PI / 2;
-ground.position.set(cx * CHUNK_SIZE, 0, cz * CHUNK_SIZE);
-chunk.add(ground);
-
-// ===== ROAD (Cross Style) =====
-const roadMat = new THREE.MeshStandardMaterial({ color: 0x444444 });
-
-const roadWidth = 18;
-
-// Horizontal road
-const road1 = new THREE.Mesh(
-    new THREE.PlaneGeometry(CHUNK_SIZE, roadWidth),
-    roadMat
-);
-road1.rotation.x = -Math.PI / 2;
-road1.position.set(cx * CHUNK_SIZE, 0.01, cz * CHUNK_SIZE);
-chunk.add(road1);
-
-// Vertical road
-const road2 = new THREE.Mesh(
-    new THREE.PlaneGeometry(roadWidth, CHUNK_SIZE),
-    roadMat
-);
-road2.rotation.x = -Math.PI / 2;
-road2.position.set(cx * CHUNK_SIZE, 0.01, cz * CHUNK_SIZE);
-chunk.add(road2);
-    // ===== RIVER (random chance) =====
-/*if (Math.random() > 0.7) {
-    const river = new THREE.Mesh(
-        new THREE.PlaneGeometry(CHUNK_SIZE, 30),
-        new THREE.MeshStandardMaterial({ color: 0x1e90ff })
+    const groundTex = makeRoadTexture();
+    groundTex.wrapS = groundTex.wrapT = THREE.RepeatWrapping;
+    const groundMesh = new THREE.Mesh(
+        new THREE.PlaneGeometry(S, S),
+        new THREE.MeshLambertMaterial({color:0x3a7a1a})
     );
-    river.rotation.x = -Math.PI / 2;
-    river.position.set(cx * CHUNK_SIZE, 0.02, cz * CHUNK_SIZE);
-    chunk.add(river);
-}
-    if (Math.random() > 0.7) {
+    groundMesh.rotation.x = -Math.PI/2;
+    groundMesh.receiveShadow = true;
+    scene.add(groundMesh);
 
-    const bridgeGeo = new THREE.BoxGeometry(40, 2, 20);
-    const bridgeMat = new THREE.MeshStandardMaterial({ color: 0x555555 });
+    // Road surface
+    const roadSurface = new THREE.Mesh(
+        new THREE.PlaneGeometry(S, S),
+        new THREE.MeshLambertMaterial({map: groundTex, transparent:true, opacity:1, color:0x444444})
+    );
+    roadSurface.rotation.x = -Math.PI/2;
+    roadSurface.position.y = 0.01;
+    roadSurface.receiveShadow = true;
+    scene.add(roadSurface);
 
-    const bridge = new THREE.Mesh(bridgeGeo, bridgeMat);
-
-    bridge.position.set(cx * CHUNK_SIZE, 8, cz * CHUNK_SIZE);
-
-    bridge.userData.type = &quot;bridge&quot;;   // tag correctly
-
-    chunk.add(bridge);
-}*/
-    
-    // ===== POLICE STATION (1 per chunk - Loop se bahar) =====
-    const station = new THREE.Group();
-    const base = new THREE.Mesh(new THREE.BoxGeometry(40, 12, 30), new THREE.MeshStandardMaterial({ color: 0xdddddd }));
-    base.position.set(cx * CHUNK_SIZE + 60, 6, cz * CHUNK_SIZE - 60);
-    station.add(base);
-    const roof = new THREE.Mesh(new THREE.BoxGeometry(42, 2, 32), new THREE.MeshStandardMaterial({ color: 0x333333 }));
-    roof.position.set(cx * CHUNK_SIZE + 60, 13, cz * CHUNK_SIZE - 60);
-    station.add(roof);
-    chunk.add(station);
-
-    // Random buildings (Reduced &amp; Road Avoidance)
-    for (let i = 0; i < 4; i++) {
-        const h = 15 + Math.random() * 35;
-        const bX = (Math.random() - 0.5) * CHUNK_SIZE;
-        const bZ = (Math.random() - 0.5) * CHUNK_SIZE;
-
-        // Road avoidance: Don't spawn buildings near the center cross (roads)
-        if (Math.abs(bX) < 25 || Math.abs(bZ) < 25) continue; 
-
-        const building = new THREE.Mesh(
-            new THREE.BoxGeometry(18, h, 18),
-            new THREE.MeshStandardMaterial({ color: 0x777777 })
-        );
-
-        building.position.set(cx * CHUNK_SIZE + bX, h / 2, cz * CHUNK_SIZE + bZ);
-        chunk.add(building);
-        buildings.push(new THREE.Box3().setFromObject(building));
-    }
-
-    scene.add(chunk);
-    activeChunks.set(chunkKey, chunk);
-}
-
-     /*  function getGroundHeight(x, z){
-    return 0.4;
-}*/
-
-
-// ===== CHUNK UPDATE =====
-
-function updateChunks() {
-
-    const playerChunkX = Math.floor(car.position.x / CHUNK_SIZE);
-    const playerChunkZ = Math.floor(car.position.z / CHUNK_SIZE);
-
-    for (let x = -RENDER_DISTANCE; x <= RENDER_DISTANCE; x++) {
-        for (let z = -RENDER_DISTANCE; z <= RENDER_DISTANCE; z++) {
-            createChunk(playerChunkX + x, playerChunkZ + z);
-        }
-    }
-
-}
-    //Romoved Far Chunks Code here
-
-        function handleMobileRotation(){
-            if(!/iPhone|iPad|iPod|Android/i.test(navigator.userAgent))return;
-            if(!document.documentElement.requestFullscreen)return;
-            document.documentElement.requestFullscreen().then(function(){
-                if(screen.orientation&amp;&amp;screen.orientation.lock)
-                    screen.orientation.lock('landscape').catch(function(){});
-                window.parent.postMessage('fs-entered','*');
-                function onFsChange(){
-                    if(!document.fullscreenElement&amp;&amp;!document.webkitFullscreenElement)
-                        window.parent.postMessage('fs-exited','*');
-                }
-                document.addEventListener('fullscreenchange',onFsChange);
-                document.addEventListener('webkitfullscreenchange',onFsChange);
-            }).catch(function(){window.parent.postMessage('fs-exited','*');});
-        }
-
-        function toggleInviteSidebar() { const s = document.getElementById('inviteSidebar'); s.classList.toggle('active'); if (s.classList.contains('active')) loadFriendsForInvite(); }
-        function loadFriendsForInvite() { if (!playerName) return; db.ref('friends/' + playerName).once('value', snapshot => { const list = document.getElementById('invite-list'); list.innerHTML = &quot;&quot;; if (snapshot.exists()) { Object.keys(snapshot.val()).forEach(friendName => { const div = document.createElement('div'); div.style.cssText = &quot;background:#222; padding:15px; margin-bottom:10px; border-radius:8px; display:flex; justify-content:space-between; align-items:center; border:1px solid #333;&quot;; div.innerHTML = `<span style=&quot;color:white; font-size:1.1rem;&quot;>${friendName}</span><button onclick=&quot;sendInvite('${friendName}')&quot; style=&quot;background:#2ecc71; color:black; border:none; padding:5px 10px; border-radius:4px; cursor:pointer; font-weight:bold; font-size:0.8rem; font-family:'Teko';&quot;>SEND CODE</button>`; list.appendChild(div); }); } else list.innerHTML = &quot;<p style='color:#666;'>No friends found.</p>&quot;; }); }
-        function _showInviteToast(msg){var t=document.getElementById('invite-toast');if(!t)return;t.innerText=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},2500);}
-        function sendInvite(friendName) {
-            if (!roomId) return _showInviteToast(&quot;Create a world first!&quot;);
-            // Write to Firebase invites/<recipientName> — NOT postMessage
-            db.ref('invites/' + friendName.toLowerCase()).push({
-                from: playerName, game: 'car', code: roomId, time: Date.now()
-            });
-            var chatId = [playerName, friendName].sort().join('_');
-            db.ref('chats/' + chatId).push({ sender: playerName, text: &quot;🏎️ Join my Car Game! Code: &quot; + roomId, timestamp: Date.now() });
-            _showInviteToast('✓ Invite sent to ' + friendName + '!');
-            window.parent.postMessage({type:'notify',msg:'🎮 Invite sent to '+friendName+'!',nt:'invite'},'*');
-            toggleInviteSidebar();
-        }
-
-        function createRoom() { 
-            roomId = Math.floor(1000 + Math.random() * 9000).toString(); myId = 'p1';
-            db.ref('car_world/' + roomId).set({
-                status: 'waiting',
-                lastActivity: Date.now(),
-                players: { p1: { x:0, z:0, r:0, n:playerName, color: 0xe74c3c } }
-            }).then(() => {
-                // Auto-remove host slot if tab is closed
-                db.ref('car_world/' + roomId + '/players/p1').onDisconnect().remove(); 
-                document.getElementById('display-code').innerText = roomId; 
-                document.getElementById('inviteBtn').style.display = 'block'; 
-                document.getElementById('status-msg').innerHTML = `Room: <b>${roomId}</b>. Invite friends to start!`;
-                toggleInviteSidebar(); // IMMEDIATE OPEN
-                handleMobileRotation();
-                // Start ping for host
-                (function carPingHost(){
-                    var _ph=[];
-                    function mp(){var t0=performance.now();
-                        fetch('https://formywebfirebase-default-rtdb.firebaseio.com/.json?shallow=true',{method:'GET',cache:'no-store'})
-                        .then(function(){var ping=Math.round(performance.now()-t0);_ph.push(ping);if(_ph.length>5)_ph.shift();
-                            var avg=Math.round(_ph.reduce(function(a,b){return a+b;},0)/_ph.length);
-                            var b=document.getElementById('car-ping-badge'),m=document.getElementById('car-ping-ms');
-                            if(b&&m){m.innerText=avg;b.className='ping-badge '+(avg<80?'ping-good':avg<200?'ping-medium':'ping-bad');}
-                        }).catch(function(){var b=document.getElementById('car-ping-badge'),m=document.getElementById('car-ping-ms');
-                            if(b&&m){m.innerText='999+';b.className='ping-badge ping-bad';}
-                        });
-                    }
-                    mp(); setInterval(mp,5000);
-                })();
-                // SYNC FIX: Using one persistent listener to detect players and then start
-                const playerRef = db.ref('car_world/' + roomId + '/players');
-                playerRef.on('value', snap => {
-                    if(!isGameStarted &amp;&amp; snap.numChildren() > 1) {
-                        isGameStarted = true;
-                        startGame();
-                    } else if (isGameStarted) {
-                        syncOtherPlayers(snap.val());
-                    }
-                });
-            }); 
-        }
-
-        // Auto-join from invite accept
-        window.addEventListener('message', function(e) {
-            if (e.data && e.data.type === 'auto-join' && e.data.code) {
-                document.getElementById('roomInput').value = e.data.code;
-                joinRoom();
+    // Buildings in each block
+    const bColors = [0xc0392b,0x2980b9,0x27ae60,0xd35400,0x8e44ad,0x2c3e50,0x7f8c8d,0xe74c3c,0x3498db,0xe67e22];
+    let bIdx = 0;
+    for (let ri=0; ri<GRID-1; ri++) {
+        for (let ci=0; ci<GRID-1; ci++) {
+            const cx = (ROADS[ci] + ROADS[ci+1]) / 2;
+            const cz = (ROADS[ri] + ROADS[ri+1]) / 2;
+            const maxW = BLOCK - ROAD_W - 4;
+            const numB = 2 + Math.floor(Math.abs(Math.sin(ri*7+ci*13)*3));
+            for (let b=0; b<numB; b++) {
+                const bw = 6 + Math.abs(Math.sin(b*11+ri*5+ci*3)*10);
+                const bd = 6 + Math.abs(Math.cos(b*7+ri*3+ci*5)*10);
+                const bh = 5 + Math.abs(Math.sin(b*13+ri+ci)*22);
+                const ox = (Math.sin(b*5+ri)*maxW*0.35);
+                const oz = (Math.cos(b*7+ci)*maxW*0.35);
+                const col = bColors[bIdx % bColors.length]; bIdx++;
+                const mesh = new THREE.Mesh(
+                    new THREE.BoxGeometry(bw, bh, bd),
+                    new THREE.MeshLambertMaterial({color: col})
+                );
+                mesh.position.set(cx+ox, bh/2, cz+oz);
+                mesh.castShadow = true;
+                mesh.receiveShadow = true;
+                scene.add(mesh);
+                // Store box for collision
+                buildings.push(new THREE.Box3(
+                    new THREE.Vector3(cx+ox-bw/2, 0, cz+oz-bd/2),
+                    new THREE.Vector3(cx+ox+bw/2, bh, cz+oz+bd/2)
+                ));
             }
+        }
+    }
+
+    // Trees along sidewalks
+    const treeMat = new THREE.MeshLambertMaterial({color:0x228822});
+    const trunkMat = new THREE.MeshLambertMaterial({color:0x8B4513});
+    ROADS.forEach(rx => {
+        for (let z=-HALF; z<=HALF; z+=18) {
+            if (ROADS.some(rz=>Math.abs(z-rz)<ROAD_W/2+1)) continue;
+            addTree(rx + ROAD_W/2 + 3, z, treeMat, trunkMat);
+            addTree(rx - ROAD_W/2 - 3, z, treeMat, trunkMat);
+        }
+    });
+    ROADS.forEach(rz => {
+        for (let x=-HALF; x<=HALF; x+=18) {
+            if (ROADS.some(rx=>Math.abs(x-rx)<ROAD_W/2+1)) continue;
+            addTree(x, rz + ROAD_W/2 + 3, treeMat, trunkMat);
+            addTree(x, rz - ROAD_W/2 - 3, treeMat, trunkMat);
+        }
+    });
+
+    // Outer walls (invisible but block player)
+    [-HALF-ROAD_W, HALF+ROAD_W].forEach(x=>{
+        buildings.push(new THREE.Box3(
+            new THREE.Vector3(x-5,-1,-HALF-40),new THREE.Vector3(x+5,5,HALF+40)
+        ));
+    });
+    [-HALF-ROAD_W, HALF+ROAD_W].forEach(z=>{
+        buildings.push(new THREE.Box3(
+            new THREE.Vector3(-HALF-40,-1,z-5),new THREE.Vector3(HALF+40,5,z+5)
+        ));
+    });
+}
+
+function addTree(x, z, leafMat, trunkMat) {
+    const g = new THREE.Group();
+    const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.3,0.4,2.5,6), trunkMat);
+    trunk.position.y = 1.25;
+    const leaves = new THREE.Mesh(new THREE.SphereGeometry(2.2,7,6), leafMat);
+    leaves.position.y = 4;
+    leaves.castShadow = true;
+    g.add(trunk); g.add(leaves);
+    g.position.set(x, 0, z);
+    scene.add(g);
+}
+
+// ═══════════════════════════════════════════════════════════
+// VEHICLE CREATION
+// ═══════════════════════════════════════════════════════════
+function createVehicle(color, label) {
+    const g = new THREE.Group();
+
+    // Body
+    const body = new THREE.Mesh(
+        new THREE.BoxGeometry(2.4, 0.7, 4.5),
+        new THREE.MeshStandardMaterial({color, metalness:0.7, roughness:0.25})
+    );
+    body.position.y = 0.55; body.castShadow = true; g.add(body);
+
+    // Cabin / windshield
+    const cabin = new THREE.Mesh(
+        new THREE.BoxGeometry(2.0, 0.65, 2.2),
+        new THREE.MeshStandardMaterial({color:0x111820, roughness:0.1, metalness:0.3})
+    );
+    cabin.position.set(0,1.03,-0.3); cabin.castShadow=true; g.add(cabin);
+
+    // Spoiler
+    const spoiler = new THREE.Mesh(
+        new THREE.BoxGeometry(2.2, 0.1, 0.3),
+        new THREE.MeshStandardMaterial({color, metalness:0.8, roughness:0.2})
+    );
+    spoiler.position.set(0,1.1,-2.1); g.add(spoiler);
+
+    // Wheels
+    const wGeo = new THREE.CylinderGeometry(0.44,0.44,0.38,16);
+    wGeo.rotateZ(Math.PI/2);
+    const wMat = new THREE.MeshStandardMaterial({color:0x111111,roughness:0.9});
+    const hubMat = new THREE.MeshStandardMaterial({color:0xaaaaaa,metalness:0.9,roughness:0.1});
+    [[1.15,0.44,1.5,'fl'],[-1.15,0.44,1.5,'fr'],[1.15,0.44,-1.5,'rl'],[-1.15,0.44,-1.5,'rr']].forEach(([wx,wy,wz,tag])=>{
+        const w = new THREE.Mesh(wGeo, wMat); w.name=tag;
+        w.position.set(wx,wy,wz); w.castShadow=true; g.add(w);
+        const hub = new THREE.Mesh(new THREE.CylinderGeometry(0.18,0.18,0.4,6), hubMat);
+        hub.rotation.z = Math.PI/2; hub.position.set(wx+(wx>0?0.2:-0.2),wy,wz); g.add(hub);
+    });
+
+    // Headlights
+    const hlMat = new THREE.MeshStandardMaterial({color:0xffffee, emissive:0xffffee, emissiveIntensity:2});
+    [[0.7,0.6,2.25],[-0.7,0.6,2.25]].forEach(([hx,hy,hz])=>{
+        const hl = new THREE.Mesh(new THREE.BoxGeometry(0.5,0.25,0.1), hlMat);
+        hl.position.set(hx,hy,hz); g.add(hl);
+    });
+    // Tail lights
+    const tlMat = new THREE.MeshStandardMaterial({color:0xff2200, emissive:0xff2200, emissiveIntensity:1.5});
+    [[0.7,0.6,-2.25],[-0.7,0.6,-2.25]].forEach(([tx,ty,tz])=>{
+        const tl = new THREE.Mesh(new THREE.BoxGeometry(0.5,0.2,0.1), tlMat);
+        tl.position.set(tx,ty,tz); g.add(tl);
+    });
+
+    // Name label
+    const cv = document.createElement('canvas'); cv.width=256; cv.height=64;
+    const ctx = cv.getContext('2d');
+    ctx.fillStyle='rgba(0,0,0,0.7)'; ctx.roundRect(0,0,256,64,12); ctx.fill();
+    ctx.font='bold 32px Segoe UI'; ctx.fillStyle='white'; ctx.textAlign='center';
+    ctx.fillText(label||'', 128, 42);
+    const sp = new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(cv),transparent:true}));
+    sp.position.y = 3.2; sp.scale.set(4,1,1); g.add(sp);
+
+    return g;
+}
+
+// ═══════════════════════════════════════════════════════════
+// AI CAR SYSTEM
+// ═══════════════════════════════════════════════════════════
+// Waypoints: intersections on road grid
+const WP = [];
+ROADS.forEach(z => ROADS.forEach(x => WP.push(new THREE.Vector3(x,0,z))));
+// WP[row*GRID+col] = intersection
+
+// Pre-defined AI routes (indices into WP)
+const AI_ROUTES = [
+    // Outer ring CCW
+    [0,1,2,3,4, 9,14,19,24, 23,22,21,20, 15,10,5,0],
+    // Inner ring CW
+    [6,7,8, 13,18, 17,16, 11,6],
+    // Cross H
+    [10,11,12,13,14],
+    // Diagonal-ish
+    [0,6,12,18,24, 23,17,11,5, 4,3,2,1,0],
+    // Vertical center
+    [2,7,12,17,22, 23,18,13,8,3,2],
+];
+
+const AI_NAMES = ['CAR_BOT1','CAR_BOT2','CAR_BOT3','CAR_BOT4','CAR_BOT5'];
+const AI_SPEEDS = [0.28,0.24,0.31,0.26,0.22];
+
+function spawnAICars() {
+    AI_ROUTES.forEach((route, i) => {
+        const col = CAR_COLORS[(i+2) % CAR_COLORS.length];
+        const mesh = createVehicle(col, '🤖 '+AI_NAMES[i].replace('CAR_',''));
+        const startWP = WP[route[0]];
+        mesh.position.set(startWP.x + (i%2===0?3:-3), 0.4, startWP.z);
+        scene.add(mesh);
+
+        aiCars.push({
+            mesh,
+            route,
+            wpIdx: 1,
+            speed: 0,
+            targetSpeed: AI_SPEEDS[i],
+            dir: 0,
+            steer: 0,
+            blocked: 0,
         });
-        function joinRoom() { 
-            const code = document.getElementById('roomInput').value.trim(); 
-            if (!code || code.length < 4) return window.parent.postMessage({type:'notify',msg:'Enter a valid 4-digit room code!',nt:'error'},'*');
-            db.ref('car_world/' + code).once('value').then(snap => { 
-                if(!snap.exists()) return window.parent.postMessage({type:'notify',msg:'Room not found!',nt:'error'},'*'); 
-                const players = snap.val().players || {};
-                let slot = null;
-                // Check if same playerName already in room - replace that slot
-                for(let i=1; i<=5; i++) { if(players['p'+i] && players['p'+i].n === playerName) { slot = 'p'+i; break; } }
-                if(!slot) for(let i=1; i<=5; i++) if(!players['p'+i]) { slot = 'p'+i; break; }
-                if(!slot) return window.parent.postMessage({type:'notify',msg:'Room is full! (Max 5 players)',nt:'error'},'*');
+    });
+}
 
-                roomId = code; myId = slot;
-                const pColor = [0x3498db, 0x2ecc71, 0xf1c40f, 0x9b59b6][Math.floor(Math.random()*4)];
-                db.ref('car_world/' + roomId + '/players/' + myId).set({ x:Math.random()*10, z:Math.random()*10, r:0, n:playerName, color:pColor }).then(() => {
-                    isGameStarted = true;
-                    handleMobileRotation();
-                    startGame();
-                    db.ref('car_world/' + roomId + '/players').on('value', snap => syncOtherPlayers(snap.val()));
-                    // Start ping measurement
-                    (function carPing(){
-                        function mp(){var t0=Date.now();db.ref('.info/serverTimeOffset').once('value',function(){
-                            var p=Date.now()-t0,b=document.getElementById('car-ping-badge'),m=document.getElementById('car-ping-ms');
-                            if(b&&m){m.innerText=p;b.className='ping-badge '+(p<100?'ping-good':p<300?'ping-medium':'ping-bad');}
-                        });}
-                        mp(); setInterval(mp,5000);
-                    })();
-                });
-            }); 
+function updateAI() {
+    aiCars.forEach((ai, idx) => {
+        const cur = ai.mesh.position;
+        const target = WP[ai.route[ai.wpIdx]];
+        const dx = target.x - cur.x;
+        const dz = target.z - cur.z;
+        const dist = Math.sqrt(dx*dx + dz*dz);
+
+        // Advance waypoint when close
+        if (dist < 3.5) {
+            ai.wpIdx = (ai.wpIdx+1) % ai.route.length;
         }
 
-        function startGame() {
-            document.getElementById('lobby').style.display = 'none';
-            document.getElementById('ui-layer').style.display = 'block';
-            document.getElementById('inviteBtn').style.display = 'block';
-            init3D();
-                        // Auto-Delete Check (Runs every 1 minute)
-            setInterval(() => {
-                db.ref('car_world/' + roomId).once('value', snap => {
-                    if(!snap.exists()) return;
-                    const data = snap.val();
-                    const inactiveTime = Date.now() - data.lastActivity;
+        // Steering toward waypoint
+        const desiredDir = Math.atan2(dx, dz);
+        let dA = desiredDir - ai.dir;
+        while (dA > Math.PI) dA -= Math.PI*2;
+        while (dA < -Math.PI) dA += Math.PI*2;
+        ai.dir += Math.sign(dA) * Math.min(Math.abs(dA), 0.055);
 
-                    if(inactiveTime > 600000) { // 10 Minutes = 600,000 ms
-                        window.parent.postMessage({type:'notify',msg:'Room closed: 10 min inactivity.',nt:'error'},'*');
-                        if(myId === 'p1') db.ref('car_world/' + roomId).remove(); // Only host deletes
-                        location.reload();
-                    }
-                });
-            }, 60000); 
+        // Speed control
+        const turnSharpness = Math.abs(dA);
+        const targetSpd = turnSharpness > 0.4 ? ai.targetSpeed * 0.6 : ai.targetSpeed;
+        ai.speed += (targetSpd - ai.speed) * 0.05;
 
-            db.ref('car_world/' + roomId + '/chat').on('child_added', snap => { const m = snap.val(); const div = document.createElement('div'); div.innerHTML = `<b>${m.user}:</b> ${m.text}`; const box = document.getElementById('chat-messages'); box.appendChild(div); box.scrollTop = box.scrollHeight; });
+        // Move
+        const nx = cur.x + Math.sin(ai.dir) * ai.speed;
+        const nz = cur.z + Math.cos(ai.dir) * ai.speed;
+
+        // Simple collision avoid with player
+        const pdx = playerCar ? playerCar.position.x - nx : 999;
+        const pdz = playerCar ? playerCar.position.z - nz : 999;
+        if (Math.sqrt(pdx*pdx+pdz*pdz) > 4) {
+            ai.mesh.position.set(nx, 0.4, nz);
         }
-        function syncOtherPlayers(players) {
-    if (!scene || !players) return;
+        ai.mesh.rotation.y = ai.dir;
 
-    // 1. Remove players who left (Ghost Removal)
-    for (let id in otherPlayers) {
-        if (!players[id]) {
-            scene.remove(otherPlayers[id]);
-            delete otherPlayers[id];
-        }
+        // Wheel spin
+        ai.mesh.children.forEach(ch => {
+            if(ch.name&amp;&amp;ch.name.length===2) ch.rotation.x += ai.speed*3;
+        });
+    });
+}
+
+// ═══════════════════════════════════════════════════════════
+// PHYSICS UPDATE
+// ═══════════════════════════════════════════════════════════
+function updatePhysics() {
+    if (!playerCar) return;
+
+    // Acceleration
+    if (keys.up)   speed = Math.min(speed+ACCEL, MAX_SPD);
+    else if(keys.down) speed = Math.max(speed-BRAKE, -MAX_REV);
+    else speed *= (1-FRICTION);
+    if (Math.abs(speed)<0.001) speed=0;
+
+    // Steering (speed-sensitive)
+    const spFactor = Math.min(Math.abs(speed)/MAX_SPD, 1);
+    const maxSteer = STEER_MAX * (1 - spFactor*0.4);
+    if (keys.left)  steer = Math.min(steer+0.005, maxSteer);
+    else if(keys.right) steer = Math.max(steer-0.005, -maxSteer);
+    else steer *= 0.75;
+
+    carDir += steer * Math.sign(speed) * (0.5 + spFactor*1.5);
+
+    // New position
+    const nx = playerCar.position.x + Math.sin(carDir)*speed;
+    const nz = playerCar.position.z + Math.cos(carDir)*speed;
+
+    // Collision
+    const hw=1.1, hd=2.1;
+    const box = new THREE.Box3(
+        new THREE.Vector3(nx-hw,0,nz-hd),
+        new THREE.Vector3(nx+hw,1.5,nz+hd)
+    );
+    let hit=false;
+    for(let b of buildings) { if(box.intersectsBox(b)){hit=true;break;} }
+
+    if (!hit) {
+        playerCar.position.set(nx, 0.4, nz);
+    } else {
+        speed *= -0.35;
     }
 
-    // 2. Add or Update players
-    for (let id in players) {
-        if (id === myId) continue;
+    // Body visual roll + pitch
+    playerCar.rotation.y = carDir;
+    const bodyMesh = playerCar.children[0]; // body
+    if (bodyMesh) {
+        bodyMesh.rotation.z = -steer * 3 * spFactor;
+        bodyMesh.rotation.x = speed * 0.15;
+    }
 
-        if (!otherPlayers[id]) {
-            otherPlayers[id] = createVehicle(players[id].color || 0x3498db, players[id].n || &quot;Player&quot;);
-            otherPlayers[id].userData.username = players[id].n || &quot;Player&quot;;
-            scene.add(otherPlayers[id]);
+    // Wheel spin + front wheel steer
+    playerCar.children.forEach(ch => {
+        if (!ch.name || ch.name.length!==2) return;
+        ch.rotation.x -= speed*3;
+        if (ch.name[0]==='f') ch.rotation.y = -steer*8;
+    });
+
+    // Camera follow
+    const camTarget = new THREE.Vector3(
+        playerCar.position.x - Math.sin(carDir)*16,
+        8,
+        playerCar.position.z - Math.cos(carDir)*16
+    );
+    camera.position.lerp(camTarget, 0.08);
+    camera.lookAt(new THREE.Vector3(
+        playerCar.position.x + Math.sin(carDir)*4,
+        0,
+        playerCar.position.z + Math.cos(carDir)*4
+    ));
+
+    // Speedometer
+    const kmh = Math.round(Math.abs(speed)*130);
+    document.getElementById('speed-val').innerText = kmh;
+    document.getElementById('gear-display').innerText = speed>0.02?'D':speed<-0.02?'R':'N';
+
+    // Firebase sync (throttled)
+    const now=Date.now();
+    if (roomId &amp;&amp; myId &amp;&amp; now-lastSync>60) {
+        lastSync=now;
+        db.ref('car_world/'+roomId+'/players/'+myId).update({x:playerCar.position.x,z:playerCar.position.z,r:carDir});
+        if(now-lastActivity>120000) {
+            db.ref('car_world/'+roomId).update({lastActivity:now});
+            lastActivity=now;
         }
-
-        if (!otherPlayers[id].userData.target) {
-            otherPlayers[id].userData.target = new THREE.Vector3();
-        }
-
-        // Error Fix: getGroundHeight ki jagah fixed 0.4 use karein
-        otherPlayers[id].userData.target.set(players[id].x, 0.4, players[id].z);
-        otherPlayers[id].userData.targetRot = players[id].r;
     }
 }
 
-        function update() {
-            let accel = keys.up ? 0.08 : (keys.down ? -0.05 : 0);
-            speed = (speed + accel) * 0.95;
-            if(Math.abs(speed) > 0.1) carDir += keys.left ? 0.05 : (keys.right ? -0.05 : 0);
-            const nx = car.position.x + Math.sin(carDir) * speed, nz = car.position.z + Math.cos(carDir) * speed;
-            const cBox = new THREE.Box3(new THREE.Vector3(nx-1.2,0,nz-2.5), new THREE.Vector3(nx+1.2,2,nz+2.5));
-            let hit = false;
-            for(let b of buildings) if(cBox.intersectsBox(b)) { hit = true; break; }
-                        if(!hit) {
-                car.position.set(nx, 0.4, nz);
-                // Sync hamesha enable rakhein taaki movement smooth dikhe
-                if (roomId &amp;&amp; myId) {
-                    db.ref('car_world/' + roomId + '/players/' + myId).update({ x: nx, z: nz, r: carDir });
-                    
-                    // Har 2 minute mein activity sync karein (Processor load kam karne ke liye)
-                    if(Date.now() - lastActivitySync > 120000) {
-                        db.ref('car_world/' + roomId).update({ lastActivity: Date.now() });
-                        lastActivitySync = Date.now();
-                    }
-                }
-
-            } 
-            else { 
-                speed = -speed * 0.4; 
-            }
-
-            car.rotation.y = carDir;
-            camera.position.lerp(new THREE.Vector3(car.position.x - Math.sin(carDir)*14, 7, car.position.z - Math.cos(carDir)*14), 0.1);
-            camera.lookAt(car.position);
-            document.getElementById('speed-val').innerText = Math.floor(Math.abs(speed)*80);
-        }
-
-    function animate() {
-
-    requestAnimationFrame(animate);
-
-    if (car) {
-
-    // Smooth zoom lerp
-    minimapZoom += (targetZoom - minimapZoom) * 0.1;
-
-    update();
-    updateChunks();
-    drawMinimap();
-}
-
-    // 🔥 Smooth Other Players
-    for (let id in otherPlayers) {
-
-        const p = otherPlayers[id];
-
-        if (p.userData.target) {
-
-            p.position.lerp(p.userData.target, 0.15);
-
-            if (p.userData.targetRot !== undefined) {
-                p.rotation.y += (p.userData.targetRot - p.rotation.y) * 0.15;
-            }
-        }
-    }
-
-    // Update big map live
-    if (bigMapContainer.style.right === &quot;0px&quot;) {
-        drawBigMap();
-    }
-
-    renderer.render(scene, camera);
-}
+// ═══════════════════════════════════════════════════════════
+// MINIMAP
+// ═══════════════════════════════════════════════════════════
 function drawMinimap() {
-    if (!car) return;
-    const size = 160;
-    if (minimapCanvas.width !== size) { minimapCanvas.width = size; minimapCanvas.height = size; }
-    
-    const scale = minimapZoom;
-    const centerX = size / 2;
-    const centerY = size / 2;
+    if (!playerCar || !minimapCtx) return;
+    const ctx = minimapCtx;
+    const W=130, H=130, scale=W/(MAP_H+ROAD_W*4);
+    ctx.clearRect(0,0,W,H);
 
-    minimapCtx.clearRect(0, 0, size, size);
-    minimapCtx.fillStyle = &quot;rgba(0,0,0,0.6)&quot;;
-    minimapCtx.fillRect(0,0,size,size);
+    // Background
+    ctx.fillStyle='rgba(0,0,0,0.85)'; ctx.beginPath(); ctx.arc(65,65,65,0,Math.PI*2); ctx.fill();
+    ctx.clip();
 
-    minimapCtx.save();
-    minimapCtx.translate(centerX, centerY);
-    // Rotate world OPPOSITE to car for player-centric view
-    minimapCtx.rotate(-car.rotation.y); 
+    const cx=playerCar.position.x, cz=playerCar.position.z;
+    const ox=W/2-cx*scale, oz=H/2-cz*scale;
 
-    // Environment (Roads &amp; Buildings)
-    minimapCtx.fillStyle = &quot;#2ecc71&quot;;
-    activeChunks.forEach((chunk) => {
-        chunk.children.forEach(obj => {
-            if (obj.geometry?.type === &quot;BoxGeometry&quot;) {
-                const dx = (obj.position.x - car.position.x) * scale;
-                // FIX: Invert dy so the world moves opposite to the car
-                const dy = -(obj.position.z - car.position.z) * scale; 
-                if(Math.abs(dx) < 80 &amp;&amp; Math.abs(dy) < 80) minimapCtx.fillRect(dx - 1, dy - 1, 2, 2);
-            }
-        });
+    // Roads
+    ctx.strokeStyle='rgba(255,255,255,0.6)'; ctx.lineWidth=ROAD_W*scale;
+    ROADS.forEach(r=>{
+        ctx.beginPath(); ctx.moveTo(r*scale+ox,-HALF*scale+oz); ctx.lineTo(r*scale+ox,HALF*scale+oz); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(-HALF*scale+ox,r*scale+oz); ctx.lineTo(HALF*scale+ox,r*scale+oz); ctx.stroke();
     });
 
-    // Other Players
-    for (let id in otherPlayers) {
-        const p = otherPlayers[id];
-        const dx = (p.position.x - car.position.x) * scale;
-        const dy = -(p.position.z - car.position.z) * scale;
-        const dist = Math.sqrt(dx*dx + dy*dy);
-        if (dist < 75) {
-            minimapCtx.fillStyle = &quot;red&quot;;
-            minimapCtx.beginPath(); minimapCtx.arc(dx, dy, 4, 0, Math.PI * 2); minimapCtx.fill();
-        }
-    }
-
-    // GPS Logic
-    let nearest = null; let minDist = Infinity;
-    for (let id in otherPlayers) {
-        const d = car.position.distanceTo(otherPlayers[id].position);
-        if (d < minDist) { minDist = d; nearest = otherPlayers[id]; }
-    }
-    if (nearest) {
-        const tx = (nearest.position.x - car.position.x) * scale;
-        const ty = -(nearest.position.z - car.position.z) * scale;
-        minimapCtx.strokeStyle = &quot;#00ffff&quot;;
-        minimapCtx.setLineDash([5, 5]);
-        minimapCtx.beginPath(); minimapCtx.moveTo(0, 0); minimapCtx.lineTo(tx, ty);
-        minimapCtx.stroke(); minimapCtx.setLineDash([]);
-    }
-    minimapCtx.restore();
-
-    // Player Arrow (Always UP)
-    minimapCtx.fillStyle = &quot;#00ff88&quot;;
-    minimapCtx.beginPath();
-    minimapCtx.moveTo(centerX, centerY - 10);
-    minimapCtx.lineTo(centerX + 6, centerY + 8);
-    minimapCtx.lineTo(centerX - 6, centerY + 8);
-    minimapCtx.fill();
-}
-
-
-
-    
-        function drawBigMap() {
-    if (!car || bigMapContainer.style.right !== &quot;0px&quot;) return;
-    bigMapZoom += (bigMapTargetZoom - bigMapZoom) * 0.1;
-
-    if (bigMapCanvas.width !== window.innerWidth) {
-        bigMapCanvas.width = window.innerWidth;
-        bigMapCanvas.height = window.innerHeight;
-    }
-    
-    const ctx = bigMapCanvas.getContext(&quot;2d&quot;);
-    const centerX = bigMapCanvas.width / 2;
-    const centerY = bigMapCanvas.height / 2;
-    const scale = bigMapZoom;
-
-    ctx.fillStyle = &quot;#111&quot;;
-    ctx.fillRect(0, 0, bigMapCanvas.width, bigMapCanvas.height);
-
-    ctx.save();
-    // Center the map view on the player's position
-    ctx.translate(centerX, centerY);
-
-    // Draw Buildings (Map stays fixed, buildings move relative to player)
-    ctx.fillStyle = &quot;#34495e&quot;;
-    activeChunks.forEach((chunk) => {
-        chunk.children.forEach(obj => {
-            if (obj.geometry?.type === &quot;BoxGeometry&quot;) {
-                const dx = (obj.position.x - car.position.x) * scale;
-                const dy = -(obj.position.z - car.position.z) * scale;
-                ctx.fillRect(dx - 5, dy - 5, 10, 10);
-            }
-        });
+    // AI cars (orange dots)
+    aiCars.forEach(ai=>{
+        const ax=ai.mesh.position.x*scale+ox, az=ai.mesh.position.z*scale+oz;
+        ctx.fillStyle='#ff8c00'; ctx.beginPath(); ctx.arc(ax,az,3.5,0,Math.PI*2); ctx.fill();
     });
 
-    // Other Players
-    for (let id in otherPlayers) {
-        const p = otherPlayers[id];
-        const dx = (p.position.x - car.position.x) * scale;
-        const dy = (p.position.z - car.position.z) * scale;
-        ctx.fillStyle = &quot;red&quot;;
-        ctx.beginPath(); ctx.arc(dx, dy, 7, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = &quot;white&quot;; ctx.font = &quot;14px Teko&quot;; ctx.textAlign = &quot;center&quot;;
-        ctx.fillText(p.userData.username || &quot;Player&quot;, dx, dy - 12);
-    }
+    // Other players (blue dots)
+    Object.values(otherCars).forEach(op=>{
+        const px=op.position.x*scale+ox, pz=op.position.z*scale+oz;
+        ctx.fillStyle='#3498db'; ctx.beginPath(); ctx.arc(px,pz,4,0,Math.PI*2); ctx.fill();
+    });
 
-    // YOU Arrow (Rotating, but always in center)
+    // Player (neon arrow)
     ctx.save();
-    ctx.rotate(-car.rotation.y); // Use car's rotation for the arrow
-    ctx.fillStyle = &quot;lime&quot;;
-    ctx.beginPath();
-    ctx.moveTo(0, -18); ctx.lineTo(10, 14); ctx.lineTo(-10, 14);
+    ctx.translate(W/2, H/2);
+    ctx.rotate(-carDir);
+    ctx.fillStyle='#00f3ff';
+    ctx.beginPath(); ctx.moveTo(0,-8); ctx.lineTo(5,5); ctx.lineTo(0,2); ctx.lineTo(-5,5); ctx.closePath();
     ctx.fill();
     ctx.restore();
 
-    ctx.restore();
-}
-    
-       
-        function sendChat() { 
-    const i = document.getElementById('chat-input'); 
-    if(!i.value) return; 
-    db.ref('car_world/' + roomId + '/chat').push({ user: playerName, text: i.value }); 
-    // Activity update on chat
-    db.ref('car_world/' + roomId).update({ lastActivity: Date.now() });
-    i.value = &quot;&quot;; 
+    // Border
+    ctx.strokeStyle='rgba(0,243,255,0.6)'; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.arc(65,65,64,0,Math.PI*2); ctx.stroke();
 }
 
-        function copyCode() { navigator.clipboard.writeText(roomId).catch(()=>{}); _showInviteToast(&quot;📋 Code &quot; + roomId + &quot; copied!&quot;); }
-        function _exitFs(cb){if(document.fullscreenElement||document.webkitFullscreenElement){try{if(screen.orientation&&screen.orientation.unlock)screen.orientation.unlock();}catch(e){}var done=false;function go(){if(done)return;done=true;cb();}setTimeout(go,400);document.addEventListener('fullscreenchange',go,{once:true});document.addEventListener('webkitfullscreenchange',go,{once:true});try{document.exitFullscreen();}catch(e){try{document.webkitExitFullscreen();}catch(e2){}}}else{cb();}}
-        
-        window.addEventListener('resize', () => {
-            if(!camera || !renderer) return;
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        });
-
-        function setupControls() {
-            const b = (id, k) => { const el = document.getElementById(id); el.addEventListener('touchstart', (e) => { e.preventDefault(); keys[k] = 1; }, {passive: false}); el.addEventListener('touchend', (e) => { e.preventDefault(); keys[k] = 0; }, {passive: false}); };
-            b('touch-gas', 'up'); b('touch-brake', 'down'); b('touch-left', 'left'); b('touch-right', 'right');
-            window.onkeydown = e => { if(e.key === 'Enter') sendChat(); if(e.key==='w'||e.key==='ArrowUp') keys.up=1; if(e.key==='s'||e.key==='ArrowDown') keys.down=1; if(e.key==='a'||e.key==='ArrowLeft') keys.left=1; if(e.key==='d'||e.key==='ArrowRight') keys.right=1; };
-            window.onkeyup = e => { if(e.key==='w'||e.key==='ArrowUp') keys.up=0; if(e.key==='s'||e.key==='ArrowDown') keys.down=0; if(e.key==='a'||e.key==='ArrowLeft') keys.left=0; if(e.key==='d'||e.key==='ArrowRight') keys.right=0; };
+// ═══════════════════════════════════════════════════════════
+// MULTIPLAYER SYNC
+// ═══════════════════════════════════════════════════════════
+function syncOtherPlayers(playersData) {
+    if (!playersData) return;
+    Object.keys(playersData).forEach(pid => {
+        if (pid===myId) return;
+        const d = playersData[pid];
+        if (!otherCars[pid]) {
+            const col = CAR_COLORS[Object.keys(otherCars).length % CAR_COLORS.length];
+            otherCars[pid] = createVehicle(col, d.n||pid);
+            otherCars[pid].position.set(d.x||0, 0.4, d.z||0);
+            scene.add(otherCars[pid]);
+        } else {
+            otherCars[pid].userData.tx = d.x||0;
+            otherCars[pid].userData.tz = d.z||0;
+            otherCars[pid].userData.tr = d.r||0;
         }
-    </script>
+    });
+    // Remove disconnected
+    Object.keys(otherCars).forEach(pid => {
+        if (!playersData[pid]) { scene.remove(otherCars[pid]); delete otherCars[pid]; }
+    });
+    // Update count
+    document.getElementById('player-count').innerText = Object.keys(playersData).length + ' player(s)';
+}
+
+function lerpOtherCars() {
+    Object.values(otherCars).forEach(op=>{
+        if (op.userData.tx!==undefined) {
+            op.position.x += (op.userData.tx - op.position.x)*0.15;
+            op.position.z += (op.userData.tz - op.position.z)*0.15;
+            op.rotation.y += (op.userData.tr - op.rotation.y)*0.15;
+        }
+    });
+}
+
+// ═══════════════════════════════════════════════════════════
+// GAME LOOP
+// ═══════════════════════════════════════════════════════════
+let lastTime=0;
+function animate(t=0) {
+    requestAnimationFrame(animate);
+    updatePhysics();
+    updateAI();
+    lerpOtherCars();
+    drawMinimap();
+    renderer.render(scene, camera);
+}
+
+// ═══════════════════════════════════════════════════════════
+// CONTROLS
+// ═══════════════════════════════════════════════════════════
+function setupControls() {
+    // Keyboard
+    window.addEventListener('keydown', e=>{
+        if(e.code==='KeyW'||e.code==='ArrowUp') keys.up=1;
+        if(e.code==='KeyS'||e.code==='ArrowDown') keys.down=1;
+        if(e.code==='KeyA'||e.code==='ArrowLeft') keys.left=1;
+        if(e.code==='KeyD'||e.code==='ArrowRight') keys.right=1;
+    });
+    window.addEventListener('keyup', e=>{
+        if(e.code==='KeyW'||e.code==='ArrowUp') keys.up=0;
+        if(e.code==='KeyS'||e.code==='ArrowDown') keys.down=0;
+        if(e.code==='KeyA'||e.code==='ArrowLeft') keys.left=0;
+        if(e.code==='KeyD'||e.code==='ArrowRight') keys.right=0;
+    });
+    // Touch
+    const tb=(id,k)=>{
+        const el=document.getElementById(id);
+        el.addEventListener('touchstart',e=>{e.preventDefault();keys[k]=1;el.classList.add('pressed');},{passive:false});
+        el.addEventListener('touchend',e=>{e.preventDefault();keys[k]=0;el.classList.remove('pressed');},{passive:false});
+    };
+    tb('t-gas','up'); tb('t-brake','down'); tb('t-left','left'); tb('t-right','right');
+    document.getElementById('touch-controls').style.display='flex';
+}
+
+// ═══════════════════════════════════════════════════════════
+// ROOM SYSTEM
+// ═══════════════════════════════════════════════════════════
+function createRoom() {
+    roomId = Math.floor(1000+Math.random()*9000).toString();
+    myId = 'p1';
+    db.ref('car_world/'+roomId).set({
+        status:'waiting', lastActivity:Date.now(),
+        players:{p1:{x:0,z:0,r:0,n:playerName,color:0xe74c3c}}
+    }).then(()=>{
+        document.getElementById('room-code-display').innerText = roomId;
+        db.ref('car_world/'+roomId+'/players/p1').onDisconnect().remove();
+        var _roomEmptyTimer=null;
+        db.ref('car_world/'+roomId+'/players').on('value',snap=>{
+            if(snap.exists()) { syncOtherPlayers(snap.val()); if(_roomEmptyTimer){clearTimeout(_roomEmptyTimer);_roomEmptyTimer=null;} }
+            else {
+                if(!_roomEmptyTimer) _roomEmptyTimer=setTimeout(function(){
+                    db.ref('car_world/'+roomId).remove();
+                },8000);
+            }
+        });
+        startGame(ROADS[0]+3, ROADS[0]+3);
+    });
+}
+
+function joinRoom() {
+    const code = document.getElementById('roomInput').value.trim();
+    if (!code||code.length<4) return;
+    db.ref('car_world/'+code).once('value').then(snap=>{
+        if(!snap.exists()) { document.getElementById('lobby-status').innerText='Room not found!'; return; }
+        const players = snap.val().players||{};
+        let slot=null;
+        for(let i=1;i<=8;i++) {
+            const k='p'+i;
+            if(!players[k]||players[k].n===playerName) {slot=k;break;}
+        }
+        if(!slot) { document.getElementById('lobby-status').innerText='Room full!'; return; }
+        roomId=code; myId=slot;
+        const color=CAR_COLORS[(parseInt(slot.replace('p',''))-1)%CAR_COLORS.length];
+        db.ref('car_world/'+roomId+'/players/'+myId).set({x:5,z:5,r:0,n:playerName,color});
+        db.ref('car_world/'+roomId+'/players/'+myId).onDisconnect().remove();
+        document.getElementById('room-code-display').innerText = roomId;
+        var _roomEmptyTimerJ=null;
+        db.ref('car_world/'+roomId+'/players').on('value',snap=>{
+            if(snap.exists()) { syncOtherPlayers(snap.val()); if(_roomEmptyTimerJ){clearTimeout(_roomEmptyTimerJ);_roomEmptyTimerJ=null;} }
+            else {
+                if(!_roomEmptyTimerJ) _roomEmptyTimerJ=setTimeout(function(){
+                    db.ref('car_world/'+roomId).remove();
+                },8000);
+            }
+        });
+        startGame(ROADS[1]+3, ROADS[1]+3);
+    });
+}
+
+function startGame(spawnX, spawnZ) {
+    const col = CAR_COLORS[(parseInt(myId.replace('p',''))-1)%CAR_COLORS.length];
+    playerCar = createVehicle(col, playerName);
+    playerCar.position.set(spawnX, 0.4, spawnZ);
+    scene.add(playerCar);
+    lastActivity = Date.now();
+    document.getElementById('lobby').style.display='none';
+    document.getElementById('hud').style.display='block';
+}
+
+// ═══════════════════════════════════════════════════════════
+// PING
+// ═══════════════════════════════════════════════════════════
+(function pingLoop(){
+    var hist=[];
+    function measure(){
+        var t0=performance.now();
+        fetch('https://formywebfirebase-default-rtdb.firebaseio.com/.json?shallow=true',{cache:'no-store'})
+        .then(function(){
+            var p=Math.round(performance.now()-t0); hist.push(p); if(hist.length>5)hist.shift();
+            var avg=Math.round(hist.reduce(function(a,b){return a+b;},0)/hist.length);
+            var b=document.getElementById('car-ping-badge'),m=document.getElementById('car-ping-ms');
+            if(b&amp;&amp;m){m.innerText=avg;b.className='ping-badge '+(avg<80?'ping-good':avg<200?'ping-medium':'ping-bad');}
+        }).catch(function(){
+            var b=document.getElementById('car-ping-badge'),m=document.getElementById('car-ping-ms');
+            if(b&amp;&amp;m){m.innerText='999+';b.className='ping-badge ping-bad';}
+        });
+    }
+    measure(); setInterval(measure,5000);
+})();
+
+// ═══════════════════════════════════════════════════════════
+// AUTO-JOIN FROM INVITE
+// ═══════════════════════════════════════════════════════════
+window.addEventListener('message', function(e){
+    if(e.data&amp;&amp;e.data.type==='auto-join'&amp;&amp;e.data.code){
+        document.getElementById('roomInput').value=e.data.code;
+        joinRoom();
+    }
+});
+
+// ═══════════════════════════════════════════════════════════
+// BOOT
+// ═══════════════════════════════════════════════════════════
+window.addEventListener('load', function(){
+    initThree();
+    // Hide loading, show lobby after world builds
+    setTimeout(()=>{
+        document.getElementById('loading-screen').style.display='none';
+        document.getElementById('lobby').style.display='flex';
+    }, 800);
+});
+</script>
 </body>
-</html>
-" sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock" allowfullscreen></iframe>
+</html>&quot;>&quot;>"></iframe>
         </div>
     </div>
 
@@ -8173,14 +8097,22 @@ function drawMinimap() {
                 });
                 const dot = document.getElementById('chat-notif-dot');
                 if (dot) dot.style.display = unread ? 'block' : 'none';
-                if (unread) _showInGameNotif('💬 New chat message!');
+                if (unread) {
+                    _showInGameNotif('💬 New chat message!');
+                    var fb = document.getElementById('hub-friends-btn') || document.querySelector('.hub-friends-btn');
+                    if (fb) { fb.classList.remove('has-notif'); void fb.offsetWidth; fb.classList.add('has-notif'); }
+                } else {
+                    var fb2 = document.getElementById('hub-friends-btn') || document.querySelector('.hub-friends-btn');
+                    if (fb2) fb2.classList.remove('has-notif');
+                }
             });
 
             // Notification dot
             const ls = localStorage.getItem('lastReadNotif') || 0;
             const dot = document.getElementById('notif-dot');
             LC.fb('section-hub', db.ref('notifications/global'), 'value', snap => {
-                const d = snap.val(); if (d) Object.values(d).forEach(n => { if (n.time > ls) dot.style.display = 'block'; });
+                const d = snap.val(); let hasNew=false; if (d) Object.values(d).forEach(n => { if (n.time > ls) hasNew=true; });
+                if(hasNew) { dot.style.display='block'; var nb3=document.querySelector('.notif-btn'); if(nb3){nb3.style.animation='';void nb3.offsetWidth;nb3.style.animation='friendBtnShake 0.5s ease 3';} }
             });
             LC.fb('section-hub', db.ref('notifications/private/' + pid), 'value', snap => {
                 const d = snap.val(); if (d) Object.values(d).forEach(n => { if (n.time > ls) dot.style.display = 'block'; });
@@ -8354,9 +8286,11 @@ function drawMinimap() {
             const s = gameMap[k];
             if (!s) return;
             const iid = 'iframe-' + k;
+            // Mount srcdoc FIRST so iframe starts loading before animation
             _mountGame(iid);
             _setUserStatus(_gameStatusNames[k] || '🎮 In Game');
-            MapsTo(s, 'right');
+            // Small delay ensures iframe has content before slide
+            setTimeout(function() { MapsTo(s, 'right'); }, 30);
         }
 
         // ─── CONTACT FORM AJAX ───
@@ -8452,6 +8386,9 @@ function drawMinimap() {
             document.querySelectorAll('.lb-game-tab').forEach(function(b){ b.classList.remove('active'); });
             if (btn) btn.classList.add('active');
             _lbCurrentGame = gk;
+            // Clear previous rank bar on tab switch
+            var rb = document.getElementById('lb-my-rank-bar');
+            if (rb) rb.classList.remove('show');
             loadLeaderboard();
         }
         function loadLeaderboard() {
@@ -8505,6 +8442,15 @@ function drawMinimap() {
                         document.getElementById('lb-my-rank-info').innerText = '#' + myRank + ' · ' + (myName.charAt(0).toUpperCase()+myName.slice(1));
                         document.getElementById('lb-my-rank-score').innerText = myScore.toLocaleString() + ' pts';
                         myRankBar.classList.add('show');
+                    } else {
+                        // Not in top 20 — check if has any score
+                        db.ref('users/' + myName + '/' + gk).once('value', function(s) {
+                            if (s.val() && s.val() > 0) {
+                                document.getElementById('lb-my-rank-info').innerText = '📊 ' + (myName.charAt(0).toUpperCase()+myName.slice(1)) + ' · Not in Top 20';
+                                document.getElementById('lb-my-rank-score').innerText = s.val().toLocaleString() + ' pts';
+                                myRankBar.classList.add('show');
+                            }
+                        });
                     }
                 }
             });
@@ -8804,7 +8750,13 @@ function drawMinimap() {
             nameEl.innerText   = pid.charAt(0).toUpperCase() + pid.slice(1);
             db.ref('friends/' + pid).once('value', function(fSnap) {
                 var fc = document.getElementById('my-friends-count');
-                if (fc) fc.innerText = fSnap.exists() ? Object.keys(fSnap.val()).length : 0;
+                var fcount = fSnap.exists() ? Object.keys(fSnap.val()).length : 0;
+                if (fc) fc.innerText = fcount;
+                var lb = document.getElementById('my-level-badge');
+                if (lb) {
+                    var badge = fcount>=20?'👑 Legend':fcount>=10?'⭐ Pro':fcount>=5?'🔥 Rising':'🌱 Newbie';
+                    lb.innerText = badge;
+                }
             });
             db.ref('users/' + pid).once('value', function(snap) {
                 if (!snap.exists()) return;
@@ -8846,6 +8798,11 @@ function drawMinimap() {
                     var best = Math.max(d.flappy_highscore||0, d.dino_highscore||0, d.snake_highscore||0, d.pacman_highscore||0);
                     rankEl.innerText = best > 0 ? best.toLocaleString() : '—';
                 }
+                var gpEl = document.getElementById('my-games-played');
+                if (gpEl) {
+                    var played = [d.flappy_highscore,d.dino_highscore,d.snake_highscore,d.pacman_highscore].filter(function(s){return s&&s>0;}).length;
+                    gpEl.innerText = played > 0 ? played + '/4' : '—';
+                }
             });
         }
 
@@ -8853,8 +8810,7 @@ function drawMinimap() {
             var inp = document.getElementById('my-bio-input');
             var countEl = document.getElementById('my-bio-wordcount');
             if (!inp || !countEl) return;
-            var words = inp.value.trim() === '' ? [] : inp.value.trim().split(/\s+/);
-            var wc = words.length;
+            var wc = inp.value.length;
             countEl.innerText = wc;
             countEl.style.color = wc > 100 ? '#ff3366' : 'rgba(255,255,255,0.3)';
             var errEl = document.getElementById('my-bio-error');
@@ -8869,8 +8825,7 @@ function drawMinimap() {
             var errEl = document.getElementById('my-bio-error');
             if (!inp || !pid) return;
             var text = inp.value.trim();
-            var words = text === '' ? [] : text.split(/\s+/);
-            if (words.length > 100) { if (errEl) errEl.innerText = '❌ Max 100 words!'; return; }
+            if (text.length > 100) { if (errEl) errEl.innerText = '❌ Max 100 characters!'; return; }
             if (_containsBadWords(text)) { if (errEl) errEl.innerText = '❌ Abusive words found! Keep it clean.'; return; }
             db.ref('users/' + pid).update({ bio: text || null }, function(err) {
                 if (err) { if (errEl) errEl.innerText = '❌ Error saving.'; return; }
@@ -9468,6 +9423,7 @@ function adminResetPass(uid) {
 }
 
 function loadRooms() {
+  db.ref('car_world').off('value'); // cleanup previous listener
   db.ref('car_world').on('value', function(snap) {
     var tbody = document.getElementById('roomTableBody');
     tbody.innerHTML = '';
@@ -9515,7 +9471,8 @@ async function renameUser() {
     if (newSnap.exists()) { st.style.color='#ff3366'; st.innerText='❌ Username already taken!'; return; }
     var oldSnap = await db.ref('users/' + oldN).once('value');
     if (!oldSnap.exists()) { st.style.color='#ff3366'; st.innerText='❌ User not found!'; return; }
-    var userData = Object.assign({}, oldSnap.val(), { _admin: true });
+    var userData = Object.assign({}, oldSnap.val());
+    delete userData._admin; // don't copy admin flag to new user
 
     st.innerText = 'Step 2/6: Copying user data...';
     await db.ref('users/' + newN).set(userData);
@@ -9725,6 +9682,31 @@ showSection('global', document.querySelector('.admin-btn'));
             _pingInterval = setInterval(measure, 5000);
         }
         function _stopPing() { if (_pingInterval) { clearInterval(_pingInterval); _pingInterval = null; } _pingHistory = []; }
+
+        // ═══ ROOM AUTO-CLEANUP ═══
+        // Called after joining/creating any multiplayer room
+        // Watches room/players — if empty for 8s, deletes room
+        var _roomCleanupIntervals = {};
+        function _watchRoom(ref, roomPath) {
+            if (_roomCleanupIntervals[roomPath]) return; // already watching
+            var _emptyTimer = null;
+            var handle = ref.on('value', function(snap) {
+                var val = snap.val();
+                var empty = !val || !val.players || Object.keys(val.players).length === 0;
+                if (empty) {
+                    if (!_emptyTimer) {
+                        _emptyTimer = setTimeout(function() {
+                            ref.remove(); // delete room
+                            ref.off('value', handle);
+                            delete _roomCleanupIntervals[roomPath];
+                        }, 8000); // 8s grace period
+                    }
+                } else {
+                    if (_emptyTimer) { clearTimeout(_emptyTimer); _emptyTimer = null; }
+                }
+            });
+            _roomCleanupIntervals[roomPath] = handle;
+        }
 
         var _inGameNotifCount = 0;
         function _showInGameNotif(text) {
