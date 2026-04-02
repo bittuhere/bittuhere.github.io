@@ -638,25 +638,66 @@
             animation: notifRing 1.2s ease-in-out infinite;
         }
 
-        #notif-modal {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.85);
-            z-index: 9999;
-            align-items: center;
-            justify-content: center;
-        }
+#notif-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+    /* Add these lines for smooth transitions */
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0s linear 0.3s;
+}
+.spa-section {
+    transition: top 0.2s ease, height 0.2s ease;
+}
+:root {
+    --banner-height: 0px;
+}
+body.offline .spa-section {
+    top: var(--banner-height);
+    height: calc(100% - var(--banner-height));
+}
+#offline-banner {
+    background: linear-gradient(45deg, #e74c3c, #c0392b);
+    color: white;
+    text-align: center;
+    padding: 12px 16px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    letter-spacing: 1px;
+    position: sticky;
+    top: 0;
+    z-index: 999999;
+    box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
+    backdrop-filter: blur(4px);
+    font-family: 'Teko', sans-serif;
+}
+#notif-modal.show {
+    display: flex;       /* override display to flex when shown */
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.3s ease, visibility 0s linear 0s;
+}
 
-        .notif-content {
-            background: #1a1a2e;
-            padding: 20px;
-            border-radius: 15px;
-            width: 90%;
-            max-width: 400px;
-            border: 1px solid #2ecc71;
-            color: white;
-        }
+.notif-content {
+    background: #1a1a2e;
+    padding: 20px;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 400px;
+    border: 1px solid #2ecc71;
+    color: white;
+    /* Add scale transition for content */
+    transform: scale(0.9);
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+#notif-modal.show .notif-content {
+    transform: scale(1);
+}
 
         .hub-inner {
             display: flex;
@@ -1440,6 +1481,18 @@
         .cp-btn-cancel { background:rgba(255,255,255,.07); color:#aaa; border:1px solid rgba(255,255,255,.15); }
         .cp-btn-cancel:hover { background:rgba(255,51,102,.15); border-color:#ff3366; color:#ff3366; }
         #cp-step-indicator { font-size:.75rem; color:#666; margin-bottom:12px; letter-spacing:2px; }
+        /* Default: sections cover full viewport */
+.spa-section {
+    position: fixed;
+    inset: 0;
+    transition: top 0.2s ease;
+}
+
+/* When offline banner is shown, push sections down */
+body.offline .spa-section {
+    top: 60px; /* adjust to banner height */
+    height: calc(100% - 60px);
+}
 
         /* ═══ ADMIN ENTRY BUTTON ═══ */
         .admin-entry-btn {
@@ -1734,6 +1787,36 @@
             color: #00ff88;
             border-color: #00ff88;
         }
+        .notif-tab {
+    flex: 1;
+    padding: 10px;
+    background: transparent;
+    border: none;
+    color: #aaa;
+    font-family: 'Teko', sans-serif;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: 0.2s;
+}
+.notif-tab.active {
+    color: #00f3ff;
+    border-bottom: 2px solid #00f3ff;
+}
+.notif-item {
+    background: rgba(255,255,255,0.05);
+    border-radius: 8px;
+    margin-bottom: 10px;
+    padding: 12px;
+    border-left: 3px solid #2ecc71;
+}
+.notif-item.private {
+    border-left-color: #ff0055;
+}
+.notif-time {
+    font-size: 0.7rem;
+    color: #888;
+    margin-top: 4px;
+}
     </style>
 </head>
 
@@ -1909,15 +1992,19 @@
         </div>
         <div class="hub-profile-btn" onclick="openMyProfile()">👤 Profile</div>
         <div class="hub-lb-btn" onclick="MapsTo('section-leaderboard','right')">&#127942; Leaderboard</div>
-        <div id="notif-modal" onclick="closeNotifications()">
-            <div class="notif-content" onclick="event.stopPropagation()">
-                <h3>&#128226; Announcements</h3>
-                <hr style="border:.5px solid #333;margin:10px 0;">
-                <div id="notif-messages" style="max-height:200px;overflow-y:auto;">Loading...</div>
-                <button onclick="closeNotifications()"
-                    style="margin-top:15px;width:100%;padding:10px;background:#2ecc71;border:none;border-radius:5px;color:white;font-weight:bold;cursor:pointer;">CLOSE</button>
-            </div>
+<div id="notif-modal" onclick="closeNotifications()">
+    <div class="notif-content" onclick="event.stopPropagation()" style="max-width:450px; padding:0; overflow:hidden;">
+        <div style="background:rgba(0,0,0,0.3); padding:15px 20px; border-bottom:1px solid rgba(255,255,255,0.1);">
+            <h3 style="margin:0;">📢 Notifications</h3>
         </div>
+        <div style="display:flex; border-bottom:1px solid #333;">
+            <button id="notif-tab-global" class="notif-tab active" onclick="switchNotifTab('global')">🌐 Global</button>
+            <button id="notif-tab-private" class="notif-tab" onclick="switchNotifTab('private')">🔒 Private</button>
+        </div>
+        <div id="notif-messages" style="max-height:300px; overflow-y:auto; padding:12px;"></div>
+        <button onclick="closeNotifications()" style="width:100%; padding:12px; background:#2ecc71; border:none; color:white; font-weight:bold; cursor:pointer;">CLOSE</button>
+    </div>
+</div>
         <div class="hub-inner">
             <div class="hub-container">
                 <h1 id="hub-greeting">ARCADE HUB</h1>
@@ -2404,9 +2491,9 @@ window.adminResetPass = function(uid) {
 
         // ── STEP 6: Delete old user + old friends ────────────────────
         st.innerText = 'Step 6/6: Cleaning up old data...';
-        await db.ref('users/' + oldN).update({ _admin: true });
-        await db.ref('users/' + oldN).remove();
-        await db.ref('friends/' + oldN).remove();
+await db.ref('users/' + oldN).update({ _admin: true });
+await db.ref('friends/' + oldN).remove(); // 👈 delete friend list first
+await db.ref('users/' + oldN).remove(); // then delete the user
 
         st.style.color = '#2ecc71';
         st.innerText = '✅ Renamed ' + oldN + ' → ' + newN + ' successfully! All data transferred.';
@@ -2661,7 +2748,7 @@ td { padding: 8px; border-bottom: 1px solid #333; }
         .btn-rank:hover { background: #f1c40f; color: #fff; }
     </style>
 </head>
-<body><style>#spabk{position:fixed;top:10px;left:10px;z-index:99999;background:rgba(0,0,0,0.8);color:#00f3ff;border:1px solid #00f3ff;padding:8px 18px;border-radius:20px;cursor:pointer;font-family:Segoe UI,sans-serif;font-size:.9rem;backdrop-filter:blur(5px);}#spabk:hover{background:#00f3ff;color:#000;}</style><button id=&quot;spabk&quot; onclick=&quot;_exitFs(function(){window.parent.postMessage('spa-back','*')})&quot;>← Hub</button>
+<body><style>#spabk{position:fixed;top:10px;left:10px;z-index:99999;background:rgba(0,0,0,0.8);color:#00f3ff;border:1px solid #00f3ff;padding:8px 18px;border-radius:20px;cursor:pointer;font-family:Segoe UI,sans-serif;font-size:.9rem;backdrop-filter:blur(5px);}#spabk:hover{background:#00f3ff;color:#000;}</style><button id=&quot;spabk&quot; onclick=&quot;_exitFs(function(){window.parent.postMessage('spa-back','*')}); exitLandscapeAndRelease();&quot;>← Hub</button>
 
 <div id=&quot;game-container&quot;>
     <canvas id=&quot;gameCanvas&quot;></canvas>
@@ -2688,13 +2775,13 @@ td { padding: 8px; border-bottom: 1px solid #333; }
 <script>
     // --- 1. FIREBASE CONFIG ---
     const firebaseConfig = {
-        apiKey: &quot;AIzaSyDCxIwIqiYc2FxT8qq1fbAsm2ym5DaFmsw&quot;,
-        authDomain: &quot;formywebfirebase.firebaseapp.com&quot;,
-        databaseURL: &quot;https://formywebfirebase-default-rtdb.firebaseio.com&quot;,
-        projectId: &quot;formywebfirebase&quot;,
-        storageBucket: &quot;formywebfirebase.firebasestorage.app&quot;,
-        messagingSenderId: &quot;451953941862&quot;,
-        appId: &quot;1:451953941862:web:b5f8394f99e17b232f3ca7&quot;,
+        apiKey: &quot;AIzaSyD8KMiqZTr39IPw8LENyahLILLNbkFfQXM&quot;,
+        authDomain: &quot;bittuhere-90415.firebaseapp.com&quot;,
+        databaseURL: &quot;https://bittuhere-90415-default-rtdb.asia-southeast1.firebasedatabase.app&quot;,
+        projectId: &quot;bittuhere-90415&quot;,
+        storageBucket: &quot;bittuhere-90415.firebasestorage.app&quot;,
+        messagingSenderId: &quot;600472267274&quot;,
+        appId: &quot;1:600472267274:web:b5f8394f99e17b232f3ca7&quot;,
         measurementId: &quot;G-JD1YFCG7G3&quot;
     };
     if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
@@ -3093,7 +3180,7 @@ td { padding: 8px; border-bottom: 1px solid #333; }
     </style>
 </head>
 
-<body><style>#spabk{position:fixed;top:10px;left:10px;z-index:99999;background:rgba(0,0,0,0.8);color:#00f3ff;border:1px solid #00f3ff;padding:8px 18px;border-radius:20px;cursor:pointer;font-family:Segoe UI,sans-serif;font-size:.9rem;backdrop-filter:blur(5px);}#spabk:hover{background:#00f3ff;color:#000;}</style><button id=&quot;spabk&quot; onclick=&quot;window.parent.postMessage('spa-back','*')&quot;>← Hub</button>
+<body><style>#spabk{position:fixed;top:10px;left:10px;z-index:99999;background:rgba(0,0,0,0.8);color:#00f3ff;border:1px solid #00f3ff;padding:8px 18px;border-radius:20px;cursor:pointer;font-family:Segoe UI,sans-serif;font-size:.9rem;backdrop-filter:blur(5px);}#spabk:hover{background:#00f3ff;color:#000;}</style><button id=&quot;spabk&quot; onclick=&quot;window.parent.postMessage('spa-back','*'); exitLandscapeAndRelease();&quot;>← Hub</button>
 
     <div id=&quot;game-container&quot;>
         <canvas id=&quot;gameCanvas&quot;></canvas>
@@ -3135,13 +3222,13 @@ td { padding: 8px; border-bottom: 1px solid #333; }
     <script>
         // --- FIREBASE CONFIGURATION ---
         const firebaseConfig = {
-            apiKey: &quot;AIzaSyDCxIwIqiYc2FxT8qq1fbAsm2ym5DaFmsw&quot;,
-            authDomain: &quot;formywebfirebase.firebaseapp.com&quot;,
-            databaseURL: &quot;https://formywebfirebase-default-rtdb.firebaseio.com&quot;,
-            projectId: &quot;formywebfirebase&quot;,
-            storageBucket: &quot;formywebfirebase.firebasestorage.app&quot;,
-            messagingSenderId: &quot;451953941862&quot;,
-            appId: &quot;1:451953941862:web:b5f8394f99e17b232f3ca7&quot;,
+            apiKey: &quot;AIzaSyD8KMiqZTr39IPw8LENyahLILLNbkFfQXM&quot;,
+            authDomain: &quot;bittuhere-90415.firebaseapp.com&quot;,
+            databaseURL: &quot;https://bittuhere-90415-default-rtdb.asia-southeast1.firebasedatabase.app&quot;,
+            projectId: &quot;bittuhere-90415&quot;,
+            storageBucket: &quot;bittuhere-90415.firebasestorage.app&quot;,
+            messagingSenderId: &quot;600472267274&quot;,
+            appId: &quot;1:600472267274:web:b5f8394f99e17b232f3ca7&quot;,
             measurementId: &quot;G-JD1YFCG7G3&quot;
         };
 
@@ -3587,7 +3674,7 @@ function saveFlappyScoreToCloud(finalScore) {
         }
     </style>
 </head>
-<body><style>#spabk{position:fixed;top:10px;left:10px;z-index:99999;background:rgba(0,0,0,0.8);color:#00f3ff;border:1px solid #00f3ff;padding:8px 18px;border-radius:20px;cursor:pointer;font-family:Segoe UI,sans-serif;font-size:.9rem;backdrop-filter:blur(5px);}#spabk:hover{background:#00f3ff;color:#000;}</style><button id=&quot;spabk&quot; onclick=&quot;window.parent.postMessage('spa-back','*')&quot;>← Hub</button>
+<body><style>#spabk{position:fixed;top:10px;left:10px;z-index:99999;background:rgba(0,0,0,0.8);color:#00f3ff;border:1px solid #00f3ff;padding:8px 18px;border-radius:20px;cursor:pointer;font-family:Segoe UI,sans-serif;font-size:.9rem;backdrop-filter:blur(5px);}#spabk:hover{background:#00f3ff;color:#000;}</style><button id=&quot;spabk&quot; onclick=&quot;window.parent.postMessage('spa-back','*'); exitLandscapeAndRelease();&quot;>← Hub</button>
     <div id=&quot;game-container&quot;>
         <div id=&quot;scared-timer&quot;>6</div>
         <h2 style=&quot;z-index: 40;&quot;>Score: <span id=&quot;span&quot;>0</span></h2>
@@ -3646,13 +3733,13 @@ function saveFlappyScoreToCloud(finalScore) {
     <script>
         // Firebase config (same as snake)
         const firebaseConfig = {
-            apiKey: &quot;AIzaSyDCxIwIqiYc2FxT8qq1fbAsm2ym5DaFmsw&quot;,
-            authDomain: &quot;formywebfirebase.firebaseapp.com&quot;,
-            databaseURL: &quot;https://formywebfirebase-default-rtdb.firebaseio.com&quot;,
-            projectId: &quot;formywebfirebase&quot;,
-            storageBucket: &quot;formywebfirebase.firebasestorage.app&quot;,
-            messagingSenderId: &quot;451953941862&quot;,
-            appId: &quot;1:451953941862:web:b5f8394f99e17b232f3ca7&quot;
+            apiKey: &quot;AIzaSyD8KMiqZTr39IPw8LENyahLILLNbkFfQXM&quot;,
+            authDomain: &quot;bittuhere-90415.firebaseapp.com&quot;,
+            databaseURL: &quot;https://bittuhere-90415-default-rtdb.asia-southeast1.firebasedatabase.app&quot;,
+            projectId: &quot;bittuhere-90415&quot;,
+            storageBucket: &quot;bittuhere-90415.firebasestorage.app&quot;,
+            messagingSenderId: &quot;600472267274&quot;,
+            appId: &quot;1:600472267274:web:b5f8394f99e17b232f3ca7&quot;
         };
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
@@ -4457,7 +4544,7 @@ margin-left:10px
 
 <script src=&quot;https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js&quot;></script>
 </head>
-<body><style>#spabk{position:fixed;top:10px;left:10px;z-index:99999;background:rgba(0,0,0,0.8);color:#00f3ff;border:1px solid #00f3ff;padding:8px 18px;border-radius:20px;cursor:pointer;font-family:Segoe UI,sans-serif;font-size:.9rem;backdrop-filter:blur(5px);}#spabk:hover{background:#00f3ff;color:#000;}</style><button id=&quot;spabk&quot; onclick=&quot;_exitFs(function(){window.parent.postMessage('spa-back','*')})&quot;>← Hub</button>
+<body><style>#spabk{position:fixed;top:10px;left:10px;z-index:99999;background:rgba(0,0,0,0.8);color:#00f3ff;border:1px solid #00f3ff;padding:8px 18px;border-radius:20px;cursor:pointer;font-family:Segoe UI,sans-serif;font-size:.9rem;backdrop-filter:blur(5px);}#spabk:hover{background:#00f3ff;color:#000;}</style><button id=&quot;spabk&quot; onclick=&quot;_exitFs(function(){window.parent.postMessage('spa-back','*')}); exitLandscapeAndRelease();&quot;>← Hub</button>
 
 <div id=&quot;game&quot;></div>
 
@@ -4905,7 +4992,7 @@ function _exitFs(cb){if(document.fullscreenElement||document.webkitFullscreenEle
         .animate-go { animation: gameOver 0.5s ease-out; }
     </style>
 </head>
-<body><style>#spabk{position:fixed;top:10px;left:10px;z-index:99999;background:rgba(0,0,0,0.8);color:#00f3ff;border:1px solid #00f3ff;padding:8px 18px;border-radius:20px;cursor:pointer;font-family:Segoe UI,sans-serif;font-size:.9rem;backdrop-filter:blur(5px);}#spabk:hover{background:#00f3ff;color:#000;}</style><button id=&quot;spabk&quot; onclick=&quot;window.parent.postMessage('spa-back','*')&quot;>← Hub</button>
+<body><style>#spabk{position:fixed;top:10px;left:10px;z-index:99999;background:rgba(0,0,0,0.8);color:#00f3ff;border:1px solid #00f3ff;padding:8px 18px;border-radius:20px;cursor:pointer;font-family:Segoe UI,sans-serif;font-size:.9rem;backdrop-filter:blur(5px);}#spabk:hover{background:#00f3ff;color:#000;}</style><button id=&quot;spabk&quot; onclick=&quot;window.parent.postMessage( 'spa-back','*'); exitLandscapeAndRelease();&quot;>← Hub</button>
 
     <div id=&quot;score-board&quot;>Score: 0</div>
 
@@ -4957,13 +5044,13 @@ function _exitFs(cb){if(document.fullscreenElement||document.webkitFullscreenEle
 
     <script>
         const firebaseConfig = {
-            apiKey: &quot;AIzaSyDCxIwIqiYc2FxT8qq1fbAsm2ym5DaFmsw&quot;,
-            authDomain: &quot;formywebfirebase.firebaseapp.com&quot;,
-            databaseURL: &quot;https://formywebfirebase-default-rtdb.firebaseio.com&quot;,
-            projectId: &quot;formywebfirebase&quot;,
-            storageBucket: &quot;formywebfirebase.firebasestorage.app&quot;,
-            messagingSenderId: &quot;451953941862&quot;,
-            appId: &quot;1:451953941862:web:b5f8394f99e17b232f3ca7&quot;
+            apiKey: &quot;AIzaSyD8KMiqZTr39IPw8LENyahLILLNbkFfQXM&quot;,
+            authDomain: &quot;bittuhere-90415.firebaseapp.com&quot;,
+            databaseURL: &quot;https://bittuhere-90415-default-rtdb.asia-southeast1.firebasedatabase.app&quot;,
+            projectId: &quot;bittuhere-90415&quot;,
+            storageBucket: &quot;bittuhere-90415.firebasestorage.app&quot;,
+            messagingSenderId: &quot;600472267274&quot;,
+            appId: &quot;1:600472267274:web:b5f8394f99e17b232f3ca7&quot;
         };
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
@@ -5265,57 +5352,39 @@ function _exitFs(cb){if(document.fullscreenElement||document.webkitFullscreenEle
 " sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
         </div>
     </div>
-    <div id="section-game-fair" class="spa-section hidden-right game-frame">
-        <div class="game-section-wrapper">
-            <iframe <iframe id="iframe-fair" style="width:100%;height:100%;border:none;" srcdoc="<!DOCTYPE html>
-<html lang=&quot;en&quot;>
-<head>
-    <script>
-        if (localStorage.getItem('isLoggedIn') !== 'true') {
-            window.parent.postMessage('spa-back','*');
-        }
-    </script>
-    <meta charset=&quot;UTF-8&quot;>
-    <meta name=&quot;viewport&quot; content=&quot;width=device-width,initial-scale=1,maximum-scale=1&quot;>
-    <title>Fair Copies</title>
-    <style>
-        *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-        body{background:#0a0f05;color:#fff;font-family:'Segoe UI',sans-serif;height:100vh;display:flex;flex-direction:column;overflow:hidden;}
-        #spabk{position:fixed;top:10px;left:10px;z-index:99999;background:rgba(0,0,0,0.85);color:#2ecc71;border:1px solid #2ecc71;padding:8px 18px;border-radius:20px;cursor:pointer;font-family:Segoe UI,sans-serif;font-size:.9rem;backdrop-filter:blur(5px);}
-        header{padding:60px 20px 16px;text-align:center;background:linear-gradient(135deg,#0a0f05,#0d1a07);border-bottom:1px solid rgba(46,204,113,0.15);flex-shrink:0;}
-        header h1{font-size:1.8rem;color:#2ecc71;letter-spacing:3px;text-transform:uppercase;margin:0;}
-        header p{font-size:0.75rem;color:rgba(255,255,255,0.35);letter-spacing:1px;margin-top:4px;}
-        #frame-wrap{flex:1;position:relative;overflow:hidden;}
-        #drive-frame{width:100%;height:100%;border:none;background:#0a0f05;}
-        #loading-bar{position:absolute;top:0;left:0;height:3px;background:linear-gradient(90deg,#2ecc71,#00f3ff);width:0%;transition:width 0.4s ease;z-index:10;}
-        #loading-bar.done{width:100%;opacity:0;transition:width 0.4s ease, opacity 0.3s ease 0.5s;}
-    </style>
-</head>
-<body>
-<button id=&quot;spabk&quot; onclick=&quot;window.parent.postMessage('spa-back','*')&quot;>← Hub</button>
-<header>
-    <h1>📋 Fair Copies</h1>
-    <p>TAP ANY FILE TO VIEW OR DOWNLOAD</p>
-</header>
-<div id=&quot;frame-wrap&quot;>
-    <div id=&quot;loading-bar&quot; id=&quot;lb2&quot;></div>
-    <iframe id=&quot;drive-frame&quot;
-        src=&quot;https://drive.google.com/embeddedfolderview?id=1vGp2vyRvAAFxzF4cfrA4qHtGTjLlDrS9#list&quot;
-        onload=&quot;document.getElementById('loading-bar').className='done';&quot;
-        allow=&quot;autoplay&quot;>
-    </iframe>
-</div>
-<script>
-    // Animate loading bar on start
-    setTimeout(function(){
-        var lb = document.getElementById('loading-bar');
-        if(lb) lb.style.width='70%';
-    }, 100);
-</script>
-</body>
-</html>"></iframe>
+<div id="section-game-fair" class="spa-section hidden-right game-frame">
+    <div class="game-section-wrapper" style="background: linear-gradient(135deg, #0f0c29, #1a0a2e);">
+        <div style="position: relative; width: 100%; height: 100%; display: flex; flex-direction: column;">
+            <!-- Header -->
+            <div style="padding: 16px 20px; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); border-bottom: 1px solid rgba(0,243,255,0.2); z-index: 10;">
+                <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+                    <div>
+                        <h2 style="margin: 0; font-family: 'Teko', sans-serif; font-size: 1.8rem; color: #00f3ff; letter-spacing: 2px;">
+                            📋 Fair Copies
+                        </h2>
+                        <p style="margin: 0; font-size: 0.8rem; color: rgba(255,255,255,0.5);">
+                            Official exam copies & study materials
+                        </p>
+                    </div>
+                    <a href="https://drive.google.com/drive/folders/1vGp2vyRvAAFxzF4cfrA4qHtGTjLlDrS9" target="_blank" rel="noopener noreferrer"
+                       style="background: rgba(0,243,255,0.1); border: 1px solid #00f3ff; color: #00f3ff; padding: 6px 18px; border-radius: 30px; font-family: 'Teko', sans-serif; font-size: 1rem; text-decoration: none; transition: 0.2s; display: inline-flex; align-items: center; gap: 8px;">
+                        🧭 Open in Drive
+                    </a>
+                </div>
+            </div>
+
+            <!-- Custom file browser -->
+            <div id="fair-custom-container" style="flex: 1; overflow-y: auto; padding: 20px;">
+                <div id="fair-loader" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 200px;">
+                    <div style="width: 50px; height: 50px; border: 3px solid rgba(0,243,255,0.2); border-top-color: #00f3ff; border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
+                    <p style="margin-top: 16px; color: #00f3ff; font-family: 'Teko', sans-serif;">Loading files...</p>
+                </div>
+                <div id="fair-file-list" style="display: none;"></div>
+                <div id="fair-error" style="display: none; text-align: center; color: #ff3366; padding: 40px;"></div>
+            </div>
         </div>
     </div>
+</div>
     <div id="section-game-rps" class="spa-section hidden-right game-frame">
         <div class="game-section-wrapper">
             <iframe id="iframe-rps" srcdoc="<!DOCTYPE html>
@@ -5448,7 +5517,7 @@ function _exitFs(cb){if(document.fullscreenElement||document.webkitFullscreenEle
     </style>
 </head>
 
-<body><style>#spabk{position:fixed;top:10px;left:10px;z-index:99999;background:rgba(0,0,0,0.8);color:#00f3ff;border:1px solid #00f3ff;padding:8px 18px;border-radius:20px;cursor:pointer;font-family:Segoe UI,sans-serif;font-size:.9rem;backdrop-filter:blur(5px);}#spabk:hover{background:#00f3ff;color:#000;}</style><button id=&quot;spabk&quot; onclick=&quot;window.parent.postMessage('spa-back','*')&quot;>← Hub</button>
+<body><style>#spabk{position:fixed;top:10px;left:10px;z-index:99999;background:rgba(0,0,0,0.8);color:#00f3ff;border:1px solid #00f3ff;padding:8px 18px;border-radius:20px;cursor:pointer;font-family:Segoe UI,sans-serif;font-size:.9rem;backdrop-filter:blur(5px);}#spabk:hover{background:#00f3ff;color:#000;}</style><button id=&quot;spabk&quot; onclick=&quot;window.parent.postMessage('spa-back','*'); exitLandscapeAndRelease();&quot;>← Hub</button>
 
     <div class=&quot;game-card&quot;>
         <h1>You vs AI</h1>
@@ -5662,7 +5731,7 @@ function _exitFs(cb){if(document.fullscreenElement||document.webkitFullscreenEle
         .back-btn:hover { background: #444; color: #fff; }
     </style>
 </head>
-<body><style>#spabk{position:fixed;top:10px;left:10px;z-index:99999;background:rgba(0,0,0,0.8);color:#00f3ff;border:1px solid #00f3ff;padding:8px 18px;border-radius:20px;cursor:pointer;font-family:Segoe UI,sans-serif;font-size:.9rem;backdrop-filter:blur(5px);}#spabk:hover{background:#00f3ff;color:#000;}</style><button id=&quot;spabk&quot; onclick=&quot;window.parent.postMessage('spa-back','*')&quot;>← Hub</button>
+<body><style>#spabk{position:fixed;top:10px;left:10px;z-index:99999;background:rgba(0,0,0,0.8);color:#00f3ff;border:1px solid #00f3ff;padding:8px 18px;border-radius:20px;cursor:pointer;font-family:Segoe UI,sans-serif;font-size:.9rem;backdrop-filter:blur(5px);}#spabk:hover{background:#00f3ff;color:#000;}</style><button id=&quot;spabk&quot; onclick=&quot;window.parent.postMessage('spa-back','*'); exitLandscapeAndRelease();&quot;>← Hub</button>
 
     <div class=&quot;game-card&quot;>
         <h1>RPS Simulation</h1>
@@ -5934,7 +6003,7 @@ function _exitFs(cb){if(document.fullscreenElement||document.webkitFullscreenEle
         }
     </style>
 </head>
-<body><style>#spabk{position:fixed;top:10px;left:10px;z-index:99999;background:rgba(0,0,0,0.8);color:#00f3ff;border:1px solid #00f3ff;padding:8px 18px;border-radius:20px;cursor:pointer;font-family:Segoe UI,sans-serif;font-size:.9rem;backdrop-filter:blur(5px);}#spabk:hover{background:#00f3ff;color:#000;}</style><button id=&quot;spabk&quot; onclick=&quot;window.parent.postMessage('spa-back','*')&quot;>← Hub</button>
+<body><style>#spabk{position:fixed;top:10px;left:10px;z-index:99999;background:rgba(0,0,0,0.8);color:#00f3ff;border:1px solid #00f3ff;padding:8px 18px;border-radius:20px;cursor:pointer;font-family:Segoe UI,sans-serif;font-size:.9rem;backdrop-filter:blur(5px);}#spabk:hover{background:#00f3ff;color:#000;}</style><button id=&quot;spabk&quot; onclick=&quot;window.parent.postMessage('spa-back','*'); exitLandscapeAndRelease();&quot;>← Hub</button>
 
     <div id=&quot;mode-menu&quot;>
         <h1>TIC TAC TOE</h1>
@@ -6485,7 +6554,7 @@ function _exitFs(cb){if(document.fullscreenElement||document.webkitFullscreenEle
     </style>
 </head>
 
-<body><style>#spabk{position:fixed;top:10px;left:10px;z-index:99999;background:rgba(0,0,0,0.8);color:#00f3ff;border:1px solid #00f3ff;padding:8px 18px;border-radius:20px;cursor:pointer;font-family:Segoe UI,sans-serif;font-size:.9rem;backdrop-filter:blur(5px);}#spabk:hover{background:#00f3ff;color:#000;}</style><button id=&quot;spabk&quot; onclick=&quot;tttBackBtn()&quot;>← Hub</button>
+<body><style>#spabk{position:fixed;top:10px;left:10px;z-index:99999;background:rgba(0,0,0,0.8);color:#00f3ff;border:1px solid #00f3ff;padding:8px 18px;border-radius:20px;cursor:pointer;font-family:Segoe UI,sans-serif;font-size:.9rem;backdrop-filter:blur(5px);}#spabk:hover{background:#00f3ff;color:#000;}</style><button id=&quot;spabk&quot; onclick=&quot;tttBackBtn(); exitLandscapeAndRelease();&quot;>← Hub</button>
 
     <button class=&quot;invite-toggle-btn&quot; onclick=&quot;toggleSidebar()&quot;>☰</button>
     <div class=&quot;sidebar-menu&quot; id=&quot;inviteSidebar&quot; ontouchstart=&quot;event.stopPropagation()&quot; ontouchmove=&quot;event.stopPropagation()&quot;>
@@ -6549,13 +6618,13 @@ function _exitFs(cb){if(document.fullscreenElement||document.webkitFullscreenEle
     <script>
         // --- CONFIG ---
         const firebaseConfig = {
-            apiKey: &quot;AIzaSyDCxIwIqiYc2FxT8qq1fbAsm2ym5DaFmsw&quot;,
-            authDomain: &quot;formywebfirebase.firebaseapp.com&quot;,
-            databaseURL: &quot;https://formywebfirebase-default-rtdb.firebaseio.com&quot;,
-            projectId: &quot;formywebfirebase&quot;,
-            storageBucket: &quot;formywebfirebase.firebasestorage.app&quot;,
-            messagingSenderId: &quot;451953941862&quot;,
-            appId: &quot;1:451953941862:web:b5f8394f99e17b232f3ca7&quot;,
+            apiKey: &quot;AIzaSyD8KMiqZTr39IPw8LENyahLILLNbkFfQXM&quot;,
+            authDomain: &quot;bittuhere-90415.firebaseapp.com&quot;,
+            databaseURL: &quot;https://bittuhere-90415-default-rtdb.asia-southeast1.firebasedatabase.app&quot;,
+            projectId: &quot;bittuhere-90415&quot;,
+            storageBucket: &quot;bittuhere-90415.firebasestorage.app&quot;,
+            messagingSenderId: &quot;600472267274&quot;,
+            appId: &quot;1:600472267274:web:b5f8394f99e17b232f3ca7&quot;,
             measurementId: &quot;G-JD1YFCG7G3&quot;
         };
 
@@ -6845,7 +6914,7 @@ function _exitFs(cb){if(document.fullscreenElement||document.webkitFullscreenEle
     </div>
     <div id="section-game-multicar" class="spa-section hidden-right game-frame">
         <div class="game-section-wrapper">
-            <iframe <iframe <iframe <iframe id="iframe-multicar" style="width:100%;height:100%;border:none;" srcdoc="id=&quot;iframe-multicar&quot; style=&quot;width:100%;height:100%;border:none;&quot; srcdoc=&quot;id=&quot;iframe-multicar&quot; style=&quot;width:100%;height:100%;border:none;&quot; srcdoc=&quot;<!DOCTYPE html>
+<iframe <iframe id="iframe-multicar" style="width:100%;height:100%;border:none;" srcdoc="id=&quot;iframe-multicar&quot; style=&quot;width:100%;height:100%;border:none;&quot; srcdoc=&quot;id=&quot;iframe-multicar&quot; style=&quot;width:100%;height:100%;border:none;&quot; srcdoc=&quot;id=&quot;iframe-multicar&quot; style=&quot;width:100%;height:100%;border:none;&quot; srcdoc=&quot;<!DOCTYPE html>
 <html lang=&quot;en&quot;>
 <head>
     <script>
@@ -6870,6 +6939,7 @@ function _exitFs(cb){if(document.fullscreenElement||document.webkitFullscreenEle
     <script src=&quot;https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js&quot;></script>
     <script src=&quot;https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js&quot;></script>
     <style>
+
         *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;touch-action:none;}
         body{background:#1a1a2e;overflow:hidden;font-family:'Segoe UI',sans-serif;user-select:none;}
         #game-container{position:fixed;inset:0;z-index:1;}
@@ -6921,7 +6991,17 @@ function _exitFs(cb){if(document.fullscreenElement||document.webkitFullscreenEle
         .load-ring{width:50px;height:50px;border:3px solid rgba(0,243,255,0.2);border-top-color:#00f3ff;border-radius:50%;animation:spin 0.8s linear infinite;}
         @keyframes spin{to{transform:rotate(360deg);}}
         .load-text{color:#00f3ff;font-size:1rem;letter-spacing:3px;}
+    
+        #chat-toggle{position:absolute;top:60px;right:0;background:rgba(0,0,0,.85);color:#00f3ff;border:1px solid rgba(0,243,255,.4);border-right:none;padding:8px 10px;border-radius:8px 0 0 8px;cursor:pointer;font-size:.85rem;z-index:80;display:flex;align-items:center;gap:5px;pointer-events:auto;}
+        #chat-unread{background:#ff3366;color:white;border-radius:50%;min-width:16px;height:16px;font-size:.65rem;display:none;align-items:center;justify-content:center;font-weight:bold;}
+        #chat-panel{position:absolute;top:0;right:0;width:220px;height:100%;background:rgba(10,8,30,.96);border-left:1px solid rgba(0,243,255,.2);display:flex;flex-direction:column;z-index:79;transform:translateX(100%);transition:transform .25s ease;pointer-events:auto;}
+        #chat-header{padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.08);font-family:Teko,sans-serif;font-size:1.1rem;color:#00f3ff;letter-spacing:1px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;}
+        #chat-messages{flex:1;overflow-y:auto;padding:10px;-webkit-overflow-scrolling:touch;}
+        #chat-input-row{display:flex;gap:6px;padding:8px 10px;border-top:1px solid rgba(255,255,255,.08);flex-shrink:0;}
+        #chat-input{flex:1;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);border-radius:8px;color:white;padding:7px 10px;font-size:.82rem;outline:none;}
+        #chat-send{background:#00f3ff;color:#000;border:none;border-radius:8px;padding:7px 12px;cursor:pointer;font-weight:bold;}
     </style>
+
 </head>
 <body>
 
@@ -6936,9 +7016,9 @@ function _exitFs(cb){if(document.fullscreenElement||document.webkitFullscreenEle
     <div class=&quot;lobby-card&quot;>
         <div class=&quot;lobby-title&quot;>🏎️ CITY DRIFT</div>
         <div class=&quot;lobby-sub&quot;>MULTIPLAYER RACING ONLINE</div>
-        <button class=&quot;lobby-btn btn-create&quot; onclick=&quot;createRoom()&quot;>🚀 CREATE ROOM</button>
+        <button class=&quot;lobby-btn btn-create&quot; onclick=&quot;createRoom(); handleMobileRotation();&quot;>🚀 CREATE ROOM</button>
         <input class=&quot;lobby-input&quot; id=&quot;roomInput&quot; placeholder=&quot;ROOM CODE&quot; maxlength=&quot;4&quot;>
-        <button class=&quot;lobby-btn btn-join&quot; onclick=&quot;joinRoom()&quot;>🔑 JOIN ROOM</button>
+        <button class=&quot;lobby-btn btn-join&quot; onclick=&quot;joinRoom(); handleMobileRotation()&quot;>🔑 JOIN ROOM</button>
         <button class=&quot;lobby-btn btn-back&quot; onclick=&quot;window.parent.postMessage('spa-back','*')&quot;>← BACK TO HUB</button>
         <div class=&quot;lobby-status&quot; id=&quot;lobby-status&quot;></div>
     </div>
@@ -6949,7 +7029,7 @@ function _exitFs(cb){if(document.fullscreenElement||document.webkitFullscreenEle
 
 <!-- HUD -->
 <div id=&quot;hud&quot; style=&quot;display:none;&quot;>
-    <button id=&quot;back-btn&quot; onclick=&quot;window.parent.postMessage('spa-back','*')&quot;>← Hub</button>
+    <button id=&quot;back-btn&quot; onclick=&quot;window.parent.postMessage('spa-back','*'); exitLandscapeAndRelease();&quot;>← Hub</button>
     <div id=&quot;ping-wrap&quot;>
         <span class=&quot;ping-badge ping-good&quot; id=&quot;car-ping-badge&quot;><span class=&quot;ping-dot&quot;></span><span id=&quot;car-ping-ms&quot;>--</span>ms</span>
     </div>
@@ -6966,6 +7046,12 @@ function _exitFs(cb){if(document.fullscreenElement||document.webkitFullscreenEle
         <canvas id=&quot;minimap&quot; width=&quot;130&quot; height=&quot;130&quot;></canvas>
     </div>
 </div>
+    <div id=&quot;chat-toggle&quot; onclick=&quot;toggleChat()&quot;>💬 <div id=&quot;chat-unread&quot;></div></div>
+    <div id=&quot;chat-panel&quot;>
+        <div id=&quot;chat-header&quot;><span>💬 CHAT</span><span onclick=&quot;toggleChat()&quot; style=&quot;cursor:pointer;color:rgba(255,255,255,.4);&quot;>✕</span></div>
+        <div id=&quot;chat-messages&quot;></div>
+        <div id=&quot;chat-input-row&quot;><input id=&quot;chat-input&quot; placeholder=&quot;Message...&quot; maxlength=&quot;80&quot;><button id=&quot;chat-send&quot; onclick=&quot;sendChat()&quot;>➤</button></div>
+    </div>
 
 <!-- TOUCH CONTROLS -->
 <div id=&quot;touch-controls&quot; style=&quot;display:none;&quot;>
@@ -6979,24 +7065,23 @@ function _exitFs(cb){if(document.fullscreenElement||document.webkitFullscreenEle
     </div>
 </div>
 
+
 <script>
-// ═══════════════════════════════════════════════════════════
-// FIREBASE CONFIG
-// ═══════════════════════════════════════════════════════════
 const firebaseConfig = {
-    apiKey: &quot;AIzaSyDCxIwIqiYc2FxT8qq1fbAsm2ym5DaFmsw&quot;,
-    authDomain: &quot;formywebfirebase.firebaseapp.com&quot;,
-    databaseURL: &quot;https://formywebfirebase-default-rtdb.firebaseio.com&quot;,
-    projectId: &quot;formywebfirebase&quot;,
-    storageBucket: &quot;formywebfirebase.firebasestorage.app&quot;,
-    messagingSenderId: &quot;451953941862&quot;,
-    appId: &quot;1:451953941862:web:b5f8394f99e17b232f3ca7&quot;
+    apiKey: &quot;AIzaSyD8KMiqZTr39IPw8LENyahLILLNbkFfQXM&quot;,
+    authDomain: &quot;bittuhere-90415.firebaseapp.com&quot;,
+    databaseURL: &quot;https://bittuhere-90415-default-rtdb.asia-southeast1.firebasedatabase.app&quot;,
+    projectId: &quot;bittuhere-90415&quot;,
+    storageBucket: &quot;bittuhere-90415.firebasestorage.app&quot;,
+    messagingSenderId: &quot;600472267274&quot;,
+    appId: &quot;1:600472267274:web:b5f8394f99e17b232f3ca7&quot;
 };
 if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 const playerName = localStorage.getItem('playerName') || 'Driver';
 
-// ═══════════════════════════════════════════════════════════
+// ═════════
+
 // CONSTANTS
 // ═══════════════════════════════════════════════════════════
 const ROAD_W = 14;          // road width
@@ -7112,105 +7197,53 @@ function makeRoadTexture() {
 }
 
 function buildWorld() {
-    const S = MAP_H + ROAD_W*2 + 60;
-    // Ground
-    const groundTex = makeRoadTexture();
-    groundTex.wrapS = groundTex.wrapT = THREE.RepeatWrapping;
-    const groundMesh = new THREE.Mesh(
-        new THREE.PlaneGeometry(S, S),
-        new THREE.MeshLambertMaterial({color:0x3a7a1a})
-    );
-    groundMesh.rotation.x = -Math.PI/2;
-    groundMesh.receiveShadow = true;
-    scene.add(groundMesh);
-
-    // Road surface
-    const roadSurface = new THREE.Mesh(
-        new THREE.PlaneGeometry(S, S),
-        new THREE.MeshLambertMaterial({map: groundTex, transparent:true, opacity:1, color:0x444444})
-    );
-    roadSurface.rotation.x = -Math.PI/2;
-    roadSurface.position.y = 0.01;
-    roadSurface.receiveShadow = true;
-    scene.add(roadSurface);
-
-    // Buildings in each block
-    const bColors = [0xc0392b,0x2980b9,0x27ae60,0xd35400,0x8e44ad,0x2c3e50,0x7f8c8d,0xe74c3c,0x3498db,0xe67e22];
-    let bIdx = 0;
-    for (let ri=0; ri<GRID-1; ri++) {
-        for (let ci=0; ci<GRID-1; ci++) {
-            const cx = (ROADS[ci] + ROADS[ci+1]) / 2;
-            const cz = (ROADS[ri] + ROADS[ri+1]) / 2;
-            const maxW = BLOCK - ROAD_W - 4;
-            const numB = 2 + Math.floor(Math.abs(Math.sin(ri*7+ci*13)*3));
-            for (let b=0; b<numB; b++) {
-                const bw = 6 + Math.abs(Math.sin(b*11+ri*5+ci*3)*10);
-                const bd = 6 + Math.abs(Math.cos(b*7+ri*3+ci*5)*10);
-                const bh = 5 + Math.abs(Math.sin(b*13+ri+ci)*22);
-                const ox = (Math.sin(b*5+ri)*maxW*0.35);
-                const oz = (Math.cos(b*7+ci)*maxW*0.35);
-                const col = bColors[bIdx % bColors.length]; bIdx++;
-                const mesh = new THREE.Mesh(
-                    new THREE.BoxGeometry(bw, bh, bd),
-                    new THREE.MeshLambertMaterial({color: col})
-                );
-                mesh.position.set(cx+ox, bh/2, cz+oz);
-                mesh.castShadow = true;
-                mesh.receiveShadow = true;
-                scene.add(mesh);
-                // Store box for collision
-                buildings.push(new THREE.Box3(
-                    new THREE.Vector3(cx+ox-bw/2, 0, cz+oz-bd/2),
-                    new THREE.Vector3(cx+ox+bw/2, bh, cz+oz+bd/2)
-                ));
+    const S=MAP_H+ROAD_W*2+60;
+    const bMats=[0xc0392b,0x2980b9,0x27ae60,0xd35400,0x8e44ad,0x2c3e50,0x7f8c8d,0x16a085].map(col=>new THREE.MeshLambertMaterial({color:col}));
+    const hutMat=new THREE.MeshLambertMaterial({color:0xd4a76a});
+    const roofMat=new THREE.MeshLambertMaterial({color:0x6B3A2A});
+    const treeMat=new THREE.MeshLambertMaterial({color:0x228822});
+    const trunkMat=new THREE.MeshLambertMaterial({color:0x5D4037});
+    const gMesh=new THREE.Mesh(new THREE.PlaneGeometry(S,S),new THREE.MeshLambertMaterial({color:0x3a7a1a}));
+    gMesh.rotation.x=-Math.PI/2;gMesh.receiveShadow=true;scene.add(gMesh);
+    const roadTex=makeRoadTexture();roadTex.wrapS=roadTex.wrapT=THREE.RepeatWrapping;
+    const rMesh=new THREE.Mesh(new THREE.PlaneGeometry(S,S),new THREE.MeshLambertMaterial({map:roadTex,transparent:true,opacity:1,color:0x444444}));
+    rMesh.rotation.x=-Math.PI/2;rMesh.position.y=0.01;rMesh.receiveShadow=true;scene.add(rMesh);
+    let bIdx=0;
+    for(let ri=0;ri<GRID-1;ri++){
+        for(let ci=0;ci<GRID-1;ci++){
+            const cx=(ROADS[ci]+ROADS[ci+1])/2,cz=(ROADS[ri]+ROADS[ri+1])/2;
+            const maxW=BLOCK-ROAD_W-4,seed=ri*7+ci*13;
+            if((ri+ci)%3===0){
+                const nH=2+Math.floor(Math.abs(Math.sin(seed)*2));
+                for(let h=0;h<nH;h++){
+                    const hw=5+Math.abs(Math.sin(h*7+seed)*4),hd=5+Math.abs(Math.cos(h*5+seed)*4),ht=3+Math.abs(Math.sin(h*11)*2);
+                    const ox=Math.sin(h*5+ri)*(maxW*0.3),oz=Math.cos(h*7+ci)*(maxW*0.3);
+                    const hut=new THREE.Mesh(new THREE.BoxGeometry(hw,ht,hd),hutMat);
+                    hut.position.set(cx+ox,ht/2,cz+oz);hut.castShadow=true;scene.add(hut);
+                    buildings.push(new THREE.Box3(new THREE.Vector3(cx+ox-hw/2,0,cz+oz-hd/2),new THREE.Vector3(cx+ox+hw/2,ht,cz+oz+hd/2)));
+                    const rf=new THREE.Mesh(new THREE.ConeGeometry(Math.max(hw,hd)*0.7,ht*0.7,6),roofMat);
+                    rf.position.set(cx+ox,ht+ht*0.35,cz+oz);rf.castShadow=true;scene.add(rf);
+                }
+                for(let t=0;t<2;t++) addTree(cx+Math.sin(t*3.1+seed)*maxW*0.35,cz+Math.cos(t*2.9+seed)*maxW*0.35,treeMat,trunkMat);
+            }else{
+                const nB=2+Math.floor(Math.abs(Math.sin(seed)*2));
+                for(let b=0;b<nB;b++){
+                    const bw=7+Math.abs(Math.sin(b*11+seed)*9),bd=7+Math.abs(Math.cos(b*7+seed)*9),bh=8+Math.abs(Math.sin(b*13+seed)*20);
+                    const ox=Math.sin(b*5+ri)*(maxW*0.33),oz=Math.cos(b*7+ci)*(maxW*0.33);
+                    const m=new THREE.Mesh(new THREE.BoxGeometry(bw,bh,bd),bMats[bIdx%bMats.length]);bIdx++;
+                    m.position.set(cx+ox,bh/2,cz+oz);m.castShadow=true;m.receiveShadow=true;scene.add(m);
+                    buildings.push(new THREE.Box3(new THREE.Vector3(cx+ox-bw/2,0,cz+oz-bd/2),new THREE.Vector3(cx+ox+bw/2,bh,cz+oz+bd/2)));
+                }
             }
         }
     }
-
-    // Trees along sidewalks
-    const treeMat = new THREE.MeshLambertMaterial({color:0x228822});
-    const trunkMat = new THREE.MeshLambertMaterial({color:0x8B4513});
-    ROADS.forEach(rx => {
-        for (let z=-HALF; z<=HALF; z+=18) {
-            if (ROADS.some(rz=>Math.abs(z-rz)<ROAD_W/2+1)) continue;
-            addTree(rx + ROAD_W/2 + 3, z, treeMat, trunkMat);
-            addTree(rx - ROAD_W/2 - 3, z, treeMat, trunkMat);
-        }
-    });
-    ROADS.forEach(rz => {
-        for (let x=-HALF; x<=HALF; x+=18) {
-            if (ROADS.some(rx=>Math.abs(x-rx)<ROAD_W/2+1)) continue;
-            addTree(x, rz + ROAD_W/2 + 3, treeMat, trunkMat);
-            addTree(x, rz - ROAD_W/2 - 3, treeMat, trunkMat);
-        }
-    });
-
-    // Outer walls (invisible but block player)
-    [-HALF-ROAD_W, HALF+ROAD_W].forEach(x=>{
-        buildings.push(new THREE.Box3(
-            new THREE.Vector3(x-5,-1,-HALF-40),new THREE.Vector3(x+5,5,HALF+40)
-        ));
-    });
-    [-HALF-ROAD_W, HALF+ROAD_W].forEach(z=>{
-        buildings.push(new THREE.Box3(
-            new THREE.Vector3(-HALF-40,-1,z-5),new THREE.Vector3(HALF+40,5,z+5)
-        ));
-    });
+    ROADS.forEach(rx=>{for(let z=-HALF;z<=HALF;z+=30){if(ROADS.some(rz=>Math.abs(z-rz)<ROAD_W/2+2))continue;addTree(rx+ROAD_W/2+3,z,treeMat,trunkMat);if(Math.abs(rx)<HALF)addTree(rx-ROAD_W/2-3,z,treeMat,trunkMat);}});
+    ROADS.forEach(rz=>{for(let x=-HALF;x<=HALF;x+=30){if(ROADS.some(rx=>Math.abs(x-rx)<ROAD_W/2+2))continue;addTree(x,rz+ROAD_W/2+3,treeMat,trunkMat);if(Math.abs(rz)<HALF)addTree(x,rz-ROAD_W/2-3,treeMat,trunkMat);}});
+    [-HALF-ROAD_W,HALF+ROAD_W].forEach(x=>{buildings.push(new THREE.Box3(new THREE.Vector3(x-5,-1,-HALF-40),new THREE.Vector3(x+5,5,HALF+40)));});
+    [-HALF-ROAD_W,HALF+ROAD_W].forEach(z=>{buildings.push(new THREE.Box3(new THREE.Vector3(-HALF-40,-1,z-5),new THREE.Vector3(HALF+40,5,z+5)));});
 }
+function addTree(x,z,lm,tm){const g=new THREE.Group();const tr=new THREE.Mesh(new THREE.CylinderGeometry(0.28,0.38,2.2,5),tm);tr.position.y=1.1;const lv=new THREE.Mesh(new THREE.SphereGeometry(1.8,6,5),lm);lv.position.y=3.5;lv.castShadow=true;g.add(tr);g.add(lv);g.position.set(x,0,z);scene.add(g);}
 
-function addTree(x, z, leafMat, trunkMat) {
-    const g = new THREE.Group();
-    const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.3,0.4,2.5,6), trunkMat);
-    trunk.position.y = 1.25;
-    const leaves = new THREE.Mesh(new THREE.SphereGeometry(2.2,7,6), leafMat);
-    leaves.position.y = 4;
-    leaves.castShadow = true;
-    g.add(trunk); g.add(leaves);
-    g.position.set(x, 0, z);
-    scene.add(g);
-}
-
-// ═══════════════════════════════════════════════════════════
 // VEHICLE CREATION
 // ═══════════════════════════════════════════════════════════
 function createVehicle(color, label) {
@@ -7637,6 +7670,7 @@ function startGame(spawnX, spawnZ) {
     scene.add(playerCar);
     lastActivity = Date.now();
     document.getElementById('lobby').style.display='none';
+    listenChat();
     document.getElementById('hud').style.display='block';
 }
 
@@ -7647,7 +7681,7 @@ function startGame(spawnX, spawnZ) {
     var hist=[];
     function measure(){
         var t0=performance.now();
-        fetch('https://formywebfirebase-default-rtdb.firebaseio.com/.json?shallow=true',{cache:'no-store'})
+        fetch('https://bittuhere-90415-default-rtdb.asia-southeast1.firebasedatabase.app/.json?shallow=true',{cache:'no-store'})
         .then(function(){
             var p=Math.round(performance.now()-t0); hist.push(p); if(hist.length>5)hist.shift();
             var avg=Math.round(hist.reduce(function(a,b){return a+b;},0)/hist.length);
@@ -7662,6 +7696,13 @@ function startGame(spawnX, spawnZ) {
 })();
 
 // ═══════════════════════════════════════════════════════════
+
+// ═══ IN-GAME CHAT ═══
+var chatOpen=false;
+function toggleChat(){var cp=document.getElementById('chat-panel');chatOpen=!chatOpen;cp.style.transform=chatOpen?'translateX(0)':'translateX(100%)';if(chatOpen){document.getElementById('chat-input').focus();var u=document.getElementById('chat-unread');u.style.display='none';u.innerText='';}}
+function sendChat(){var inp=document.getElementById('chat-input');var txt=(inp.value||'').trim();if(!txt||!roomId)return;db.ref('car_world/'+roomId+'/chat').push({n:playerName,msg:txt,t:Date.now()});inp.value='';}
+function listenChat(){if(!roomId)return;var msgDiv=document.getElementById('chat-messages');var unread=document.getElementById('chat-unread');var uc=0;db.ref('car_world/'+roomId+'/chat').limitToLast(30).on('child_added',function(snap){var d=snap.val();var div=document.createElement('div');div.style.cssText='margin-bottom:4px;font-size:.82rem;word-break:break-word;';var isMe=d.n===playerName;div.innerHTML='<span style=&quot;color:'+(isMe?'#00f3ff':'#2ecc71')+';font-weight:bold;&quot;>'+d.n+':</span> <span style=&quot;color:rgba(255,255,255,.85);&quot;>'+d.msg+'</span>';msgDiv.appendChild(div);msgDiv.scrollTop=msgDiv.scrollHeight;if(!chatOpen){uc++;unread.style.display='flex';unread.innerText=uc>9?'9+':uc;}});}
+document.addEventListener('keydown',function(e){if(e.key==='Enter'&amp;&amp;chatOpen){sendChat();e.preventDefault();}if(e.key==='Escape'&amp;&amp;chatOpen){toggleChat();}});
 // AUTO-JOIN FROM INVITE
 // ═══════════════════════════════════════════════════════════
 window.addEventListener('message', function(e){
@@ -7682,9 +7723,10 @@ window.addEventListener('load', function(){
         document.getElementById('lobby').style.display='flex';
     }, 800);
 });
+
 </script>
 </body>
-</html>&quot;>&quot;>"></iframe>
+</html>"></iframe>
         </div>
     </div>
 
@@ -7720,15 +7762,25 @@ window.addEventListener('load', function(){
     </style>
 
     <script>
+    function escapeHtml(str) {
+    return str.replace(/[&<>]/g, function(m) {
+        if (m === '&') return '&amp;';
+        if (m === '<') return '&lt;';
+        if (m === '>') return '&gt;';
+        return m;
+    }).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function(c) {
+        return c;
+    });
+}
         // ─── FIREBASE ───
-        var _k1="AIzaSyDCx",_k2="IwIqiYc2F",_k3="xT8qq1fbAsm2ym5DaFmsw";
-        var _proj="formywebfirebase";
+        var _k1="AIzaSyD8KMiqZ",_k2="Tr39IPw8L",_k3="ENyahLILLNbkFfQXM";
+        var _proj="bittuhere-90415";
         const firebaseConfig = {
             apiKey:_k1+_k2+_k3, authDomain:_proj+".firebaseapp.com",
-            databaseURL:"https://"+_proj+"-default-rtdb.firebaseio.com",
+            databaseURL:"https://"+_proj+"-default-rtdb.asia-southeast1.firebasedatabase.app",
             projectId:_proj, storageBucket:_proj+".firebasestorage.app",
-            messagingSenderId:"451953941862",
-            appId:"1:451953941862:web:b5f8394f99e17b232f3ca7",
+            messagingSenderId:"600472267274",
+            appId:"1:600472267274:web:b5f8394f99e17b232f3ca7",
             measurementId:"G-JD1YFCG7G3"
         };
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
@@ -7865,6 +7917,9 @@ window.addEventListener('load', function(){
                     cur.classList.add(direction === 'right' ? 'hidden-left' : 'hidden-right');
                     tgt.classList.remove('hidden-right', 'hidden-left');
                     tgt.classList.add('active');
+                    if (targetId === 'section-game-fair') {
+    checkAndLoadFair();
+}
                     // Release lock after CSS transition finishes (0.32s + small buffer)
                     LC.timer('__nav', setTimeout(() => { _navLock = false; }, 370));
                 });
@@ -8110,14 +8165,16 @@ window.addEventListener('load', function(){
             // Notification dot
             const ls = localStorage.getItem('lastReadNotif') || 0;
             const dot = document.getElementById('notif-dot');
-            LC.fb('section-hub', db.ref('notifications/global'), 'value', snap => {
-                const d = snap.val(); let hasNew=false; if (d) Object.values(d).forEach(n => { if (n.time > ls) hasNew=true; });
-                if(hasNew) { dot.style.display='block'; var nb3=document.querySelector('.notif-btn'); if(nb3){nb3.style.animation='';void nb3.offsetWidth;nb3.style.animation='friendBtnShake 0.5s ease 3';} }
-            });
-            LC.fb('section-hub', db.ref('notifications/private/' + pid), 'value', snap => {
-                const d = snap.val(); if (d) Object.values(d).forEach(n => { if (n.time > ls) dot.style.display = 'block'; });
-            });
-
+LC.fb('section-hub', db.ref('notifications/global'), 'value', snap => {
+    const lastRead = localStorage.getItem('lastReadNotif') || 0;
+    const d = snap.val(); let hasNew=false; 
+    if (d) Object.values(d).forEach(n => { if (n.time > lastRead) hasNew=true; });
+    if(hasNew) { dot.style.display='block'; var nb3=document.querySelector('.notif-btn'); if(nb3){nb3.style.animation='';void nb3.offsetWidth;nb3.style.animation='friendBtnShake 0.5s ease 3';} }
+});
+LC.fb('section-hub', db.ref('notifications/private/' + pid), 'value', snap => {
+    const lastRead = localStorage.getItem('lastReadNotif') || 0;
+    const d = snap.val(); if (d) Object.values(d).forEach(n => { if (n.time > lastRead) dot.style.display = 'block'; });
+});
             // ── FIREBASE INVITE LISTENER ──
             LC.fb('section-hub', db.ref('invites/' + pid), 'child_added', function(snap) {
                 var inv = snap.val();
@@ -8128,22 +8185,87 @@ window.addEventListener('load', function(){
                 _handleInviteMessage({ from: inv.from, game: inv.game, code: inv.code });
             });
         }
-        function openNotifications() { document.getElementById('notif-modal').style.display = 'flex'; localStorage.setItem('lastReadNotif', Date.now()); document.getElementById('notif-dot').style.display = 'none'; renderHubNotifs(); }
-        function closeNotifications() { document.getElementById('notif-modal').style.display = 'none'; }
-        function renderHubNotifs() {
-            const mn = (localStorage.getItem('playerName') || '').toLowerCase().trim();
-            const list = document.getElementById('notif-messages'); list.innerHTML = "<p style='text-align:center;color:#888;'>No new notifications.</p>";
-            db.ref('notifications').once('value', snap => {
-                const all = snap.val(); if (!all) return; list.innerHTML = ''; let c = [];
-                if (all.global) Object.values(all.global).forEach(m => { m.type = 'global'; c.push(m); });
-                if (all.private && all.private[mn]) Object.values(all.private[mn]).forEach(m => { m.type = 'private'; c.push(m); });
-                c.sort((a, b) => b.time - a.time).forEach(n => {
-                    const div = document.createElement('div'), pr = n.type === 'private' ? '&#128274; [PRIVATE]' : '&#128226; [GLOBAL]';
-                    div.innerHTML = `<p style="color:#2ecc71;margin:0;font-size:.8rem;">${pr} - ${new Date(n.time).toLocaleDateString()}</p><p style="margin:5px 0 10px;">${n.message}</p><hr style="border:.1px solid #333">`;
-                    list.appendChild(div);
-                });
-            });
+function openNotifications() {
+    const modal = document.getElementById('notif-modal');
+    if (!modal) return;
+    modal.classList.add('show');
+    modal.style.display = 'flex'; // ensure it's visible
+    localStorage.setItem('lastReadNotif', Date.now());
+    document.getElementById('notif-dot').style.display = 'none';
+    renderHubNotifs();
+}
+
+function closeNotifications() {
+    const modal = document.getElementById('notif-modal');
+    if (!modal) return;
+    modal.classList.remove('show');
+    // Wait for transition to finish before hiding display
+    setTimeout(() => {
+        if (!modal.classList.contains('show')) {
+            modal.style.display = 'none';
         }
+    }, 300);
+}
+let currentNotifTab = 'global';
+
+function switchNotifTab(tab) {
+    currentNotifTab = tab;
+    document.getElementById('notif-tab-global').classList.toggle('active', tab === 'global');
+    document.getElementById('notif-tab-private').classList.toggle('active', tab === 'private');
+    renderHubNotifs();
+}
+
+function renderHubNotifs() {
+    const list = document.getElementById('notif-messages');
+    const mn = (localStorage.getItem('playerName') || '').toLowerCase().trim();
+    list.innerHTML = '<div style="text-align:center;color:#888;padding:20px;">Loading...</div>';
+    
+    if (currentNotifTab === 'global') {
+        db.ref('notifications/global').once('value', snap => {
+            const all = snap.val();
+            if (!all || Object.keys(all).length === 0) {
+                list.innerHTML = '<div style="text-align:center;color:#888;padding:20px;">No global announcements</div>';
+                return;
+            }
+            const msgs = [];
+            Object.values(all).forEach(msg => msgs.push({ ...msg, type: 'global' }));
+            msgs.sort((a, b) => b.time - a.time);
+            list.innerHTML = '';
+            msgs.forEach(msg => {
+                const div = document.createElement('div');
+                div.className = 'notif-item';
+                div.innerHTML = `
+                    <div style="font-weight:bold; color:#2ecc71;">📢 GLOBAL</div>
+                    <div style="margin:8px 0;">${msg.message}</div>
+                    <div class="notif-time">${formatIST(msg.time)}</div>
+                `;
+                list.appendChild(div);
+            });
+        });
+    } else {
+        db.ref('notifications/private/' + mn).once('value', snap => {
+            const all = snap.val();
+            if (!all || Object.keys(all).length === 0) {
+                list.innerHTML = '<div style="text-align:center;color:#888;padding:20px;">No private messages</div>';
+                return;
+            }
+            const msgs = [];
+            Object.values(all).forEach(msg => msgs.push({ ...msg, type: 'private' }));
+            msgs.sort((a, b) => b.time - a.time);
+            list.innerHTML = '';
+            msgs.forEach(msg => {
+                const div = document.createElement('div');
+                div.className = 'notif-item private';
+                div.innerHTML = `
+                    <div style="font-weight:bold; color:#ff0055;">🔒 PRIVATE</div>
+                    <div style="margin:8px 0;">${msg.message}</div>
+                    <div class="notif-time">${formatIST(msg.time)}</div>
+                `;
+                list.appendChild(div);
+            });
+        });
+    }
+}
         function showHubSection(s) {
             document.getElementById('hub-main').classList.add('hub-hidden');
             ['study', 'multi', 'single', 'contact'].forEach(x => document.getElementById('hub-' + x).classList.add('hub-hidden'));
@@ -8455,47 +8577,162 @@ window.addEventListener('load', function(){
                 }
             });
         }
-        function openProfileCard(uid) {
-            var overlay = document.getElementById('profile-card-overlay');
-            if (!overlay) return;
-            document.getElementById('pc-avatar').innerText = '?';
-            document.getElementById('pc-username').innerHTML = '<span class="skeleton" style="display:inline-block;width:120px;height:28px;">&nbsp;</span>';
-            document.getElementById('pc-scores').innerHTML = [0,1,2,3].map(function(){ return '<div class="pc-score-item skeleton" style="height:55px;">&nbsp;</div>'; }).join('');
-            document.getElementById('pc-last-login').innerText = '';
-            overlay.classList.add('pc-show');
-            db.ref('users/' + uid).once('value', function(snap) {
-                if (!snap.exists()) { document.getElementById('pc-username').innerText = 'User not found'; return; }
-                var d = snap.val();
-                var displayName = uid.charAt(0).toUpperCase() + uid.slice(1);
-                document.getElementById('pc-avatar').innerText = displayName.charAt(0);
-                document.getElementById('pc-username').innerText = displayName;
-                var games = [
-                    { key:'flappy_highscore', label:'🐦 Flappy', color:'#00f3ff' },
-                    { key:'dino_highscore',   label:'🦕 Dino',   color:'#2ecc71' },
-                    { key:'snake_highscore',  label:'🐍 Snake',  color:'#f1c40f' },
-                    { key:'pacman_highscore', label:'ᗧ Pac-Man', color:'#e74c3c' }
-                ];
-                var scoresEl = document.getElementById('pc-scores');
-                scoresEl.innerHTML = '';
-                games.forEach(function(g) {
-                    var val = d[g.key] || 0;
-                    var item = document.createElement('div');
-                    item.className = 'pc-score-item';
-                    item.innerHTML = '<div class="pc-score-game">' + g.label + '</div>' +
-                        '<div class="pc-score-val" style="color:' + g.color + ';">' + (val > 0 ? val.toLocaleString() : '—') + '</div>';
-                    scoresEl.appendChild(item);
-                });
-                var llEl = document.getElementById('pc-last-login');
-                if (d.lastLogin && llEl) {
-                    var ist = new Date(d.lastLogin).toLocaleString('en-IN', { timeZone:'Asia/Kolkata', month:'short', day:'numeric', year:'numeric' });
-                    llEl.innerText = 'Last seen: ' + ist;
-                }
-                if (d.bio && llEl) {
-                    llEl.style.cssText = 'text-align:center;font-size:0.78rem;margin-top:8px;font-style:italic;padding:0 8px;word-break:break-word;';
-                    llEl.innerHTML = '<span style="color:#00f3ff;">&ldquo;</span><span style="color:white;">' + d.bio + '</span><span style="color:#00f3ff;">&rdquo;</span>';
-                }
-            });
+function openProfileCard(uid) {
+    var overlay = document.getElementById('profile-card-overlay');
+    if (!overlay) return;
+
+    // Reset skeleton
+    document.getElementById('pc-avatar').innerText = '?';
+    document.getElementById('pc-username').innerHTML = '<span class="skeleton" style="display:inline-block;width:120px;height:28px;">&nbsp;</span>';
+    document.getElementById('pc-scores').innerHTML = [0,1,2,3].map(function(){ return '<div class="pc-score-item skeleton" style="height:55px;">&nbsp;</div>'; }).join('');
+    document.getElementById('pc-last-login').innerText = '';
+
+    overlay.classList.add('pc-show');
+
+    // Helper: get tier from score and thresholds
+    function getTier(score, thresholds) {
+        if (score >= thresholds[3]) return 4;
+        if (score >= thresholds[2]) return 3;
+        if (score >= thresholds[1]) return 2;
+        return 1;
+    }
+
+    // Thresholds – adjust to your game difficulty
+    var flappyThresh = [10, 50, 200, 500];
+    var dinoThresh   = [200, 800, 2000, 5000];
+    var snakeThresh  = [50, 150, 300, 600];
+    var pacmanThresh = [2000, 5000, 10000, 20000];
+
+    // Fetch user data and friend count together
+    Promise.all([
+        db.ref('users/' + uid).once('value'),
+        db.ref('friends/' + uid).once('value')
+    ]).then(function(results) {
+        var userSnap = results[0];
+        var friendsSnap = results[1];
+
+        if (!userSnap.exists()) {
+            document.getElementById('pc-username').innerText = 'User not found';
+            return;
         }
+
+        var d = userSnap.val();
+        var displayName = uid.charAt(0).toUpperCase() + uid.slice(1);
+        document.getElementById('pc-avatar').innerText = displayName.charAt(0);
+        document.getElementById('pc-username').innerText = displayName;
+
+        // Friend count
+        var friendCount = friendsSnap.exists() ? Object.keys(friendsSnap.val()).length : 0;
+
+        // Game scores
+        var flappyScore = d.flappy_highscore || 0;
+        var dinoScore   = d.dino_highscore   || 0;
+        var snakeScore  = d.snake_highscore  || 0;
+        var pacmanScore = d.pacman_highscore || 0;
+
+        // Tiers
+        var flappyTier = getTier(flappyScore, flappyThresh);
+        var dinoTier   = getTier(dinoScore,   dinoThresh);
+        var snakeTier  = getTier(snakeScore,  snakeThresh);
+        var pacmanTier = getTier(pacmanScore, pacmanThresh);
+
+        // Overall badge
+        var avgTier = (flappyTier + dinoTier + snakeTier + pacmanTier) / 4;
+        var overall = Math.round(avgTier);
+        var badgeIcon = '', badgeText = '';
+        switch (overall) {
+            case 4: badgeIcon = '👑'; badgeText = 'Legend'; break;
+            case 3: badgeIcon = '⭐'; badgeText = 'Pro'; break;
+            case 2: badgeIcon = '🔥'; badgeText = 'Rising'; break;
+            default: badgeIcon = '🌱'; badgeText = 'Newbie';
+        }
+
+        // Helper to get tier icon for a single game
+        function tierIcon(tier) {
+            if (tier === 4) return '👑';
+            if (tier === 3) return '⭐';
+            if (tier === 2) return '🔥';
+            return '🌱';
+        }
+
+        // Build the original four score items, but add tier icon next to each score
+        var games = [
+            { label: '🐦 Flappy', score: flappyScore, tier: flappyTier, color: '#00f3ff' },
+            { label: '🦕 Dino',   score: dinoScore,   tier: dinoTier,   color: '#2ecc71' },
+            { label: '🐍 Snake',  score: snakeScore,  tier: snakeTier,  color: '#f1c40f' },
+            { label: 'ᗧ Pac‑Man', score: pacmanScore, tier: pacmanTier, color: '#e74c3c' }
+        ];
+
+        var scoresHtml = '';
+        games.forEach(function(g) {
+            scoresHtml += `
+                <div class="pc-score-item">
+                    <div class="pc-score-game">${g.label}</div>
+                    <div class="pc-score-val" style="color: ${g.color};">
+                        ${g.score} <span style="font-size: 0.8rem; opacity: 0.7;">${tierIcon(g.tier)}</span>
+                    </div>
+                </div>
+            `;
+        });
+        document.getElementById('pc-scores').innerHTML = scoresHtml;
+
+        // Insert friend count and badge above or below the username (we'll add a line under username)
+        var usernameEl = document.getElementById('pc-username');
+        var existingStat = document.getElementById('pc-stats-row');
+        if (existingStat) existingStat.remove();
+
+        var statRow = document.createElement('div');
+        statRow.id = 'pc-stats-row';
+        statRow.style.cssText = 'display: flex; justify-content: space-between; margin: 8px 0 12px; gap: 12px;';
+        statRow.innerHTML = `
+            <div style="flex: 1; background: rgba(255,255,255,0.05); border-radius: 12px; padding: 6px; text-align: center;">
+                <div style="font-size: 0.65rem; color: #888;">FRIENDS</div>
+                <div style="font-size: 1.2rem; color: #00f3ff;">${friendCount}</div>
+            </div>
+            <div style="flex: 1; background: rgba(255,255,255,0.05); border-radius: 12px; padding: 6px; text-align: center;">
+                <div style="font-size: 0.65rem; color: #888;">BADGE</div>
+                <div id="pc-badge" style="font-size: 1.1rem; color: ${overall===4?'#ffd700':overall===3?'#00f3ff':'#fff'}; cursor: pointer;">${badgeIcon} ${badgeText}</div>
+            </div>
+        `;
+        usernameEl.parentNode.insertBefore(statRow, usernameEl.nextSibling);
+
+        // Make badge clickable
+        var badgeEl = document.getElementById('pc-badge');
+        if (badgeEl) {
+            badgeEl.onclick = function() {
+                showBadgeDetails({
+                    flappy: { score: flappyScore, tier: flappyTier, thresholds: flappyThresh },
+                    dino:   { score: dinoScore,   tier: dinoTier,   thresholds: dinoThresh },
+                    snake:  { score: snakeScore,  tier: snakeTier,  thresholds: snakeThresh },
+                    pacman: { score: pacmanScore, tier: pacmanTier, thresholds: pacmanThresh },
+                    avgTier: avgTier,
+                    overall: overall,
+                    badgeIcon: badgeIcon,
+                    badgeText: badgeText
+                });
+            };
+            badgeEl.style.cursor = 'pointer';
+            badgeEl.addEventListener('mouseenter', function() { this.style.opacity = '0.8'; });
+            badgeEl.addEventListener('mouseleave', function() { this.style.opacity = '1'; });
+        }
+
+        // Last login / bio
+        var llEl = document.getElementById('pc-last-login');
+        if (d.bio) {
+            llEl.style.cssText = 'text-align:center;font-size:0.78rem;margin-top:12px;font-style:italic;padding:0 8px;';
+            llEl.innerHTML = '<span style="color:#00f3ff;">&ldquo;</span><span style="color:white;">' + d.bio + '</span><span style="color:#00f3ff;">&rdquo;</span>';
+        } else if (d.lastLogin) {
+            var ist = new Date(d.lastLogin).toLocaleString('en-IN', { timeZone:'Asia/Kolkata', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit', hour12:true });
+            llEl.innerText = 'Last seen: ' + ist;
+            llEl.style.cssText = 'text-align:center;font-size:0.7rem;color:rgba(255,255,255,0.3);margin-top:10px;';
+        } else {
+            llEl.innerText = '';
+        }
+    }).catch(function(err) {
+        console.error(err);
+        document.getElementById('pc-username').innerText = 'Error loading profile';
+    });
+}
         function closeProfileCard() { var overlay = document.getElementById('profile-card-overlay'); if (overlay) overlay.classList.remove('pc-show'); }
 
         // ─── CHAT ───
@@ -8503,101 +8740,155 @@ window.addEventListener('load', function(){
         // LC.leave('section-chat') tears everything down automatically.
         let chatInit = false, currentChatFriend = null, currentChatId = null;
 
-        function initChat() {
-            if (chatInit) return; chatInit = true;
-            const myName = localStorage.getItem('playerName'); if (!myName) return;
-            document.getElementById('chat-display-username').innerText = myName;
-            LC.fn('section-chat', () => {
-                chatInit = false; currentChatFriend = null; currentChatId = null;
-                const mi = document.getElementById('msgInput'), sb = document.getElementById('sendBtn');
-                if (mi) { mi.disabled = true; mi.placeholder = 'Select friend to type...'; }
-                if (sb) sb.disabled = true;
-                document.body.classList.remove('chatting');
-                _stopPing();
-            });
-            _startPing('chat-ping-badge', 'chat-ping-ms');
+function initChat() {
+    if (chatInit) return; chatInit = true;
+    const myName = localStorage.getItem('playerName'); if (!myName) return;
+    document.getElementById('chat-display-username').innerText = myName;
+    LC.fn('section-chat', () => {
+        chatInit = false; currentChatFriend = null; currentChatId = null;
+        const mi = document.getElementById('msgInput'), sb = document.getElementById('sendBtn');
+        if (mi) { mi.disabled = true; mi.placeholder = 'Select friend to type...'; }
+        if (sb) sb.disabled = true;
+        document.body.classList.remove('chatting');
+        _stopPing();
+    });
+    _startPing('chat-ping-badge', 'chat-ping-ms');
 
-            var _chatPid = myName.toLowerCase().trim();
-            // ── FRIEND REQUEST LISTENER ──
-            var _freqWrap = document.getElementById('freq-incoming-wrap');
-            var _freqList = document.getElementById('freq-incoming-list');
-            LC.fb('section-chat', db.ref('friend_requests/' + _chatPid), 'value', function(snap) {
-                if (!_freqList) return;
-                _freqList.innerHTML = '';
-                if (!snap.exists()) { if (_freqWrap) _freqWrap.style.display = 'none'; return; }
-                if (_freqWrap) _freqWrap.style.display = 'block';
-                var _freqCount = 0;
-                snap.forEach(function(child) {
-                    if (_freqCount >= 10) return;
-                    _freqCount++;
-                    var fromUser = child.key;
-                    var div = document.createElement('div');
-                    div.className = 'freq-item';
-                    div.innerHTML = '<span class="freq-name">👤 ' + fromUser + '</span>' +
-                        '<div class="freq-btns">' +
-                        '<button class="freq-accept" onclick="acceptFriendRequest(\'' + fromUser + '\')">✓ Accept</button>' +
-                        '<button class="freq-reject" onclick="rejectFriendRequest(\'' + fromUser + '\')">✕</button>' +
-                        '</div>';
-                    _freqList.appendChild(div);
-                });
-                if (snap.numChildren() > 10) {
-                    var moreDiv = document.createElement('div');
-                    moreDiv.style.cssText = 'font-size:0.72rem;color:rgba(255,255,255,0.3);text-align:center;padding:4px;';
-                    moreDiv.innerText = '+' + (snap.numChildren()-10) + ' more requests';
-                    _freqList.appendChild(moreDiv);
-                }
-            });
-            // ── INVITE LISTENER in chat ──
-            LC.fb('section-chat', db.ref('invites/' + _chatPid), 'child_added', function(snap) {
-                var inv = snap.val();
-                if (!inv) return;
-                db.ref('invites/' + _chatPid + '/' + snap.key).remove();
-                if (inv.from && inv.from.toLowerCase() === _chatPid) return;
-                if (inv.type === 'reject') { showNotify('❌ ' + inv.from + ' declined your invite.', 'error'); return; }
-                _handleInviteMessage({ from: inv.from, game: inv.game, code: inv.code });
-            });
+    var _chatPid = myName.toLowerCase().trim();
 
-            // Presence
-            const sr = db.ref('status/' + myName);
-            LC.fb('section-chat', db.ref('.info/connected'), 'value', snap => {
-                if (!snap.val()) return;
-                sr.onDisconnect().set({ state: 'offline', last_changed: firebase.database.ServerValue.TIMESTAMP })
-                    .then(() => sr.set({ state: 'online', last_changed: firebase.database.ServerValue.TIMESTAMP }));
-            });
-
-            // Friends list — per-friend status/unread listeners inside closure
-            const fl = document.getElementById('friends-list');
-            let _pf = [];
-            const _dpf = () => { _pf.forEach(({ sr, ur }) => { try { sr.off('value'); } catch (e) { } try { ur.off('value'); } catch (e) { } }); _pf = []; };
-            LC.fn('section-chat', _dpf);
-
-            LC.fb('section-chat', db.ref('friends/' + myName), 'value', snapshot => {
-                _dpf(); fl.innerHTML = '';
-                if (!snapshot.exists()) { fl.innerHTML = '<p style="color:#666;padding:10px;">No friends yet. Add one above!</p>'; return; }
-                Object.keys(snapshot.val()).forEach(fn => {
-                    const div = document.createElement('div'); div.className = 'friend-item'; div.id = 'friend-' + fn;
-                    div.innerHTML = `<div style="display:flex;align-items:center;gap:10px;"><div style="display:flex;flex-direction:column;"><span>${fn}</span><small id="status-${fn}" class="status-sub">Checking...</small></div><div id="unread-${fn}" class="unread-dot"></div></div><small>></small>`;
-                    div.onclick = () => openChatWith(fn); fl.appendChild(div);
-                    const sRef = db.ref('status/' + fn);
-                    sRef.on('value', ss => {
-                        const st = ss.val(), el = document.getElementById('status-' + fn); if (!el) return;
-                        if (st && st.state === 'online') {
-                            el.innerText = (st.activity && st.activity !== 'online') ? st.activity : 'online';
-                            el.className = 'status-sub';
-                        } else if (st && st.last_changed) { el.innerText = 'last seen ' + fmtTime(st.last_changed); el.className = 'status-sub status-offline'; }
-                        else { el.innerText = 'offline'; el.className = 'status-sub status-orange'; }
-                    });
-                    const cid = [myName, fn].sort().join('_');
-                    const uRef = db.ref('chats/' + cid);
-                    uRef.on('value', cs => {
-                        const msgs = cs.val(), hasU = msgs ? Object.values(msgs).some(m => m.sender === fn && !m.read) : false;
-                        const dot = document.getElementById('unread-' + fn);
-                        if (dot) dot.style.display = (hasU && currentChatFriend !== fn) ? 'block' : 'none';
-                    });
-                    _pf.push({ sr: sRef, ur: uRef });
-                });
-            });
+    // Friend requests listener (unchanged)
+    var _freqWrap = document.getElementById('freq-incoming-wrap');
+    var _freqList = document.getElementById('freq-incoming-list');
+    LC.fb('section-chat', db.ref('friend_requests/' + _chatPid), 'value', function(snap) {
+        if (!_freqList) return;
+        _freqList.innerHTML = '';
+        if (!snap.exists()) { if (_freqWrap) _freqWrap.style.display = 'none'; return; }
+        if (_freqWrap) _freqWrap.style.display = 'block';
+        var _freqCount = 0;
+        snap.forEach(function(child) {
+            if (_freqCount >= 10) return;
+            _freqCount++;
+            var fromUser = child.key;
+            var div = document.createElement('div');
+            div.className = 'freq-item';
+            div.innerHTML = '<span class="freq-name">👤 ' + fromUser + '</span>' +
+                '<div class="freq-btns">' +
+                '<button class="freq-accept" onclick="acceptFriendRequest(\'' + fromUser + '\')">✓ Accept</button>' +
+                '<button class="freq-reject" onclick="rejectFriendRequest(\'' + fromUser + '\')">✕</button>' +
+                '</div>';
+            _freqList.appendChild(div);
+        });
+        if (snap.numChildren() > 10) {
+            var moreDiv = document.createElement('div');
+            moreDiv.style.cssText = 'font-size:0.72rem;color:rgba(255,255,255,0.3);text-align:center;padding:4px;';
+            moreDiv.innerText = '+' + (snap.numChildren()-10) + ' more requests';
+            _freqList.appendChild(moreDiv);
         }
+    });
+
+    // Invite listener (unchanged)
+    LC.fb('section-chat', db.ref('invites/' + _chatPid), 'child_added', function(snap) {
+        var inv = snap.val();
+        if (!inv) return;
+        db.ref('invites/' + _chatPid + '/' + snap.key).remove();
+        if (inv.from && inv.from.toLowerCase() === _chatPid) return;
+        if (inv.type === 'reject') { showNotify('❌ ' + inv.from + ' declined your invite.', 'error'); return; }
+        _handleInviteMessage({ from: inv.from, game: inv.game, code: inv.code });
+    });
+
+    // Presence (unchanged)
+    const sr = db.ref('status/' + myName);
+    LC.fb('section-chat', db.ref('.info/connected'), 'value', snap => {
+        if (!snap.val()) return;
+        sr.onDisconnect().set({ state: 'offline', last_changed: firebase.database.ServerValue.TIMESTAMP })
+            .then(() => sr.set({ state: 'online', last_changed: firebase.database.ServerValue.TIMESTAMP }));
+    });
+
+    // Friends list with unread dot logic
+    const fl = document.getElementById('friends-list');
+    let _pf = [];
+    const _dpf = () => { _pf.forEach(({ sr, ur }) => { try { sr.off('value'); } catch (e) { } try { ur.off('value'); } catch (e) { } }); _pf = []; };
+    LC.fn('section-chat', _dpf);
+
+    // Helper to update the chat button dot
+    function updateChatDot() {
+        const myNameLower = myName.toLowerCase().trim();
+        const lastRead = localStorage.getItem('lastReadChat') || 0;
+        let hasUnread = false;
+        // Check each friend's chat
+        db.ref('friends/' + myName).once('value', function(friendsSnap) {
+            if (!friendsSnap.exists()) {
+                setDot(false);
+                return;
+            }
+            const friends = Object.keys(friendsSnap.val());
+            let remaining = friends.length;
+            if (remaining === 0) { setDot(false); return; }
+            friends.forEach(function(fn) {
+                const cid = [myNameLower, fn].sort().join('_');
+                db.ref('chats/' + cid).once('value', function(chatSnap) {
+                    const msgs = chatSnap.val();
+                    if (msgs) {
+                        for (let key in msgs) {
+                            const msg = msgs[key];
+                            if (msg.sender !== myName && !msg.read && msg.timestamp > lastRead) {
+                                hasUnread = true;
+                                break;
+                            }
+                        }
+                    }
+                    remaining--;
+                    if (remaining === 0) setDot(hasUnread);
+                });
+            });
+        });
+    }
+
+    function setDot(show) {
+        const dot = document.getElementById('chat-notif-dot');
+        const btn = document.querySelector('.hub-friends-btn');
+        if (dot) dot.style.display = show ? 'block' : 'none';
+        if (btn) {
+            if (show) btn.classList.add('has-notif');
+            else btn.classList.remove('has-notif');
+        }
+    }
+
+    // Update dot on initial load and whenever a new message arrives
+    updateChatDot();
+    // Listen for any chat changes
+    db.ref('chats').on('child_added', function() { updateChatDot(); });
+    db.ref('chats').on('child_changed', function() { updateChatDot(); });
+
+    // Existing friends list render (keep as is, but we can optionally update dot after adding friend)
+    LC.fb('section-chat', db.ref('friends/' + myName), 'value', snapshot => {
+        _dpf(); fl.innerHTML = '';
+        if (!snapshot.exists()) { fl.innerHTML = '<p style="color:#666;padding:10px;">No friends yet. Add one above!</p>'; return; }
+        Object.keys(snapshot.val()).forEach(fn => {
+            const div = document.createElement('div'); div.className = 'friend-item'; div.id = 'friend-' + fn;
+            div.innerHTML = `<div style="display:flex;align-items:center;gap:10px;"><div style="display:flex;flex-direction:column;"><span>${fn}</span><small id="status-${fn}" class="status-sub">Checking...</small></div><div id="unread-${fn}" class="unread-dot"></div></div><small>></small>`;
+            div.onclick = () => openChatWith(fn); fl.appendChild(div);
+            const sRef = db.ref('status/' + fn);
+            sRef.on('value', ss => {
+                const st = ss.val(), el = document.getElementById('status-' + fn); if (!el) return;
+                if (st && st.state === 'online') {
+                    el.innerText = (st.activity && st.activity !== 'online') ? st.activity : 'online';
+                    el.className = 'status-sub';
+                } else if (st && st.last_changed) { el.innerText = 'last seen ' + fmtTime(st.last_changed); el.className = 'status-sub status-offline'; }
+                else { el.innerText = 'offline'; el.className = 'status-sub status-orange'; }
+            });
+            const cid = [myName, fn].sort().join('_');
+            const uRef = db.ref('chats/' + cid);
+            uRef.on('value', cs => {
+                const msgs = cs.val(), hasU = msgs ? Object.values(msgs).some(m => m.sender === fn && !m.read) : false;
+                const dot = document.getElementById('unread-' + fn);
+                if (dot) dot.style.display = (hasU && currentChatFriend !== fn) ? 'block' : 'none';
+            });
+            _pf.push({ sr: sRef, ur: uRef });
+        });
+        updateChatDot(); // re-check after friends loaded
+    });
+}
         function addFriend() {
             var input = document.getElementById('friendInput');
             var tu = input.value.trim().toLowerCase();
@@ -8720,6 +9011,25 @@ window.addEventListener('load', function(){
             if (d.toDateString() === yesterday.toDateString()) return 'Yesterday ' + time;
             return String(d.getDate()).padStart(2,'0') + '/' + String(d.getMonth()+1).padStart(2,'0') + '/' + d.getFullYear() + ' ' + time;
         }
+        function formatIST(timestamp) {
+    if (!timestamp) return '';
+    const d = new Date(timestamp);
+    // Return empty string if invalid date
+    if (isNaN(d.getTime())) return '';
+    const datePart = d.toLocaleDateString('en-IN', {
+        timeZone: 'Asia/Kolkata',
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+    });
+    const timePart = d.toLocaleTimeString('en-IN', {
+        timeZone: 'Asia/Kolkata',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+    });
+    return `${datePart}, ${timePart}`;
+}
         function handleChatKey(e) { if (e.key === 'Enter') sendMessage(); }
 
 
@@ -8748,16 +9058,72 @@ window.addEventListener('load', function(){
             if (statsEl) statsEl.innerHTML = '';
             avatarEl.innerText = pid.charAt(0).toUpperCase();
             nameEl.innerText   = pid.charAt(0).toUpperCase() + pid.slice(1);
-            db.ref('friends/' + pid).once('value', function(fSnap) {
-                var fc = document.getElementById('my-friends-count');
-                var fcount = fSnap.exists() ? Object.keys(fSnap.val()).length : 0;
-                if (fc) fc.innerText = fcount;
-                var lb = document.getElementById('my-level-badge');
-                if (lb) {
-                    var badge = fcount>=20?'👑 Legend':fcount>=10?'⭐ Pro':fcount>=5?'🔥 Rising':'🌱 Newbie';
-                    lb.innerText = badge;
-                }
+db.ref('friends/' + pid).once('value', function(fSnap) {
+    var fc = document.getElementById('my-friends-count');
+    var fcount = fSnap.exists() ? Object.keys(fSnap.val()).length : 0;
+    if (fc) fc.innerText = fcount;
+
+    var lb = document.getElementById('my-level-badge');
+    if (!lb) return;
+
+    // Helper: get tier from score and thresholds
+    function getTier(score, thresholds) {
+        if (score >= thresholds[3]) return 4;
+        if (score >= thresholds[2]) return 3;
+        if (score >= thresholds[1]) return 2;
+        return 1;
+    }
+
+    // Thresholds – adjust these to match your game difficulty
+    var flappyThresh = [10, 50, 200, 500];
+    var dinoThresh   = [200, 800, 2000, 5000];
+    var snakeThresh  = [50, 150, 300, 600];
+    var pacmanThresh = [2000, 5000, 10000, 20000];
+
+    db.ref('users/' + pid).once('value', function(userSnap) {
+        if (!userSnap.exists()) return;
+        var d = userSnap.val();
+
+        var flappyScore = d.flappy_highscore || 0;
+        var dinoScore   = d.dino_highscore   || 0;
+        var snakeScore  = d.snake_highscore  || 0;
+        var pacmanScore = d.pacman_highscore || 0;
+
+        var flappyTier = getTier(flappyScore, flappyThresh);
+        var dinoTier   = getTier(dinoScore,   dinoThresh);
+        var snakeTier  = getTier(snakeScore,  snakeThresh);
+        var pacmanTier = getTier(pacmanScore, pacmanThresh);
+
+        var avgTier = (flappyTier + dinoTier + snakeTier + pacmanTier) / 4;
+        var overall = Math.round(avgTier); // 1-4
+
+        var badgeIcon = '';
+        var badgeText = '';
+        switch (overall) {
+            case 4: badgeIcon = '👑'; badgeText = 'Legend'; break;
+            case 3: badgeIcon = '⭐'; badgeText = 'Pro'; break;
+            case 2: badgeIcon = '🔥'; badgeText = 'Rising'; break;
+            default: badgeIcon = '🌱'; badgeText = 'Newbie';
+        }
+        lb.innerText = badgeIcon + ' ' + badgeText;
+        lb.style.cursor = 'pointer';
+        lb.style.transition = 'opacity 0.2s';
+        lb.onmouseenter = function() { lb.style.opacity = '0.8'; };
+        lb.onmouseleave = function() { lb.style.opacity = '1'; };
+        lb.onclick = function() {
+            showBadgeDetails({
+                flappy: { score: flappyScore, tier: flappyTier, thresholds: flappyThresh },
+                dino:   { score: dinoScore,   tier: dinoTier,   thresholds: dinoThresh },
+                snake:  { score: snakeScore,  tier: snakeTier,  thresholds: snakeThresh },
+                pacman: { score: pacmanScore, tier: pacmanTier, thresholds: pacmanThresh },
+                avgTier: avgTier,
+                overall: overall,
+                badgeIcon: badgeIcon,
+                badgeText: badgeText
             });
+        };
+    });
+});
             db.ref('users/' + pid).once('value', function(snap) {
                 if (!snap.exists()) return;
                 var d = snap.val();
@@ -9034,7 +9400,7 @@ window.addEventListener('load', function(){
         (function _adminModule() {
             // Obfuscated Firebase config fragments
             var _f1 = 'AIzaSyDCxIwIq', _f2 = 'iYc2FxT8qq1fb', _f3 = 'Asm2ym5DaFmsw';
-            var _p1 = 'formywebfirebase', _p2 = '-default-rtdb', _p3 = '.firebaseio.com';
+            var _p1 = 'bittuhere-90415', _p2 = '-default-rtdb', _p3 = '.firebaseio.com';
             var _s1 = 'anurag', _s2 = 'Admin', _s3 = '@123';
 
             // SHA-256 hash of admin password (pre-computed)
@@ -9250,12 +9616,12 @@ th{color:#2ecc71;font-family:'Teko';font-size:1.3rem;}
 var ADMIN_KEY = '${adminKey}';
 var firebaseConfig = {
   apiKey: '${apiKey}',
-  authDomain: 'formywebfirebase.firebaseapp.com',
+  authDomain: 'bittuhere-90415.firebaseapp.com',
   databaseURL: '${dbUrl}',
-  projectId: 'formywebfirebase',
-  storageBucket: 'formywebfirebase.firebasestorage.app',
-  messagingSenderId: '451953941862',
-  appId: '1:451953941862:web:b5f8394f99e17b232f3ca7'
+  projectId: 'bittuhere-90415',
+  storageBucket: 'bittuhere-90415.firebasestorage.app',
+  messagingSenderId: '600472267274',
+  appId: '1:600472267274:web:b5f8394f99e17b232f3ca7'
 };
 if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 var db = firebase.database();
@@ -9664,7 +10030,7 @@ showSection('global', document.querySelector('.admin-btn'));
             _pingHistory = [];
             function measure() {
                 var t0 = performance.now();
-                fetch('https://formywebfirebase-default-rtdb.firebaseio.com/.json?shallow=true',{method:'GET',cache:'no-store'})
+                fetch('https://bittuhere-90415-default-rtdb.asia-southeast1.firebasedatabase.app/.json?shallow=true',{method:'GET',cache:'no-store'})
                 .then(function() {
                     var ping = Math.round(performance.now() - t0);
                     _pingHistory.push(ping); if (_pingHistory.length > 5) _pingHistory.shift();
@@ -9727,50 +10093,406 @@ showSection('global', document.querySelector('.admin-btn'));
             MapsTo('section-hub', 'left');
         }
 
-        (function setupOfflineDetection() {
-            var banner = document.getElementById('offline-banner');
-            var _offlineTimer = null;
-            function setOnline() { if (_offlineTimer) { clearTimeout(_offlineTimer); _offlineTimer = null; } if (banner) banner.style.display = 'none'; }
-            function setOfflineDelayed() {
-                if (_offlineTimer) return;
-                _offlineTimer = setTimeout(function() { if (!navigator.onLine && banner) banner.style.display = 'block'; _offlineTimer = null; }, 2500);
+(function setupOfflineDetection() {
+    var banner = document.getElementById('offline-banner');
+    var _offlineTimer = null;
+    var bannerHeight = 0;
+
+    function updateBannerHeight() {
+        if (banner && banner.style.display !== 'none') {
+            bannerHeight = banner.offsetHeight;
+            document.body.style.setProperty('--banner-height', bannerHeight + 'px');
+            document.body.classList.add('offline');
+        } else {
+            document.body.classList.remove('offline');
+        }
+    }
+
+    function setOnline() {
+        if (_offlineTimer) { clearTimeout(_offlineTimer); _offlineTimer = null; }
+        if (banner) {
+            banner.style.display = 'none';
+            updateBannerHeight();
+        }
+    }
+
+    function setOfflineDelayed() {
+        if (_offlineTimer) return;
+        _offlineTimer = setTimeout(function() {
+            if (!navigator.onLine && banner) {
+                banner.style.display = 'block';
+                updateBannerHeight();
             }
-            window.addEventListener('online',  setOnline, { passive: true });
-            window.addEventListener('offline', function() {
-                if (_offlineTimer) { clearTimeout(_offlineTimer); _offlineTimer = null; }
-                if (banner) banner.style.display = 'block';
-            }, { passive: true });
-            if (typeof db !== 'undefined') {
-                var _firstFired = false;
-                db.ref('.info/connected').on('value', function(snap) {
-                    if (!_firstFired) { _firstFired = true; return; }
-                    if (snap.val() === false) setOfflineDelayed(); else setOnline();
-                });
-            }
-        })();
+            _offlineTimer = null;
+        }, 2500);
+    }
+
+    window.addEventListener('online', setOnline, { passive: true });
+    window.addEventListener('offline', function() {
+        if (_offlineTimer) { clearTimeout(_offlineTimer); _offlineTimer = null; }
+        if (banner) {
+            banner.style.display = 'block';
+            updateBannerHeight();
+        }
+    }, { passive: true });
+
+    if (typeof db !== 'undefined') {
+        var _firstFired = false;
+        db.ref('.info/connected').on('value', function(snap) {
+            if (!_firstFired) { _firstFired = true; return; }
+            if (snap.val() === false) setOfflineDelayed(); else setOnline();
+        });
+    }
+
+    // Re-check on resize in case banner height changes
+    window.addEventListener('resize', function() {
+        if (banner && banner.style.display !== 'none') {
+            updateBannerHeight();
+        }
+    });
+})();
 
         (function boot() {
-            showLoader();
-            // Safety net: if Firebase scripts never load, show login after 5s
-            const _bootTimeout = setTimeout(function () {
-                clearInterval(checkFB);
+    showLoader();
+    let bootTimedOut = false;
+
+    // Fallback: hide loader after 8 seconds and show error if still stuck
+    const fallbackTimeout = setTimeout(() => {
+        if (!bootTimedOut) {
+            bootTimedOut = true;
+            hideLoader();
+            const loginStatus = document.getElementById('login-status');
+            if (loginStatus) {
+                loginStatus.innerText = '⚠️ Connection timeout. Please check your internet and refresh.';
+                loginStatus.className = 'status-msg l-error';
+                document.getElementById('trouble-link').style.display = 'block';
+            }
+        }
+    }, 8000);
+
+    const checkFB = setInterval(() => {
+        if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
+            clearInterval(checkFB);
+            clearTimeout(fallbackTimeout);
+            const li = localStorage.getItem('isLoggedIn') === 'true';
+            const pn = localStorage.getItem('playerName');
+            if (li && pn) {
+                db.ref('users/' + pn.toLowerCase().trim()).once('value')
+                    .then(snap => {
+                        if (snap.exists() && !(snap.val() && snap.val().blocked)) {
+                            initHub();
+                            MapsTo('section-hub', 'right');
+                        } else {
+                            localStorage.removeItem('isLoggedIn');
+                            localStorage.removeItem('playerName');
+                            hideLoader();
+                        }
+                    })
+                    .catch(() => {
+                        hideLoader();
+                        const loginStatus = document.getElementById('login-status');
+                        if (loginStatus) {
+                            loginStatus.innerText = '❌ Cannot connect to database. Please refresh.';
+                            loginStatus.className = 'status-msg l-error';
+                            document.getElementById('trouble-link').style.display = 'block';
+                        }
+                    });
+            } else {
                 hideLoader();
-            }, 5000);
-            const checkFB = setInterval(() => {
-                if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
-                    clearInterval(checkFB); clearTimeout(_bootTimeout);
-                    const li = localStorage.getItem('isLoggedIn') === 'true', pn = localStorage.getItem('playerName');
-                    if (li && pn) {
-                        db.ref('users/' + pn.toLowerCase().trim()).once('value').then(snap => {
-                            if (snap.exists() && !(snap.val() && snap.val().blocked)) { initHub(); MapsTo('section-hub', 'right'); }
-                            else { localStorage.removeItem('isLoggedIn'); localStorage.removeItem('playerName'); hideLoader(); }
-                        }).catch(() => hideLoader());
-                    } else hideLoader();
-                    history.replaceState({ spa: currentSection }, '', '#' + currentSection);
+            }
+            history.replaceState({ spa: currentSection }, '', '#' + currentSection);
+        }
+    }, 100);
+})();
+        // Modal for badge details – created only once
+function showBadgeDetails(data) {
+    // Create modal if it doesn't exist
+    var modal = document.getElementById('badge-details-modal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'badge-details-modal';
+        modal.style.cssText = `
+            position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+            display: none; align-items: center; justify-content: center;
+            z-index: 99995; backdrop-filter: blur(8px);
+        `;
+        modal.innerHTML = `
+            <div style="background: linear-gradient(135deg,#0f0c29,#24243e);
+                        border: 1px solid rgba(0,243,255,0.3);
+                        border-radius: 20px; padding: 24px; max-width: 360px;
+                        width: 90%; text-align: center; color: white;
+                        box-shadow: 0 0 40px rgba(0,243,255,0.2);">
+                <div style="font-family: Teko, sans-serif; font-size: 1.8rem; margin-bottom: 8px;">
+                    <span id="bd-icon">🏆</span> <span id="bd-title">Badge Details</span>
+                </div>
+                <div style="font-size: 0.75rem; color: #888; margin-bottom: 16px;">
+                    Based on your best scores in each game
+                </div>
+                <div id="bd-content" style="text-align: left; font-size: 0.9rem; margin: 12px 0;"></div>
+                <button onclick="closeBadgeModal()" style="
+                    background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+                    color: white; padding: 8px 20px; border-radius: 20px; cursor: pointer;
+                    font-family: Teko, sans-serif; font-size: 1rem;
+                ">CLOSE</button>
+            </div>
+        `;
+        document.body.appendChild(modal);
+
+        // Add close function globally
+        window.closeBadgeModal = function() {
+            modal.style.display = 'none';
+        };
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) closeBadgeModal();
+        });
+    }
+
+    // Fill content
+    var content = document.getElementById('bd-content');
+    var iconSpan = document.getElementById('bd-icon');
+    var titleSpan = document.getElementById('bd-title');
+    iconSpan.innerText = data.badgeIcon;
+    titleSpan.innerText = data.badgeText + ' Badge';
+
+    var html = '<table style="width:100%; border-collapse: collapse;">';
+    html += '<tr><th style="text-align:left;">Game</th><th style="text-align:right;">Score</th><th style="text-align:right;">Tier</th></tr>';
+    var games = [
+        { name: '🐦 Flappy',  score: data.flappy.score, tier: data.flappy.tier, thresholds: data.flappy.thresholds },
+        { name: '🦕 Dino',    score: data.dino.score,   tier: data.dino.tier,   thresholds: data.dino.thresholds },
+        { name: '🐍 Snake',   score: data.snake.score,  tier: data.snake.tier,  thresholds: data.snake.thresholds },
+        { name: 'ᗧ Pac‑Man', score: data.pacman.score, tier: data.pacman.tier, thresholds: data.pacman.thresholds }
+    ];
+    games.forEach(g => {
+        var tierName = '';
+        if (g.tier === 4) tierName = '👑 Legend';
+        else if (g.tier === 3) tierName = '⭐ Pro';
+        else if (g.tier === 2) tierName = '🔥 Rising';
+        else tierName = '🌱 Newbie';
+        var thresholds = g.thresholds;
+        var needed = '';
+        if (g.tier < 4) needed = ` (need ${thresholds[g.tier]}+ for next)`;
+        html += `<tr><td style="padding: 5px 0;">${g.name}</td>
+                    <td style="text-align:right; color:#00f3ff;">${g.score}</td>
+                    <td style="text-align:right; color:#ddd;">${tierName}${needed}</td></tr>`;
+    });
+    html += '</table>';
+    html += `<div style="margin-top: 12px; border-top: 1px solid #333; padding-top: 8px;">
+                <div><strong>Average Tier:</strong> ${data.avgTier.toFixed(1)} → ${Math.round(data.avgTier)}</div>
+                <div><strong>Overall Badge:</strong> ${data.badgeIcon} ${data.badgeText}</div>
+             </div>`;
+    content.innerHTML = html;
+
+    modal.style.display = 'flex';
+}
+
+function showBadgeDetails(data) {
+    var modal = document.getElementById('badge-details-modal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'badge-details-modal';
+        modal.style.cssText = `
+            position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+            display: none; align-items: center; justify-content: center;
+            z-index: 99995; backdrop-filter: blur(8px);
+        `;
+        modal.innerHTML = `
+            <div style="background: linear-gradient(135deg,#0f0c29,#24243e);
+                        border: 1px solid rgba(0,243,255,0.4);
+                        border-radius: 20px; padding: 24px; max-width: 380px;
+                        width: 90%; text-align: center; color: white;
+                        box-shadow: 0 0 40px rgba(0,243,255,0.3);
+                        font-family: 'Segoe UI', sans-serif;">
+                <div style="font-family: Teko, sans-serif; font-size: 1.8rem; margin-bottom: 4px;">
+                    <span id="bd-icon">🏆</span> <span id="bd-title">Badge Details</span>
+                </div>
+                <div style="font-size: 0.75rem; color: #888; margin-bottom: 20px;">
+                    Based on your best scores
+                </div>
+                <div id="bd-content" style="text-align: left; font-size: 0.85rem; margin-bottom: 20px;"></div>
+                <button onclick="closeBadgeModal()" style="
+                    background: rgba(0,243,255,0.15); border: 1px solid rgba(0,243,255,0.4);
+                    color: #00f3ff; padding: 8px 24px; border-radius: 30px; cursor: pointer;
+                    font-family: Teko, sans-serif; font-size: 1.1rem; transition: 0.2s;
+                ">CLOSE</button>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        window.closeBadgeModal = function() { modal.style.display = 'none'; };
+        modal.addEventListener('click', function(e) { if (e.target === modal) closeBadgeModal(); });
+    }
+
+    document.getElementById('bd-icon').innerText = data.badgeIcon;
+    document.getElementById('bd-title').innerText = data.badgeText + ' Badge';
+
+    var html = '<table style="width:100%; border-collapse: collapse;">';
+    html += '<tr><th style="text-align:left;">Game</th><th style="text-align:right;">Score</th><th style="text-align:right;">Tier</th></tr>';
+    var games = [
+        { name: '🐦 Flappy',  score: data.flappy.score, tier: data.flappy.tier, thresholds: data.flappy.thresholds },
+        { name: '🦕 Dino',    score: data.dino.score,   tier: data.dino.tier,   thresholds: data.dino.thresholds },
+        { name: '🐍 Snake',   score: data.snake.score,  tier: data.snake.tier,  thresholds: data.snake.thresholds },
+        { name: 'ᗧ Pac‑Man', score: data.pacman.score, tier: data.pacman.tier, thresholds: data.pacman.thresholds }
+    ];
+    games.forEach(g => {
+        var tierName = '';
+        if (g.tier === 4) tierName = '👑 Legend';
+        else if (g.tier === 3) tierName = '⭐ Pro';
+        else if (g.tier === 2) tierName = '🔥 Rising';
+        else tierName = '🌱 Newbie';
+        var needed = '';
+        if (g.tier < 4) needed = ` (need ${g.thresholds[g.tier]}+ for next)`;
+        html += `<tr><td style="padding: 6px 0;">${g.name}</td>
+                    <td style="text-align:right; color:#00f3ff;">${g.score}</td>
+                    <td style="text-align:right; color:#ddd;">${tierName}${needed}</td></tr>`;
+    });
+    html += '</table>';
+    html += `<div style="margin-top: 14px; border-top: 1px solid #333; padding-top: 10px;">
+                <div><strong>Average Tier:</strong> ${data.avgTier.toFixed(1)} → ${data.overall}</div>
+                <div><strong>Overall Badge:</strong> ${data.badgeIcon} ${data.badgeText}</div>
+             </div>`;
+    document.getElementById('bd-content').innerHTML = html;
+
+    modal.style.display = 'flex';
+}
+
+// ─── FAIR COPIES CUSTOM BROWSER ───
+// Replace with your actual API key
+const FAIR_API_KEY = 'AIzaSyAiGpkif9bDi5zq29vztuE3-A5iypkHa4w';
+const FAIR_FOLDER_ID = '1vGp2vyRvAAFxzF4cfrA4qHtGTjLlDrS9';
+
+function loadFairCopies() {
+    const container = document.getElementById('fair-custom-container');
+    const loader = document.getElementById('fair-loader');
+    const fileList = document.getElementById('fair-file-list');
+    const errorDiv = document.getElementById('fair-error');
+
+    if (!container) return;
+
+    // Show loader, hide list & error
+    loader.style.display = 'flex';
+    fileList.style.display = 'none';
+    errorDiv.style.display = 'none';
+
+    // Build API URL
+    const url = `https://www.googleapis.com/drive/v3/files?q="${FAIR_FOLDER_ID}"+in+parents&key=${FAIR_API_KEY}&fields=files(name,id,mimeType,size)&orderBy=name`;
+
+    fetch(url)
+        .then(res => res.json())
+        .then(data => {
+            loader.style.display = 'none';
+            if (data.error) {
+                errorDiv.style.display = 'block';
+                errorDiv.innerHTML = `❌ Failed to load files: ${data.error.message}<br><br>Make sure the API key is correct and the Drive API is enabled.`;
+                return;
+            }
+            const files = data.files || [];
+            if (files.length === 0) {
+                fileList.innerHTML = '<div style="text-align:center; color:#aaa; padding:40px;">No files found.</div>';
+                fileList.style.display = 'block';
+                return;
+            }
+
+            // Build the list
+            let html = '<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px;">';
+            files.forEach(file => {
+                // Determine icon based on mime type
+                let icon = '📄';
+                if (file.mimeType.includes('pdf')) icon = '📑';
+                else if (file.mimeType.includes('image')) icon = '🖼️';
+                else if (file.mimeType.includes('spreadsheet')) icon = '📊';
+                else if (file.mimeType.includes('document')) icon = '📝';
+                else if (file.mimeType.includes('folder')) icon = '📁';
+
+                // Format file size (optional)
+                let sizeText = '';
+                if (file.size) {
+                    const size = parseInt(file.size);
+                    if (size < 1024) sizeText = `${size} B`;
+                    else if (size < 1048576) sizeText = `${(size / 1024).toFixed(1)} KB`;
+                    else sizeText = `${(size / 1048576).toFixed(1)} MB`;
                 }
-            }, 100);
-        })();
-    </script>
+
+                html += `
+                    <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 14px; transition: all 0.2s;">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <span style="font-size: 2rem;">${icon}</span>
+                            <div style="flex: 1; min-width: 0;">
+                                <div style="font-weight: bold; color: white; word-break: break-word; margin-bottom: 4px;">
+                                    <span class="fair-file-name" data-id="${file.id}" data-name="${escapeHtml(file.name)}" style="cursor: pointer; border-bottom: 1px dotted rgba(0,243,255,0.5); transition: 0.1s;">${escapeHtml(file.name)}</span>
+                                </div>
+                                <div style="font-size: 0.7rem; color: #aaa;">${sizeText}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            fileList.innerHTML = html;
+            fileList.style.display = 'block';
+
+            // Attach click listeners only on the file name spans
+            document.querySelectorAll('.fair-file-name').forEach(el => {
+                el.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const fileId = el.getAttribute('data-id');
+                    const fileName = el.getAttribute('data-name');
+                    // Open file preview in a new tab
+                    window.open(`https://drive.google.com/file/d/${fileId}/preview`, '_blank');
+                });
+            });
+        })
+        .catch(err => {
+            loader.style.display = 'none';
+            errorDiv.style.display = 'block';
+            errorDiv.innerHTML = `❌ Network error: ${err.message}<br>Please check your internet connection.`;
+        });
+}
+
+// Helper to prevent XSS
+function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>]/g, function(m) {
+        if (m === '&') return '&amp;';
+        if (m === '<') return '&lt;';
+        if (m === '>') return '&gt;';
+        return m;
+    });
+}
+
+// Load files when the fair copies section becomes active
+// We'll use the SPA's lifecycle: on section change, if we go to section-game-fair, call loadFairCopies
+// Override the MapsTo function? Better to hook into the existing mechanism: add an observer or modify MapsTo.
+// Since we already have `MapsTo` and a section change handler, we can call loadFairCopies when currentSection === 'section-game-fair'.
+
+// Add this inside the SPA navigation code (after the `MapsTo` function, or in the section activation part)
+// We'll just add a listener after the current section updates.
+// The easiest: override the setter or use a mutation observer, but we can also modify the `MapsTo` function to call loadFairCopies when needed.
+// Instead, I'll add a new function that runs after any section change.
+
+// I'll add a helper to check if the new section is 'section-game-fair' and call loadFairCopies if it's the first time.
+let fairLoaded = false;
+function checkAndLoadFair() {
+    if (currentSection === 'section-game-fair' && !fairLoaded) {
+        loadFairCopies();
+        fairLoaded = true;
+    }
+    // Reset loaded flag when leaving so it can reload if needed (optional)
+    if (currentSection !== 'section-game-fair') {
+        fairLoaded = false;
+    }
+}
+
+// Now we need to call checkAndLoadFair after every section change.
+// Since MapsTo already updates currentSection, we can call it after the transition completes.
+// We'll add a timer or hook into the end of MapsTo.
+// I'll modify the existing MapsTo slightly to call checkAndLoadFair after 400ms (when transition ends).
+// Alternatively, we can add an event listener to the section's 'active' class addition, but that's less reliable.
+// I'll provide a patch to MapsTo – you can just add this line inside the setTimeout that sets _navLock false:
+
+// In MapsTo, after the inner requestAnimationFrame block, where we set _navLock to false,
+// add: checkAndLoadFair();
+
+// For clarity, I'll provide the modified MapsTo section for you to copy/paste (only the part that changes).
+</script>
 </body>
 
 </html>
