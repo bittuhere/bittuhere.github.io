@@ -1703,60 +1703,139 @@ body.offline .spa-section {
         
 
         /* ROTATE OVERLAY */
-        #rotate-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(13, 11, 34, 0.97);
-            z-index: 99990;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 18px;
-        }
+#rotate-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(5, 5, 20, 0.96);
+    backdrop-filter: blur(12px);
+    z-index: 99990;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Teko', sans-serif;
+}
 
-        #rotate-overlay.rotate-show {
-            display: flex;
-        }
+#rotate-overlay.rotate-show {
+    display: flex;
+}
 
-        .rotate-phone-icon {
-            font-size: 5rem;
-            animation: rotatePhone 2.5s ease-in-out infinite;
-        }
+.rotate-card {
+    background: rgba(20, 20, 40, 0.9);
+    border: 1px solid rgba(0, 243, 255, 0.3);
+    border-radius: 48px;
+    padding: 32px 24px;
+    text-align: center;
+    max-width: 300px;
+    width: 85%;
+    backdrop-filter: blur(20px);
+    box-shadow: 0 0 50px rgba(0, 243, 255, 0.2);
+    animation: cardPulse 2s ease-in-out infinite;
+}
 
-        @keyframes rotatePhone {
-            0% {
-                transform: rotate(0deg);
-            }
+@keyframes cardPulse {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+}
 
-            35% {
-                transform: rotate(90deg);
-            }
+.rotate-icon {
+    margin-bottom: 20px;
+}
 
-            65% {
-                transform: rotate(90deg);
-            }
+.phone-icon {
+    width: 70px;
+    height: 130px;
+    margin: 0 auto;
+    background: #0d0b22;
+    border: 3px solid #00f3ff;
+    border-radius: 24px;
+    position: relative;
+    box-shadow: 0 0 15px #00f3ff;
+    animation: rotatePhoneTap 2s ease-in-out infinite;
+}
 
-            100% {
-                transform: rotate(0deg);
-            }
-        }
+.phone-icon::before {
+    content: "📱";
+    position: absolute;
+    font-size: 2.5rem;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    filter: drop-shadow(0 0 5px #00f3ff);
+}
 
-        .rotate-label {
-            font-family: 'Teko', sans-serif;
-            font-size: 2rem;
-            color: #00f3ff;
-            letter-spacing: 4px;
-            text-align: center;
-        }
+.phone-icon::after {
+    content: "";
+    position: absolute;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 28px;
+    height: 4px;
+    background: #00f3ff;
+    border-radius: 4px;
+}
 
-        .rotate-sub {
-            color: #888;
-            font-size: 0.85rem;
-            letter-spacing: 2px;
-            text-align: center;
-        }
+@keyframes rotatePhoneTap {
+    0% {
+        transform: rotate(0deg) scale(1);
+        box-shadow: 0 0 10px #00f3ff;
+    }
+    40% {
+        transform: rotate(90deg) scale(1.05);
+        box-shadow: 0 0 25px #00f3ff;
+    }
+    70% {
+        transform: rotate(90deg) scale(1.05);
+        box-shadow: 0 0 25px #00f3ff;
+    }
+    100% {
+        transform: rotate(0deg) scale(1);
+        box-shadow: 0 0 10px #00f3ff;
+    }
+}
 
+.rotate-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    background: linear-gradient(135deg, #00f3ff, #ff00ff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    margin-top: 8px;
+}
+
+.rotate-sub {
+    font-size: 0.85rem;
+    color: #aaa;
+    margin: 12px 0 20px;
+    line-height: 1.4;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.tap-rotate-btn {
+    background: linear-gradient(45deg, #00f3ff, #0066ff);
+    border: none;
+    border-radius: 60px;
+    padding: 12px 20px;
+    width: 90%;
+    font-family: 'Teko', sans-serif;
+    font-size: 1.2rem;
+    font-weight: bold;
+    letter-spacing: 1px;
+    color: #000;
+    cursor: pointer;
+    transition: 0.2s;
+    box-shadow: 0 0 15px rgba(0, 243, 255, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.tap-rotate-btn:active {
+    transform: scale(0.96);
+}
         /* SCORE SYNC TOAST */
         #score-sync-toast {
             position: fixed;
@@ -1923,12 +2002,16 @@ body.offline .spa-section {
         </div>
     </div>
 
-    <div id="rotate-overlay" onclick="handleMobileRotation()">
-        <div class="rotate-phone-icon">📱</div>
-        <div class="rotate-label">ROTATE TO LANDSCAPE</div>
-        <div class="rotate-sub">for the best game experience</div>
+<div id="rotate-overlay" onclick="handleMobileRotation();">
+    <div class="rotate-card">
+        <div class="rotate-icon">
+            <div class="phone-icon"></div>
+        </div>
+        <div class="rotate-title">TAP TO ROTATE</div>
+        <div class="rotate-sub">For the best experience, please rotate your device to landscape</div>
+        <button class="tap-rotate-btn">🔄 Tap to Rotate</button>
     </div>
-
+</div>
     <!-- NEON LOADING OVERLAY -->
     <div id="loading-overlay">
         <div class="neon-spinner-wrap">
@@ -2688,7 +2771,7 @@ td { padding: 8px; border-bottom: 1px solid #333; }
     <!-- GAME FRAMES -->
     <div id="section-game-dino" class="spa-section hidden-right game-frame">
         <div class="game-section-wrapper">
-            <iframe id="iframe-dino" srcdoc="<!DOCTYPE html>
+            <iframe allow="fullscreen; screen-orientation" id="iframe-dino" srcdoc="<!DOCTYPE html>
 <html lang=&quot;en&quot;>
 <head>
     <script>
@@ -2765,7 +2848,7 @@ td { padding: 8px; border-bottom: 1px solid #333; }
     <div id=&quot;loader&quot;>
         <h2 style=&quot;color:#535353; margin:0;&quot;>Dino Game</h2>
         <p id=&quot;loading-status&quot; style=&quot;color:#aaa; font-size:14px;&quot;>Loading assets...</p>
-        <p id=&quot;play-text&quot;>PRESS SPACE OR TAP TO PLAY</p>
+        <p id=&quot;play-text&quot;>CLICK OR TAP TO PLAY</p>
     </div>
 </div>
 
@@ -2844,22 +2927,37 @@ td { padding: 8px; border-bottom: 1px solid #333; }
     }
 
     // --- 3. MOBILE ROTATION (Robust Fix) ---
-    function handleMobileRotation(){
-        if(!/iPhone|iPad|iPod|Android/i.test(navigator.userAgent))return;
-        if(!document.documentElement.requestFullscreen)return;
-        document.documentElement.requestFullscreen().then(function(){
-            if(screen.orientation&amp;&amp;screen.orientation.lock)
-                screen.orientation.lock('landscape').catch(function(){});
-            window.parent.postMessage('fs-entered','*');
-            function onFsChange(){
-                if(!document.fullscreenElement&amp;&amp;!document.webkitFullscreenElement)
-                    window.parent.postMessage('fs-exited','*');
-            }
-            document.addEventListener('fullscreenchange',onFsChange);
-            document.addEventListener('webkitfullscreenchange',onFsChange);
-        }).catch(function(){window.parent.postMessage('fs-exited','*');});
+ async function handleMobileRotation() {
+  // 1. Check if it's a mobile device
+  if (!/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+    return;
+  }
+
+  try {
+    // 2. Request Fullscreen (Required for locking on most browsers)
+    const docEl = document.documentElement;
+    if (docEl.requestFullscreen) {
+      await docEl.requestFullscreen();
+    } else if (docEl.webkitRequestFullscreen) {
+      /* Safari */
+      await docEl.webkitRequestFullscreen();
+    } else if (docEl.msRequestFullscreen) {
+      /* IE11 */
+      await docEl.msRequestFullscreen();
     }
-      
+
+    // 3. Lock Orientation to Landscape
+    if (screen.orientation && screen.orientation.lock) {
+      // 'landscape' locks to both primary or secondary
+      await screen.orientation.lock('landscape');
+      console.log(&quot;Locked to landscape&quot;);
+    } else {
+      console.warn(&quot;Screen Orientation API not supported.&quot;);
+    }
+  } catch (error) {
+    console.error(&quot;Failed to rotate or go fullscreen:&quot;, error);
+  }
+}
 
     function saveDinoScoreToCloud(finalScore) {
         const playerName = localStorage.getItem('playerName');
@@ -2921,7 +3019,7 @@ td { padding: 8px; border-bottom: 1px solid #333; }
         }
     }
 
-    function initInteraction() {
+  function initInteraction() {
         handleMobileRotation(); // Trigger rotation on first click
         loader.style.display = 'none';
         resetGame();
@@ -4478,7 +4576,7 @@ function saveFlappyScoreToCloud(finalScore) {
 </html>" sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock"></iframe>
         </div>
     </div>
-    <div id="section-game-car" class="spa-section hidden-right game-frame">
+    <div id="section-game-car" allow="fullscreen; screen-orientation" class="spa-section hidden-right game-frame">
         <div class="game-section-wrapper">
             <iframe id="iframe-car" srcdoc="<!DOCTYPE html>
 <html lang=&quot;en&quot;>
@@ -4574,24 +4672,41 @@ let crashShake=0
 init()
 setupControls()
 animate()
-document.addEventListener('touchstart',function _fT(){document.removeEventListener('touchstart',_fT);handleMobileRotation();},{once:true,passive:true});
-document.addEventListener('click',function _fC(){document.removeEventListener('click',_fC);handleMobileRotation();},{once:true});
+document.addEventListener('touchstart',function _fT(){document.removeEventListener('touchstart',_fT);handleMobileRotation2();},{once:true,passive:true});
+document.addEventListener('click',function _fC(){document.removeEventListener('click',_fC);handleMobileRotation2();},{once:true});
 
-function handleMobileRotation(){
-  if(!/iPhone|iPad|iPod|Android/i.test(navigator.userAgent))return;
-  if(!document.documentElement.requestFullscreen)return;
-  document.documentElement.requestFullscreen().then(function(){
-    if(screen.orientation&&screen.orientation.lock)
-      screen.orientation.lock('landscape').catch(function(){});
-    window.parent.postMessage('fs-entered','*');
-    function onFsChange(){
-      if(!document.fullscreenElement&&!document.webkitFullscreenElement)
-        window.parent.postMessage('fs-exited','*');
+async function handleMobileRotation() {
+  // 1. Check if it's a mobile device
+  if (!/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+    return;
+  }
+
+  try {
+    // 2. Request Fullscreen (Required for locking on most browsers)
+    const docEl = document.documentElement;
+    if (docEl.requestFullscreen) {
+      await docEl.requestFullscreen();
+    } else if (docEl.webkitRequestFullscreen) {
+      /* Safari */
+      await docEl.webkitRequestFullscreen();
+    } else if (docEl.msRequestFullscreen) {
+      /* IE11 */
+      await docEl.msRequestFullscreen();
     }
-    document.addEventListener('fullscreenchange',onFsChange);
-    document.addEventListener('webkitfullscreenchange',onFsChange);
-  }).catch(function(){window.parent.postMessage('fs-exited','*');});
+
+    // 3. Lock Orientation to Landscape
+    if (screen.orientation && screen.orientation.lock) {
+      // 'landscape' locks to both primary or secondary
+      await screen.orientation.lock('landscape');
+      console.log(&quot;Locked to landscape&quot;);
+    } else {
+      console.warn(&quot;Screen Orientation API not supported.&quot;);
+    }
+  } catch (error) {
+    console.error(&quot;Failed to rotate or go fullscreen:&quot;, error);
+  }
 }
+
 
 function init(){
 scene=new THREE.Scene()
@@ -6914,7 +7029,7 @@ function _exitFs(cb){if(document.fullscreenElement||document.webkitFullscreenEle
     </div>
     <div id="section-game-multicar" class="spa-section hidden-right game-frame">
         <div class="game-section-wrapper">
-<iframe <iframe id="iframe-multicar" style="width:100%;height:100%;border:none;" srcdoc="id=&quot;iframe-multicar&quot; style=&quot;width:100%;height:100%;border:none;&quot; srcdoc=&quot;id=&quot;iframe-multicar&quot; style=&quot;width:100%;height:100%;border:none;&quot; srcdoc=&quot;id=&quot;iframe-multicar&quot; style=&quot;width:100%;height:100%;border:none;&quot; srcdoc=&quot;<!DOCTYPE html>
+<iframe id="iframe-multicar" allow="fullscreen; screen-orientation" style="width:100%;height:100%;border:none;" srcdoc="id=&quot;iframe-multicar&quot; style=&quot;width:100%;height:100%;border:none;&quot; srcdoc=&quot;id=&quot;iframe-multicar&quot; style=&quot;width:100%;height:100%;border:none;&quot; srcdoc=&quot;id=&quot;iframe-multicar&quot; style=&quot;width:100%;height:100%;border:none;&quot; srcdoc=&quot;<!DOCTYPE html>
 <html lang=&quot;en&quot;>
 <head>
     <script>
@@ -7067,6 +7182,38 @@ function _exitFs(cb){if(document.fullscreenElement||document.webkitFullscreenEle
 
 
 <script>
+ async function handleMobileRotation() {
+  // 1. Check if it's a mobile device
+  if (!/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+    return;
+  }
+
+  try {
+    // 2. Request Fullscreen (Required for locking on most browsers)
+    const docEl = document.documentElement;
+    if (docEl.requestFullscreen) {
+      await docEl.requestFullscreen();
+    } else if (docEl.webkitRequestFullscreen) {
+      /* Safari */
+      await docEl.webkitRequestFullscreen();
+    } else if (docEl.msRequestFullscreen) {
+      /* IE11 */
+      await docEl.msRequestFullscreen();
+    }
+
+    // 3. Lock Orientation to Landscape
+    if (screen.orientation && screen.orientation.lock) {
+      // 'landscape' locks to both primary or secondary
+      await screen.orientation.lock('landscape');
+      console.log(&quot;Locked to landscape&quot;);
+    } else {
+      console.warn(&quot;Screen Orientation API not supported.&quot;);
+    }
+  } catch (error) {
+    console.error(&quot;Failed to rotate or go fullscreen:&quot;, error);
+  }
+}
+
 const firebaseConfig = {
     apiKey: &quot;AIzaSyD8KMiqZTr39IPw8LENyahLILLNbkFfQXM&quot;,
     authDomain: &quot;bittuhere-90415.firebaseapp.com&quot;,
@@ -7794,23 +7941,68 @@ window.addEventListener('load', function(){
         //  LC.leave(sectionId)            runs all cleanup for that section
         //  LC.leaveAll()                  logout helper
         // MOBILE ROTAION BEST GUIDE
-        /*function handleMobileRotation() {
-            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-            if (isMobile) {
-                const docElm = document.documentElement;
-                if (docElm.requestFullscreen) {
-                    docElm.requestFullscreen().then(() => {
-                        if (screen.orientation && screen.orientation.lock) {
-                            screen.orientation.lock('landscape').catch(() => { });
-                        }
-                    }).catch(() => { });
-                }
-            }
-        } */
+ async function handleMobileRotation() {
+  // 1. Check if it's a mobile device
+  if (!/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+    console.log("Not a mobile device.");
+    return;
+  }
+
+  try {
+    // 2. Request Fullscreen (Required for locking on most browsers)
+    const docEl = document.documentElement;
+    if (docEl.requestFullscreen) {
+      await docEl.requestFullscreen();
+    } else if (docEl.webkitRequestFullscreen) {
+      /* Safari */
+      await docEl.webkitRequestFullscreen();
+    } else if (docEl.msRequestFullscreen) {
+      /* IE11 */
+      await docEl.msRequestFullscreen();
+    }
+
+    // 3. Lock Orientation to Landscape
+    if (screen.orientation && screen.orientation.lock) {
+      // 'landscape' locks to both primary or secondary
+      await screen.orientation.lock('landscape');
+      console.log("Locked to landscape");
+    } else {
+      console.warn("Screen Orientation API not supported.");
+    }
+  } catch (error) {
+    console.error("Failed to rotate or go fullscreen:", error);
+  }
+}
+
+
         // POWERFUL CODE TO EXIT FULL SCREEN
         // FULLSCREEN + PHONE IS ROTATED OR NOT CHECKER
 
-        // <!--PASTE FULLSCREEN EXIT CODE HERE-->
+        async function exitLandscapeAndRelease() {
+  try {
+    // 1. Unlock the orientation (This returns it to "sensor" mode)
+    if (screen.orientation && screen.orientation.unlock) {
+      screen.orientation.unlock();
+      console.log("Orientation unlocked. Phone will now follow the sensor.");
+    }
+
+    // 2. Exit Fullscreen (Usually required to leave forced landscape)
+    if (document.fullscreenElement || document.webkitFullscreenElement) {
+      if (document.exitFullscreen) {
+        await document.exitFullscreen();
+      } else if (document.webkitExitFullscreen) {
+        /* Safari */
+        await document.webkitExitFullscreen();
+      }
+    }
+
+    console.log("Successfully returned to original phase.");
+  } catch (error) {
+    // If it's already in the original phase/not fullscreen, it just lands here and does nothing.
+    console.log("Phone was already in original phase or exit was not needed.");
+  }
+}
+
 
         // MOBILE ROTAION PORTON END
         // ═══════════════════════════════════════════════════════
