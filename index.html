@@ -12181,99 +12181,143 @@ showSection('global', document.querySelector('.admin-btn'));
             modal.style.display = 'flex';
         }
 
-        // ─── FAIR COPIES CUSTOM BROWSER ───
-        // Replace with your actual API key
-        const FAIR_API_KEY = 'AIzaSyAiGpkif9bDi5zq29vztuE3-A5iypkHa4w';
-        const FAIR_FOLDER_ID = '1vGp2vyRvAAFxzF4cfrA4qHtGTjLlDrS9';
+    // ─── FAIR COPIES CUSTOM BROWSER (Nested Folders Support) ───
+const FAIR_API_KEY = 'AIzaSyAiGpkif9bDi5zq29vztuE3-A5iypkHa4w';
+const FAIR_FOLDER_ID = '1vGp2vyRvAAFxzF4cfrA4qHtGTjLlDrS9';
 
-        function loadFairCopies() {
-            const container = document.getElementById('fair-custom-container');
-            const loader = document.getElementById('fair-loader');
-            const fileList = document.getElementById('fair-file-list');
-            const errorDiv = document.getElementById('fair-error');
+// Helper to escape HTML
+function escapeHtmlFair(str) {
+    if (!str) return '';
+    return str.replace(/[&<>]/g, function(m) {
+        if (m === '&') return '&amp;';
+        if (m === '<') return '&lt;';
+        if (m === '>') return '&gt;';
+        return m;
+    });
+}
 
-            if (!container) return;
-
-            // Show loader, hide list & error
-            loader.style.display = 'flex';
-            fileList.style.display = 'none';
-            errorDiv.style.display = 'none';
-
-            // Build API URL
-            const url = `https://www.googleapis.com/drive/v3/files?q="${FAIR_FOLDER_ID}"+in+parents&key=${FAIR_API_KEY}&fields=files(name,id,mimeType,size)&orderBy=name`;
-
-            fetch(url)
-                .then(res => res.json())
-                .then(data => {
-                    loader.style.display = 'none';
-                    if (data.error) {
-                        errorDiv.style.display = 'block';
-                        errorDiv.innerHTML = `❌ Failed to load files: ${data.error.message}<br><br>Make sure the API key is correct and the Drive API is enabled.`;
-                        return;
-                    }
-                    const files = data.files || [];
-                    if (files.length === 0) {
-                        fileList.innerHTML = '<div style="text-align:center; color:#aaa; padding:40px;">No files found.</div>';
-                        fileList.style.display = 'block';
-                        return;
-                    }
-
-                    // Build the list
-                    let html = '<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px;">';
-                    files.forEach(file => {
-                        // Determine icon based on mime type
-                        let icon = '📄';
-                        if (file.mimeType.includes('pdf')) icon = '📑';
-                        else if (file.mimeType.includes('image')) icon = '🖼️';
-                        else if (file.mimeType.includes('spreadsheet')) icon = '📊';
-                        else if (file.mimeType.includes('document')) icon = '📝';
-                        else if (file.mimeType.includes('folder')) icon = '📁';
-
-                        // Format file size (optional)
-                        let sizeText = '';
-                        if (file.size) {
-                            const size = parseInt(file.size);
-                            if (size < 1024) sizeText = `${size} B`;
-                            else if (size < 1048576) sizeText = `${(size / 1024).toFixed(1)} KB`;
-                            else sizeText = `${(size / 1048576).toFixed(1)} MB`;
-                        }
-
-                        html += `
-                    <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 14px; transition: all 0.2s;">
-                        <div style="display: flex; align-items: center; gap: 12px;">
-                            <span style="font-size: 2rem;">${icon}</span>
-                            <div style="flex: 1; min-width: 0;">
-                                <div style="font-weight: bold; color: white; word-break: break-word; margin-bottom: 4px;">
-                                    <span class="fair-file-name" data-id="${file.id}" data-name="${escapeHtml(file.name)}" style="cursor: pointer; border-bottom: 1px dotted rgba(0,243,255,0.5); transition: 0.1s;">${escapeHtml(file.name)}</span>
-                                </div>
-                                <div style="font-size: 0.7rem; color: #aaa;">${sizeText}</div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                    });
-                    html += '</div>';
-                    fileList.innerHTML = html;
-                    fileList.style.display = 'block';
-
-                    // Attach click listeners only on the file name spans
-                    document.querySelectorAll('.fair-file-name').forEach(el => {
-                        el.addEventListener('click', (e) => {
-                            e.stopPropagation();
-                            const fileId = el.getAttribute('data-id');
-                            const fileName = el.getAttribute('data-name');
-                            // Open file preview in a new tab
-                            window.open(`https://drive.google.com/file/d/${fileId}/preview`, '_blank');
-                        });
-                    });
-                })
-                .catch(err => {
-                    loader.style.display = 'none';
-                    errorDiv.style.display = 'block';
-                    errorDiv.innerHTML = `❌ Network error: ${err.message}<br>Please check your internet connection.`;
-                });
+// Main function: loads any folder by ID
+async function loadFolderContents(folderId, breadcrumb = []) {
+    const container = document.getElementById('fair-custom-container');
+    const loader = document.getElementById('fair-loader');
+    const fileListDiv = document.getElementById('fair-file-list');
+    const errorDiv = document.getElementById('fair-error');
+    
+    if (!container) return;
+    
+    loader.style.display = 'flex';
+    fileListDiv.style.display = 'none';
+    errorDiv.style.display = 'none';
+    
+    const url = `https://www.googleapis.com/drive/v3/files?q='${folderId}' in parents and trashed=false&key=${FAIR_API_KEY}&fields=files(id,name,mimeType,size)&orderBy=name`;
+    
+    try {
+        const res = await fetch(url);
+        const data = await res.json();
+        
+        loader.style.display = 'none';
+        
+        if (data.error) {
+            errorDiv.style.display = 'block';
+            errorDiv.innerHTML = `❌ Google Drive error: ${data.error.message}<br>Make sure API key is restricted to your domain.`;
+            return;
         }
+        
+        const files = data.files || [];
+        let html = '';
+        
+        // Back button (if not root)
+        if (breadcrumb.length > 0) {
+            html += `<div style="margin-bottom: 16px;">
+                        <button id="fair-back-btn" style="background: rgba(0,243,255,0.2); border: 1px solid #00f3ff; color: #00f3ff; padding: 6px 16px; border-radius: 20px; cursor: pointer; font-family: 'Teko', sans-serif;">
+                            ← Back to ${breadcrumb[breadcrumb.length-1]?.name || 'Parent'}
+                        </button>
+                     </div>`;
+        }
+        
+        // Breadcrumb trail
+        if (breadcrumb.length > 0) {
+            html += `<div style="margin-bottom: 12px; font-size: 0.85rem; color: #aaa; font-family: monospace;">
+                        📍 ${breadcrumb.map(f => `<span style="color:#00f3ff;">${escapeHtmlFair(f.name)}</span>`).join(' > ')}
+                     </div>`;
+        }
+        
+        if (files.length === 0) {
+            html += `<div style="text-align:center; color:#aaa; padding:40px;">📭 This folder is empty.</div>`;
+        } else {
+            html += `<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px;">`;
+            for (const file of files) {
+                const isFolder = file.mimeType === 'application/vnd.google-apps.folder';
+                let icon = isFolder ? '📁' : '📄';
+                if (file.mimeType.includes('pdf')) icon = '📑';
+                else if (file.mimeType.includes('image')) icon = '🖼️';
+                else if (file.mimeType.includes('spreadsheet')) icon = '📊';
+                else if (file.mimeType.includes('document')) icon = '📝';
+                
+                let sizeText = '';
+                if (file.size) {
+                    const sz = parseInt(file.size);
+                    if (sz < 1024) sizeText = `${sz} B`;
+                    else if (sz < 1048576) sizeText = `${(sz / 1024).toFixed(1)} KB`;
+                    else sizeText = `${(sz / 1048576).toFixed(1)} MB`;
+                }
+                
+                html += `<div class="fair-item" data-id="${file.id}" data-name="${escapeHtmlFair(file.name)}" data-mime="${file.mimeType}" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 14px; transition: all 0.2s; cursor: pointer;">
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <span style="font-size: 2rem;">${icon}</span>
+                                <div style="flex: 1; min-width: 0;">
+                                    <div style="font-weight: bold; color: white; word-break: break-word;">${escapeHtmlFair(file.name)}</div>
+                                    <div style="font-size: 0.7rem; color: #aaa;">${sizeText}</div>
+                                </div>
+                            </div>
+                        </div>`;
+            }
+            html += `</div>`;
+        }
+        
+        fileListDiv.innerHTML = html;
+        fileListDiv.style.display = 'block';
+        
+        // Attach click handlers
+        document.querySelectorAll('.fair-item').forEach(el => {
+            el.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const id = el.getAttribute('data-id');
+                const name = el.getAttribute('data-name');
+                const mime = el.getAttribute('data-mime');
+                
+                if (mime === 'application/vnd.google-apps.folder') {
+                    const newBreadcrumb = [...breadcrumb, { id, name }];
+                    loadFolderContents(id, newBreadcrumb);
+                } else {
+                    window.open(`https://drive.google.com/file/d/${id}/preview`, '_blank');
+                }
+            });
+        });
+        
+        // Back button handler
+        const backBtn = document.getElementById('fair-back-btn');
+        if (backBtn) {
+            backBtn.onclick = () => {
+                if (breadcrumb.length > 0) {
+                    const parentCrumb = breadcrumb.slice(0, -1);
+                    const parentId = parentCrumb.length > 0 ? parentCrumb[parentCrumb.length-1].id : FAIR_FOLDER_ID;
+                    loadFolderContents(parentId, parentCrumb);
+                }
+            };
+        }
+        
+    } catch (err) {
+        loader.style.display = 'none';
+        errorDiv.style.display = 'block';
+        errorDiv.innerHTML = `❌ Network error: ${err.message}<br>Please check your internet connection.`;
+    }
+}
 
+// Expose as window.loadFairCopies (to be called from checkAndLoadFair)
+window.loadFairCopies = function() {
+    loadFolderContents(FAIR_FOLDER_ID, []);
+};
         // Helper to prevent XSS
         function escapeHtml(str) {
             if (!str) return '';
