@@ -3280,7 +3280,63 @@
             color: #888;
             margin-top: 4px;
         }
-    </style>
+    
+        /* ═══ FAIR COPIES RING PROGRESS ═══ */
+        .fair-ring-wrap { position:relative; width:80px; height:80px; flex-shrink:0; }
+        .fair-ring { width:100%; height:100%; transform:rotate(-90deg); }
+        .fair-ring-bg { fill:none; stroke:rgba(0,243,255,0.12); stroke-width:8; }
+        .fair-ring-fg { fill:none; stroke:#00f3ff; stroke-width:8; stroke-linecap:round;
+            stroke-dasharray:264; stroke-dashoffset:264;
+            transition:stroke-dashoffset 0.35s ease; }
+        .fair-ring-pct { position:absolute; inset:0; display:flex; align-items:center;
+            justify-content:center; color:#00f3ff; font-size:0.95rem;
+            font-family:'Teko',sans-serif; letter-spacing:1px; }
+        .fair-load-label { margin-top:12px; color:#00f3ff; font-family:'Teko',sans-serif;
+            font-size:1rem; letter-spacing:1px; }
+
+        /* ═══ FAIR FILE OPTIONS POPUP ═══ */
+        #fair-opts-popup { display:none; position:fixed; z-index:100001;
+            background:rgba(13,11,34,0.97); border:1px solid rgba(0,243,255,0.35);
+            border-radius:14px; padding:18px 20px; min-width:220px;
+            box-shadow:0 8px 40px rgba(0,0,0,0.6); }
+        .fair-opt-name { color:#fff; font-size:0.85rem; margin-bottom:14px;
+            word-break:break-word; line-height:1.4; opacity:.8; }
+        .fair-opt-btn { width:100%; padding:10px 0; margin-bottom:8px; border:none;
+            border-radius:10px; cursor:pointer; font-size:0.9rem;
+            font-family:'Segoe UI',sans-serif; font-weight:600;
+            transition:opacity .15s; }
+        .fair-opt-btn:active { opacity:.75; }
+        .fair-opt-load { background:linear-gradient(135deg,#00f3ff,#0066ff); color:#000; }
+        .fair-opt-dl   { background:rgba(46,204,113,.15); border:1px solid #2ecc71 !important;
+            color:#2ecc71; border:none; }
+        .fair-opt-cancel { background:rgba(255,255,255,.06); color:rgba(255,255,255,.5); border:none; }
+
+        /* ═══ FAIR FILE VIEWER MODAL ═══ */
+        #fair-viewer { display:none; position:fixed; inset:0; z-index:100000;
+            background:rgba(8,6,20,0.98); flex-direction:column; }
+        #fair-viewer.open { display:flex; }
+        #fair-viewer-bar { display:flex; align-items:center; gap:10px;
+            padding:10px 16px; background:#0d0b22;
+            border-bottom:1px solid rgba(0,243,255,0.2); flex-shrink:0; }
+        #fair-viewer-title { flex:1; color:#00f3ff; font-family:'Teko',sans-serif;
+            font-size:1.1rem; letter-spacing:1px; white-space:nowrap;
+            overflow:hidden; text-overflow:ellipsis; }
+        .fair-viewer-btn { background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.15);
+            color:white; border-radius:8px; padding:7px 14px; cursor:pointer;
+            font-size:.85rem; white-space:nowrap; }
+        .fair-viewer-btn:hover { background:rgba(255,255,255,.13); }
+        #fair-viewer-progress { display:flex; flex-direction:column; align-items:center;
+            justify-content:center; flex:1; gap:12px; }
+        #fair-viewer-content { flex:1; overflow:auto; display:none;
+            -webkit-overflow-scrolling:touch; background:#111; }
+        #fair-viewer-content canvas { display:block; margin:0 auto 8px; max-width:100%; }
+        #fair-viewer-content img { display:block; margin:auto; max-width:100%; max-height:100%; }
+        #fair-viewer-content pre { color:#e0e0e0; font-size:.85rem; padding:20px;
+            white-space:pre-wrap; word-break:break-all; font-family:monospace;
+            background:#0d0b22; margin:0; min-height:100%; }
+        .fair-viewer-unsupported { text-align:center; padding:40px; color:rgba(255,255,255,.5); }
+
+        </style>
 </head>
 
 <body>
@@ -7006,47 +7062,43 @@ function _exitFs(cb){if(document.fullscreenElement||document.webkitFullscreenEle
         </div>
     </div>
     <div id="section-game-fair" class="spa-section hidden-right game-frame">
-        <div class="game-section-wrapper" style="background: linear-gradient(135deg, #0f0c29, #1a0a2e);">
-            <div style="position: relative; width: 100%; height: 100%; display: flex; flex-direction: column;">
+        <div class="game-section-wrapper" style="background:linear-gradient(135deg,#0f0c29,#1a0a2e);">
+            <div style="position:relative;width:100%;height:100%;display:flex;flex-direction:column;">
+
                 <!-- Header -->
-                <div
-                    style="padding: 16px 20px; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); border-bottom: 1px solid rgba(0,243,255,0.2); z-index: 10;">
-                    <div
-                        style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+                <div style="padding:16px 20px;background:rgba(0,0,0,0.6);backdrop-filter:blur(8px);border-bottom:1px solid rgba(0,243,255,0.2);z-index:10;flex-shrink:0;">
+                    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
                         <div>
-                            <h2
-                                style="margin: 0; font-family: 'Teko', sans-serif; font-size: 1.8rem; color: #00f3ff; letter-spacing: 2px;">
-                                📋 Fair Copies
-                            </h2>
-                            <p style="margin: 0; font-size: 0.8rem; color: rgba(255,255,255,0.5);">
-                                Official exam copies & study materials
-                            </p>
+                            <h2 style="margin:0;font-family:'Teko',sans-serif;font-size:1.8rem;color:#00f3ff;letter-spacing:2px;">📋 Fair Copies</h2>
+                            <p style="margin:0;font-size:0.8rem;color:rgba(255,255,255,0.5);">Official exam copies &amp; study materials</p>
                         </div>
                         <a href="https://drive.google.com/drive/folders/1vGp2vyRvAAFxzF4cfrA4qHtGTjLlDrS9"
                             target="_blank" rel="noopener noreferrer"
-                            style="background: rgba(0,243,255,0.1); border: 1px solid #00f3ff; color: #00f3ff; padding: 6px 18px; border-radius: 30px; font-family: 'Teko', sans-serif; font-size: 1rem; text-decoration: none; transition: 0.2s; display: inline-flex; align-items: center; gap: 8px;">
+                            style="background:rgba(0,243,255,0.1);border:1px solid #00f3ff;color:#00f3ff;padding:6px 18px;border-radius:30px;font-family:'Teko',sans-serif;font-size:1rem;text-decoration:none;display:inline-flex;align-items:center;gap:8px;">
                             🧭 Open in Drive
                         </a>
                     </div>
                 </div>
 
-                <!-- Custom file browser -->
-                <div id="fair-custom-container" style="flex: 1; overflow-y: auto; padding: 20px;">
-                    <div id="fair-loader"
-                        style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 200px;">
-                        <div
-                            style="width: 50px; height: 50px; border: 3px solid rgba(0,243,255,0.2); border-top-color: #00f3ff; border-radius: 50%; animation: spin 0.8s linear infinite;">
+                <!-- File Browser -->
+                <div id="fair-custom-container" style="flex:1;overflow-y:auto;padding:20px;-webkit-overflow-scrolling:touch;">
+                    <div id="fair-loader" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:200px;gap:0;">
+                        <div class="fair-ring-wrap">
+                            <svg viewBox="0 0 100 100" class="fair-ring">
+                                <circle cx="50" cy="50" r="42" class="fair-ring-bg"/>
+                                <circle cx="50" cy="50" r="42" class="fair-ring-fg" id="fair-ring-fg"/>
+                            </svg>
+                            <div class="fair-ring-pct" id="fair-pct-text">0%</div>
                         </div>
-                        <p style="margin-top: 16px; color: #00f3ff; font-family: 'Teko', sans-serif;">Loading files...
-                        </p>
+                        <p class="fair-load-label" id="fair-load-label">Connecting...</p>
                     </div>
-                    <div id="fair-file-list" style="display: none;"></div>
-                    <div id="fair-error" style="display: none; text-align: center; color: #ff3366; padding: 40px;">
-                    </div>
+                    <div id="fair-file-list" style="display:none;"></div>
+                    <div id="fair-error" style="display:none;text-align:center;color:#ff3366;padding:40px;"></div>
                 </div>
             </div>
         </div>
     </div>
+    
     <div id="section-game-rps" class="spa-section hidden-right game-frame">
         <div class="game-section-wrapper">
             <iframe id="iframe-rps" srcdoc="<!DOCTYPE html>
@@ -9631,6 +9683,25 @@ window.addEventListener('load', function(){
         // ═══════════════════════════════════════════════════════
         //  THROTTLE — prevents layout thrashing on scroll/resize
         // ═══════════════════════════════════════════════════════
+        // ---------- Global Zoom Toggle for Fair Copies Preview ----------
+function enableGlobalZoom() {
+    let vp = document.querySelector('meta[name="viewport"]');
+    if (vp) {
+        vp.setAttribute('content', 'width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes, maximum-scale=5.0');
+    } else {
+        let newMeta = document.createElement('meta');
+        newMeta.name = 'viewport';
+        newMeta.content = 'width=device-width, initial-scale=1.0, user-scalable=yes, maximum-scale=5.0';
+        document.head.appendChild(newMeta);
+    }
+}
+
+function disableGlobalZoom() {
+    let vp = document.querySelector('meta[name="viewport"]');
+    if (vp) {
+        vp.setAttribute('content', 'width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no');
+    }
+}
         function _throttle(fn, ms) {
             let last = 0;
             return function (...a) { const n = performance.now(); if (n - last >= ms) { last = n; requestAnimationFrame(() => fn.apply(this, a)); } }
@@ -10197,10 +10268,10 @@ window.addEventListener('load', function(){
             'pacman': 'ᗧ Playing Pac-Man',
             'car': '🚗 Playing Car Game',
             'snake': '🐍 Playing Snake',
-            'fair': '🎯 Playing Fair Game',
+            'fair': '📝 Viewing Fair Copies',
             'rps': '✊ Playing Rock Paper Scissors',
             'rpsrand': '✊ Playing RPS vs AI',
-            'ttt': '❌ Playing Tic-Tac-Toe',
+            'ttt': '❌⭕ Playing Tic-Tac-Toe',
             'multittt': '🎮 Playing TTT Online',
             'multicar': '🏎️ Playing Car Multiplayer'
         };
@@ -12181,7 +12252,7 @@ showSection('global', document.querySelector('.admin-btn'));
             modal.style.display = 'flex';
         }
 
- // ========== FAIR COPIES – HISTORY STACK + RELIABLE PREVIEW ==========
+// ========== FAIR COPIES – HISTORY STACK + RELIABLE PREVIEW ==========
 const FAIR_API_KEY = 'AIzaSyAiGpkif9bDi5zq29vztuE3-A5iypkHa4w';
 const FAIR_ROOT_ID = '1vGp2vyRvAAFxzF4cfrA4qHtGTjLlDrS9';
 
@@ -12192,233 +12263,506 @@ function fairEscape(str) {
     return str.replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;');
 }
 
-// ----- Modal with Google Drive embed (works for all files) -----
-function fairEnsureModal() {
-    if (document.getElementById('fairModal')) return;
-    const modalHtml = `
-        <div id="fairModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.95); z-index:100000; align-items:center; justify-content:center;">
-            <div style="width:90%; height:90%; max-width:1200px; background:#1a1a2e; border-radius:12px; border:1px solid #00f3ff; display:flex; flex-direction:column;">
-                <div style="display:flex; justify-content:space-between; padding:12px 20px; background:#0d0b22; border-bottom:1px solid #00f3ff;">
-                    <span id="fairModalTitle" style="color:#00f3ff; font-family:'Teko';">Loading...</span>
-                    <button id="fairModalClose" style="background:none; border:none; color:#ff3366; font-size:1.8rem; cursor:pointer;">&times;</button>
-                </div>
-                <div id="fairModalSpinner" style="flex:1; display:flex; align-items:center; justify-content:center;">
-                    <div style="width:40px; height:40px; border:3px solid rgba(0,243,255,0.2); border-top-color:#00f3ff; border-radius:50%; animation:spin 0.8s linear infinite;"></div>
-                </div>
-                <iframe id="fairModalIframe" style="flex:1; width:100%; border:none; display:none;" sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-modals"></iframe>
-            </div>
-        </div>
-    `;
-    document.body.insertAdjacentHTML('beforeend', modalHtml);
-    document.getElementById('fairModalClose').onclick = () => document.getElementById('fairModal').style.display = 'none';
-    document.getElementById('fairModal').onclick = (e) => { if (e.target === document.getElementById('fairModal')) e.target.style.display = 'none'; };
+function setFairProgress(pct, label) {
+    var fg = document.getElementById('fair-ring-fg');
+    var pt = document.getElementById('fair-pct-text');
+    var lb = document.getElementById('fair-load-label');
+    var p  = Math.max(0, Math.min(100, Math.round(pct)));
+    if (fg) fg.style.strokeDashoffset = String(264 - (264 * p / 100));
+    if (pt) pt.textContent = p + '%';
+    if (lb && label) lb.textContent = label;
 }
 
-// Preview using Google Drive embed (100% reliable)
-async function fairPreview(fileId, fileName) {
-    fairEnsureModal();
-    const modal = document.getElementById('fairModal');
-    const title = document.getElementById('fairModalTitle');
-    const iframe = document.getElementById('fairModalIframe');
-    const spinner = document.getElementById('fairModalSpinner');
-    title.innerText = fileName;
-    iframe.style.display = 'none';
-    spinner.style.display = 'flex';
-    modal.style.display = 'flex';
-    iframe.src = `https://drive.google.com/file/d/${fileId}/preview`;
-    iframe.onload = () => {
-        spinner.style.display = 'none';
-        iframe.style.display = 'block';
-    };
-    iframe.onerror = () => {
-        spinner.innerHTML = '<div style="color:#ff3366;">Preview not available</div>';
-    };
+function _loadPDFJS() {
+    return new Promise(function(resolve, reject) {
+        if (window.pdfjsLib) { resolve(); return; }
+        var s = document.createElement('script');
+        s.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js';
+        s.onload = function() {
+            pdfjsLib.GlobalWorkerOptions.workerSrc =
+                'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+            resolve();
+        };
+        s.onerror = function() { reject(new Error('PDF.js failed to load')); };
+        document.head.appendChild(s);
+    });
 }
 
-// ----- Load folder by ID using history stack -----
-async function fairLoadFolder(folderId, folderName, addToHistory = true) {
-    const loader = document.getElementById('fair-loader');
-    const listDiv = document.getElementById('fair-file-list');
-    const errorDiv = document.getElementById('fair-error');
-    if (!loader) return;
-    
-    loader.style.display = 'flex';
-    listDiv.style.display = 'none';
-    errorDiv.style.display = 'none';
-    
+async function _fetchProgress(url, onPct) {
+    var resp = await fetch(url);
+    if (!resp.ok) throw new Error('HTTP ' + resp.status + ': ' + resp.statusText);
+    var total = parseInt(resp.headers.get('content-length') || '0');
+    var reader = resp.body.getReader();
+    var chunks = [], loaded = 0;
+    var fakeTimer = null;
+    if (!total) {
+        var fakePct = 0;
+        fakeTimer = setInterval(function() {
+            fakePct = Math.min(85, fakePct + 3);
+            onPct(fakePct);
+        }, 180);
+    }
+    while (true) {
+        var _ref = await reader.read(), done = _ref.done, value = _ref.value;
+        if (done) break;
+        chunks.push(value);
+        loaded += value.length;
+        if (total) onPct(Math.round(loaded / total * 95));
+    }
+    if (fakeTimer) clearInterval(fakeTimer);
+    onPct(100);
+    var totalLen = chunks.reduce(function(s, c) { return s + c.length; }, 0);
+    var buf = new Uint8Array(totalLen);
+    var off = 0;
+    for (var i = 0; i < chunks.length; i++) { buf.set(chunks[i], off); off += chunks[i].length; }
+    return buf.buffer;
+}
+
+function _fairEnsureViewer() {
+    if (document.getElementById('fair-viewer')) return;
+    var div = document.createElement('div');
+    div.id = 'fair-viewer';
+    div.innerHTML =
+        '<div id="fair-viewer-bar">' +
+          '<span id="fair-viewer-title">Loading...</span>' +
+          '<button class="fair-viewer-btn" id="fair-viewer-dl">📥 Download</button>' +
+          '<button class="fair-viewer-btn" id="fair-viewer-close" style="color:#ff3366;">✕</button>' +
+        '</div>' +
+        '<div id="fair-viewer-progress">' +
+          '<div class="fair-ring-wrap">' +
+            '<svg viewBox="0 0 100 100" class="fair-ring">' +
+              '<circle cx="50" cy="50" r="42" class="fair-ring-bg"/>' +
+              '<circle cx="50" cy="50" r="42" class="fair-ring-fg" id="fv-ring-fg"/>' +
+            '</svg>' +
+            '<div class="fair-ring-pct" id="fv-pct-text">0%</div>' +
+          '</div>' +
+          '<p class="fair-load-label" id="fv-load-label">Loading file...</p>' +
+        '</div>' +
+        '<div id="fair-viewer-content"></div>';
+    document.body.appendChild(div);
+
+    document.getElementById('fair-viewer-close').onclick = function() {
+        document.getElementById('fair-viewer').classList.remove('open');
+        document.getElementById('fair-viewer-content').innerHTML = '';
+        document.getElementById('fair-viewer-content').style.display = 'none';
+        document.getElementById('fair-viewer-progress').style.display = 'flex';
+        try { disableGlobalZoom(); } catch(e) {}
+    };
+
+    div.addEventListener('click', function(e) {
+        if (e.target === div) {
+            div.classList.remove('open');
+            document.getElementById('fair-viewer-content').innerHTML = '';
+            document.getElementById('fair-viewer-content').style.display = 'none';
+            document.getElementById('fair-viewer-progress').style.display = 'flex';
+            try { disableGlobalZoom(); } catch(e) {}
+        }
+    });
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && div.classList.contains('open')) {
+            div.classList.remove('open');
+            document.getElementById('fair-viewer-content').innerHTML = '';
+            document.getElementById('fair-viewer-content').style.display = 'none';
+            document.getElementById('fair-viewer-progress').style.display = 'flex';
+            try { disableGlobalZoom(); } catch(e) {}
+        }
+    });
+}
+
+function _setViewerProgress(pct, label) {
+    var fg = document.getElementById('fv-ring-fg');
+    var pt = document.getElementById('fv-pct-text');
+    var lb = document.getElementById('fv-load-label');
+    var p = Math.max(0, Math.min(100, Math.round(pct)));
+    if (fg) fg.style.strokeDashoffset = String(264 - (264 * p / 100));
+    if (pt) pt.textContent = p + '%';
+    if (lb && label) lb.textContent = label;
+}
+
+function _viewerShowContent() {
+    document.getElementById('fair-viewer-progress').style.display = 'none';
+    document.getElementById('fair-viewer-content').style.display = 'block';
+}
+
+function _fairGetType(mime) {
+    if (!mime) return 'other';
+    if (mime === 'application/pdf') return 'pdf';
+    if (mime.startsWith('image/')) return 'image';
+    if (mime === 'text/plain' || mime === 'text/csv' || mime === 'application/json' ||
+        mime.startsWith('text/')) return 'text';
+    if (mime === 'application/vnd.google-apps.document') return 'gdoc';
+    if (mime === 'application/vnd.google-apps.spreadsheet') return 'gsheet';
+    if (mime === 'application/vnd.google-apps.presentation') return 'gslide';
+    if (mime === 'application/vnd.google-apps.folder') return 'folder';
+    return 'other';
+}
+
+async function fairLoadFile(fileId, fileName, mimeType) {
+    _fairEnsureViewer();
+    var viewer = document.getElementById('fair-viewer');
+    var content = document.getElementById('fair-viewer-content');
+    var title = document.getElementById('fair-viewer-title');
+    var dlBtn = document.getElementById('fair-viewer-dl');
+
+    viewer.classList.add('open');
+    try { enableGlobalZoom(); } catch(e) {}
+
+    content.innerHTML = '';
+    content.style.display = 'none';
+    document.getElementById('fair-viewer-progress').style.display = 'flex';
+    title.textContent = fileName;
+    _setViewerProgress(0, 'Preparing...');
+
+    var type = _fairGetType(mimeType);
+    var dlUrl = '';
+
     try {
-        const url = `https://www.googleapis.com/drive/v3/files?q='${folderId}' in parents and trashed=false&key=${FAIR_API_KEY}&fields=files(id,name,mimeType,size),nextPageToken&orderBy=name&pageSize=50`;
-        const res = await fetch(url);
-        const data = await res.json();
-        if (data.error) throw new Error(data.error.message);
-        const files = data.files || [];
-        const nextPageToken = data.nextPageToken || null;
-        
-        if (addToHistory) {
-            fairHistory.push({ id: folderId, name: folderName });
-        }
-        
-        let html = '';
-        
-        // Back button
-        if (fairHistory.length > 1) {
-            html += `<div style="margin-bottom:16px;">
-                        <button id="fairBackBtn" style="background:rgba(0,243,255,0.2); border:1px solid #00f3ff; color:#00f3ff; padding:6px 16px; border-radius:20px; cursor:pointer;">← Back</button>
-                     </div>`;
-        }
-        
-        // Breadcrumb
-        if (fairHistory.length > 0) {
-            html += `<div style="margin-bottom:12px; font-size:0.85rem; color:#aaa;">📍 ${fairHistory.map(f => `<span style="color:#00f3ff;">${fairEscape(f.name)}</span>`).join(' > ')}</div>`;
-        }
-        
-        if (files.length === 0) {
-            html += `<div style="text-align:center; padding:40px; color:#aaa;">📭 This folder is empty.</div>`;
+        if (type === 'pdf') {
+            dlUrl = 'https://drive.google.com/uc?export=download&id=' + fileId;
+            dlBtn.onclick = function() { window.open(dlUrl, '_blank'); };
+            _setViewerProgress(5, 'Loading PDF.js...');
+            await _loadPDFJS();
+            _setViewerProgress(15, 'Fetching PDF...');
+            var mediaUrl = 'https://www.googleapis.com/drive/v3/files/' + fileId + '?alt=media&key=' + FAIR_API_KEY;
+            var buf = await _fetchProgress(mediaUrl, function(p) { _setViewerProgress(15 + p * 0.6, 'Downloading (' + p + '%)...'); });
+            _setViewerProgress(80, 'Rendering pages...');
+            var pdfDoc = await pdfjsLib.getDocument({ data: buf }).promise;
+            var numPages = pdfDoc.numPages;
+            for (var pg = 1; pg <= numPages; pg++) {
+                var page = await pdfDoc.getPage(pg);
+                var vp = page.getViewport({ scale: 1.5 });
+                var canvas = document.createElement('canvas');
+                canvas.width = vp.width;
+                canvas.height = vp.height;
+                canvas.style.marginBottom = '6px';
+                canvas.style.maxWidth = '100%';
+                content.appendChild(canvas);
+                await page.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise;
+                _setViewerProgress(80 + (pg / numPages) * 18, 'Rendering page ' + pg + '/' + numPages);
+            }
+            _setViewerProgress(100, 'Done!');
+            _viewerShowContent();
+
+        } else if (type === 'image') {
+            dlUrl = 'https://drive.google.com/uc?export=download&id=' + fileId;
+            dlBtn.onclick = function() { window.open(dlUrl, '_blank'); };
+            _setViewerProgress(5, 'Fetching image...');
+            var mediaUrl = 'https://www.googleapis.com/drive/v3/files/' + fileId + '?alt=media&key=' + FAIR_API_KEY;
+            var buf = await _fetchProgress(mediaUrl, function(p) { _setViewerProgress(5 + p * 0.9, 'Downloading (' + p + '%)...'); });
+            var blob = new Blob([buf], { type: mimeType });
+            var url = URL.createObjectURL(blob);
+            var img = document.createElement('img');
+            img.src = url;
+            img.style.cssText = 'display:block;margin:auto;max-width:100%;max-height:90vh;padding:16px;';
+            img.onload = function() { URL.revokeObjectURL(url); };
+            content.appendChild(img);
+            _setViewerProgress(100, 'Done!');
+            _viewerShowContent();
+
+        } else if (type === 'text') {
+            dlUrl = 'https://drive.google.com/uc?export=download&id=' + fileId;
+            dlBtn.onclick = function() { window.open(dlUrl, '_blank'); };
+            _setViewerProgress(5, 'Fetching text...');
+            var mediaUrl = 'https://www.googleapis.com/drive/v3/files/' + fileId + '?alt=media&key=' + FAIR_API_KEY;
+            var buf = await _fetchProgress(mediaUrl, function(p) { _setViewerProgress(5 + p * 0.9, 'Downloading (' + p + '%)...'); });
+            var text = new TextDecoder().decode(buf);
+            var pre = document.createElement('pre');
+            pre.textContent = text;
+            content.appendChild(pre);
+            _setViewerProgress(100, 'Done!');
+            _viewerShowContent();
+
+        } else if (type === 'gdoc' || type === 'gsheet' || type === 'gslide') {
+            dlUrl = 'https://www.googleapis.com/drive/v3/files/' + fileId + '/export?mimeType=application%2Fpdf&key=' + FAIR_API_KEY;
+            dlBtn.onclick = function() { window.open(dlUrl, '_blank'); };
+            _setViewerProgress(5, 'Loading PDF.js...');
+            await _loadPDFJS();
+            _setViewerProgress(15, 'Exporting as PDF...');
+            var buf = await _fetchProgress(dlUrl, function(p) { _setViewerProgress(15 + p * 0.6, 'Exporting (' + p + '%)...'); });
+            _setViewerProgress(80, 'Rendering...');
+            var pdfDoc = await pdfjsLib.getDocument({ data: buf }).promise;
+            var numPages = pdfDoc.numPages;
+            for (var pg = 1; pg <= numPages; pg++) {
+                var page = await pdfDoc.getPage(pg);
+                var vp = page.getViewport({ scale: 1.5 });
+                var canvas = document.createElement('canvas');
+                canvas.width = vp.width; canvas.height = vp.height;
+                canvas.style.marginBottom = '6px'; canvas.style.maxWidth = '100%';
+                content.appendChild(canvas);
+                await page.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise;
+                _setViewerProgress(80 + (pg / numPages) * 18, 'Rendering page ' + pg + '/' + numPages);
+            }
+            _setViewerProgress(100, 'Done!');
+            _viewerShowContent();
+
         } else {
-            html += `<div class="fair-grid" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:16px;">`;
-            for (const file of files) {
-                const isFolder = file.mimeType === 'application/vnd.google-apps.folder';
-                let icon = isFolder ? '📁' : '📄';
-                if (file.mimeType.includes('pdf')) icon = '📑';
+            dlUrl = 'https://drive.google.com/uc?export=download&id=' + fileId;
+            dlBtn.onclick = function() { window.open(dlUrl, '_blank'); };
+            _setViewerProgress(100, 'Preview not available');
+            var msg = document.createElement('div');
+            msg.className = 'fair-viewer-unsupported';
+            msg.innerHTML = '<div style="font-size:3rem;margin-bottom:16px;">📄</div>' +
+                '<div style="color:#fff;margin-bottom:12px;">' + fairEscape(fileName) + '</div>' +
+                '<div style="color:rgba(255,255,255,.4);font-size:.85rem;margin-bottom:24px;">This file type cannot be previewed here.</div>' +
+                '<button onclick="window.open(\'' + dlUrl + '\',\'_blank\')" style="background:linear-gradient(135deg,#00f3ff,#0066ff);color:#000;border:none;border-radius:10px;padding:12px 28px;cursor:pointer;font-size:1rem;font-weight:bold;">📥 Download File</button>';
+            content.appendChild(msg);
+            _viewerShowContent();
+        }
+    } catch (err) {
+        _setViewerProgress(0, 'Error!');
+        var msg = document.createElement('div');
+        msg.className = 'fair-viewer-unsupported';
+        msg.innerHTML = '<div style="font-size:2rem;margin-bottom:12px;">❌</div>' +
+            '<div style="color:#ff3366;">' + fairEscape(err.message) + '</div>' +
+            '<div style="color:rgba(255,255,255,.4);font-size:.8rem;margin-top:8px;">Try downloading instead.</div>';
+        content.appendChild(msg);
+        _viewerShowContent();
+    }
+}
+
+function _fairEnsureOptsPopup() {
+    if (document.getElementById('fair-opts-popup')) return;
+    var div = document.createElement('div');
+    div.id = 'fair-opts-popup';
+    div.innerHTML =
+        '<div class="fair-opt-name" id="fair-opt-name">file.pdf</div>' +
+        '<button class="fair-opt-btn fair-opt-load" id="fair-opt-load">👁️ Load File Here</button>' +
+        '<button class="fair-opt-btn fair-opt-dl"   id="fair-opt-dl">📥 Download File</button>' +
+        '<button class="fair-opt-btn fair-opt-cancel" id="fair-opt-cancel">Cancel</button>';
+    document.body.appendChild(div);
+    document.getElementById('fair-opt-cancel').onclick = function() {
+        document.getElementById('fair-opts-popup').style.display = 'none';
+    };
+    document.addEventListener('click', function(e) {
+        var pop = document.getElementById('fair-opts-popup');
+        if (pop && pop.style.display === 'block' && !pop.contains(e.target)) {
+            pop.style.display = 'none';
+        }
+    }, true);
+}
+
+function fairShowOptions(fileId, fileName, mimeType, event) {
+    _fairEnsureOptsPopup();
+    var pop = document.getElementById('fair-opts-popup');
+    document.getElementById('fair-opt-name').textContent = fileName;
+
+    var dlUrl = 'https://drive.google.com/uc?export=download&id=' + fileId;
+    document.getElementById('fair-opt-dl').onclick = function() {
+        pop.style.display = 'none';
+        window.open(dlUrl, '_blank');
+    };
+    document.getElementById('fair-opt-load').onclick = function() {
+        pop.style.display = 'none';
+        fairLoadFile(fileId, fileName, mimeType);
+    };
+
+    var x = event.clientX || window.innerWidth / 2;
+    var y = event.clientY || window.innerHeight / 2;
+    pop.style.display = 'block';
+    var pw = pop.offsetWidth || 240, ph = pop.offsetHeight || 180;
+    pop.style.left = Math.min(x, window.innerWidth - pw - 12) + 'px';
+    pop.style.top  = Math.min(y, window.innerHeight - ph - 12) + 'px';
+    event.stopPropagation();
+}
+
+async function fairLoadFolder(folderId, folderName, addToHistory) {
+    if (addToHistory === undefined) addToHistory = true;
+    var loader  = document.getElementById('fair-loader');
+    var listDiv = document.getElementById('fair-file-list');
+    var errDiv  = document.getElementById('fair-error');
+    if (!loader) return;
+
+    loader.style.display  = 'flex';
+    listDiv.style.display = 'none';
+    errDiv.style.display  = 'none';
+    setFairProgress(0, 'Connecting...');
+
+    var fakePct = 0;
+    var fakeTimer = setInterval(function() {
+        fakePct = Math.min(30, fakePct + 2);
+        setFairProgress(fakePct, 'Loading files...');
+    }, 120);
+
+    try {
+        var url = 'https://www.googleapis.com/drive/v3/files?q=\'' + folderId +
+            '\' in parents and trashed=false&key=' + FAIR_API_KEY +
+            '&fields=files(id,name,mimeType,size),nextPageToken&orderBy=folder%2Cname&pageSize=50';
+        var res = await fetch(url);
+        clearInterval(fakeTimer);
+        setFairProgress(60, 'Processing...');
+        var data = await res.json();
+        if (data.error) throw new Error(data.error.message);
+        var files = data.files || [];
+        var nextPageToken = data.nextPageToken || null;
+        setFairProgress(80, 'Rendering...');
+
+        if (addToHistory) fairHistory.push({ id: folderId, name: folderName });
+
+        var html = '';
+
+        if (fairHistory.length > 1) {
+            html += '<div style="margin-bottom:16px;">' +
+                '<button id="fairBackBtn" style="background:rgba(0,243,255,0.15);border:1px solid #00f3ff;color:#00f3ff;padding:6px 16px;border-radius:20px;cursor:pointer;">← Back</button>' +
+                '</div>';
+        }
+
+        if (fairHistory.length > 0) {
+            html += '<div style="margin-bottom:14px;font-size:.82rem;color:#aaa;">📍 ' +
+                fairHistory.map(function(f) { return '<span style="color:#00f3ff;">' + fairEscape(f.name) + '</span>'; }).join(' › ') +
+                '</div>';
+        }
+
+        if (files.length === 0) {
+            html += '<div style="text-align:center;padding:40px;color:#aaa;">📭 This folder is empty.</div>';
+        } else {
+            html += '<div class="fair-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;">';
+            files.forEach(function(file) {
+                var isFolder = file.mimeType === 'application/vnd.google-apps.folder';
+                var icon = isFolder ? '📁' : '📄';
+                if (file.mimeType.includes('pdf'))   icon = '📑';
                 else if (file.mimeType.includes('image')) icon = '🖼️';
-                else if (file.mimeType.includes('spreadsheet')) icon = '📊';
+                else if (file.mimeType.includes('spreadsheet') || file.mimeType.includes('sheet')) icon = '📊';
                 else if (file.mimeType.includes('document')) icon = '📝';
-                let sizeText = file.size ? (parseInt(file.size) < 1024 ? `${parseInt(file.size)} B` : `${(parseInt(file.size)/1024).toFixed(1)} KB`) : '';
-                html += `<div class="fair-item" data-id="${file.id}" data-name="${fairEscape(file.name)}" data-mime="${file.mimeType}" style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:12px; padding:14px; cursor:pointer;">
-                            <div style="display:flex; align-items:center; gap:12px;">
-                                <span style="font-size:2rem;">${icon}</span>
-                                <div style="flex:1;">
-                                    <div style="font-weight:bold; color:white;">${fairEscape(file.name)}</div>
-                                    <div style="font-size:0.7rem; color:#aaa;">${sizeText}</div>
-                                </div>
-                            </div>
-                        </div>`;
-            }
-            html += `</div>`;
+                else if (file.mimeType.includes('presentation')) icon = '📽️';
+                var sz = file.size ? (parseInt(file.size) < 1048576
+                    ? (parseInt(file.size)/1024).toFixed(1) + ' KB'
+                    : (parseInt(file.size)/1048576).toFixed(2) + ' MB') : '';
+                html += '<div class="fair-item" data-id="' + file.id + '" ' +
+                    'data-name="' + fairEscape(file.name) + '" data-mime="' + file.mimeType + '" ' +
+                    'style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);' +
+                    'border-radius:12px;padding:14px;cursor:pointer;transition:border-color .2s,background .2s;">' +
+                    '<div style="display:flex;align-items:center;gap:12px;">' +
+                    '<span style="font-size:2rem;">' + icon + '</span>' +
+                    '<div style="flex:1;min-width:0;">' +
+                    '<div style="font-weight:bold;color:white;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + fairEscape(file.name) + '</div>' +
+                    '<div style="font-size:.7rem;color:#aaa;margin-top:2px;">' + sz + '</div>' +
+                    '</div></div></div>';
+            });
+            html += '</div>';
             if (nextPageToken) {
-                html += `<div style="text-align:center; margin-top:20px;">
-                            <button class="fair-load-more" data-folder="${folderId}" data-token="${nextPageToken}" style="background:rgba(0,243,255,0.1); border:1px solid #00f3ff; color:#00f3ff; padding:8px 24px; border-radius:30px; cursor:pointer;">🔄 Load More</button>
-                         </div>`;
+                html += '<div style="text-align:center;margin-top:20px;">' +
+                    '<button class="fair-load-more" data-folder="' + folderId + '" data-token="' + nextPageToken + '" ' +
+                    'style="background:rgba(0,243,255,.1);border:1px solid #00f3ff;color:#00f3ff;padding:8px 24px;border-radius:30px;cursor:pointer;">🔄 Load More</button>' +
+                    '</div>';
             }
         }
-        
+
         listDiv.innerHTML = html;
         listDiv.style.display = 'block';
+        setFairProgress(100, 'Done!');
         loader.style.display = 'none';
-        
-        // Back button
-        const backBtn = document.getElementById('fairBackBtn');
+
+        var backBtn = document.getElementById('fairBackBtn');
         if (backBtn) {
-            backBtn.onclick = () => {
+            backBtn.onclick = function() {
                 if (fairHistory.length >= 2) {
                     fairHistory.pop();
-                    const prev = fairHistory[fairHistory.length - 1];
+                    var prev = fairHistory[fairHistory.length - 1];
                     fairLoadFolder(prev.id, prev.name, false);
                 }
             };
         }
-        
-        // Item clicks
-        listDiv.querySelectorAll('.fair-item').forEach(el => {
-            el.addEventListener('click', (e) => {
+
+        listDiv.querySelectorAll('.fair-item').forEach(function(el) {
+            el.addEventListener('mouseenter', function() {
+                el.style.borderColor = 'rgba(0,243,255,0.4)';
+                el.style.background  = 'rgba(0,243,255,0.05)';
+            });
+            el.addEventListener('mouseleave', function() {
+                el.style.borderColor = 'rgba(255,255,255,0.1)';
+                el.style.background  = 'rgba(255,255,255,0.05)';
+            });
+            el.addEventListener('click', function(e) {
                 e.stopPropagation();
-                const id = el.dataset.id;
-                const name = el.dataset.name;
-                const mime = el.dataset.mime;
+                var id   = el.dataset.id;
+                var name = el.dataset.name;
+                var mime = el.dataset.mime;
                 if (mime === 'application/vnd.google-apps.folder') {
                     fairLoadFolder(id, name, true);
                 } else {
-                    fairPreview(id, name);
+                    fairShowOptions(id, name, mime, e);
                 }
             });
         });
-        
-        // Load more
-        listDiv.querySelectorAll('.fair-load-more').forEach(btn => {
-            btn.addEventListener('click', async (e) => {
+
+        listDiv.querySelectorAll('.fair-load-more').forEach(function(btn) {
+            btn.addEventListener('click', async function(e) {
                 e.stopPropagation();
-                const folder = btn.dataset.folder;
-                const token = btn.dataset.token;
+                btn.disabled = true; btn.textContent = '⏳ Loading...';
                 try {
-                    const url = `https://www.googleapis.com/drive/v3/files?q='${folder}' in parents and trashed=false&key=${FAIR_API_KEY}&fields=files(id,name,mimeType,size),nextPageToken&orderBy=name&pageSize=50&pageToken=${token}`;
-                    const res = await fetch(url);
-                    const data = await res.json();
-                    if (data.error) throw new Error(data.error.message);
-                    const newFiles = data.files || [];
-                    const nextToken = data.nextPageToken || null;
-                    const grid = listDiv.querySelector('.fair-grid');
+                    var folder = btn.dataset.folder, token = btn.dataset.token;
+                    var url2 = 'https://www.googleapis.com/drive/v3/files?q=\'' + folder +
+                        '\' in parents and trashed=false&key=' + FAIR_API_KEY +
+                        '&fields=files(id,name,mimeType,size),nextPageToken&orderBy=folder%2Cname&pageSize=50&pageToken=' + token;
+                    var res2 = await fetch(url2);
+                    var data2 = await res2.json();
+                    if (data2.error) throw new Error(data2.error.message);
+                    var grid = listDiv.querySelector('.fair-grid');
                     if (grid) {
-                        for (const file of newFiles) {
-                            const isFolder = file.mimeType === 'application/vnd.google-apps.folder';
-                            let icon = isFolder ? '📁' : '📄';
-                            if (file.mimeType.includes('pdf')) icon = '📑';
+                        (data2.files || []).forEach(function(file) {
+                            var isFolder = file.mimeType === 'application/vnd.google-apps.folder';
+                            var icon = isFolder ? '📁' : '📄';
+                            if (file.mimeType.includes('pdf'))   icon = '📑';
                             else if (file.mimeType.includes('image')) icon = '🖼️';
                             else if (file.mimeType.includes('spreadsheet')) icon = '📊';
-                            else if (file.mimeType.includes('document')) icon = '📝';
-                            let sizeText = file.size ? (parseInt(file.size) < 1024 ? `${parseInt(file.size)} B` : `${(parseInt(file.size)/1024).toFixed(1)} KB`) : '';
-                            const item = document.createElement('div');
+                            else if (file.mimeType.includes('document'))    icon = '📝';
+                            var sz = file.size ? (parseInt(file.size) < 1048576
+                                ? (parseInt(file.size)/1024).toFixed(1)+' KB'
+                                : (parseInt(file.size)/1048576).toFixed(2)+' MB') : '';
+                            var item = document.createElement('div');
                             item.className = 'fair-item';
-                            item.dataset.id = file.id;
+                            item.dataset.id   = file.id;
                             item.dataset.name = fairEscape(file.name);
                             item.dataset.mime = file.mimeType;
-                            item.style.cssText = 'background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:12px; padding:14px; cursor:pointer;';
-                            item.innerHTML = `<div style="display:flex; align-items:center; gap:12px;">
-                                                <span style="font-size:2rem;">${icon}</span>
-                                                <div style="flex:1;">
-                                                    <div style="font-weight:bold; color:white;">${fairEscape(file.name)}</div>
-                                                    <div style="font-size:0.7rem; color:#aaa;">${sizeText}</div>
-                                                </div>
-                                            </div>`;
-                            item.addEventListener('click', (ev) => {
+                            item.style.cssText = 'background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:14px;cursor:pointer;transition:border-color .2s,background .2s;';
+                            item.innerHTML = '<div style="display:flex;align-items:center;gap:12px;">' +
+                                '<span style="font-size:2rem;">' + icon + '</span>' +
+                                '<div style="flex:1;min-width:0;">' +
+                                '<div style="font-weight:bold;color:white;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + fairEscape(file.name) + '</div>' +
+                                '<div style="font-size:.7rem;color:#aaa;margin-top:2px;">' + sz + '</div>' +
+                                '</div></div>';
+                            item.addEventListener('mouseenter', function() { item.style.borderColor='rgba(0,243,255,.4)'; item.style.background='rgba(0,243,255,.05)'; });
+                            item.addEventListener('mouseleave', function() { item.style.borderColor='rgba(255,255,255,.1)'; item.style.background='rgba(255,255,255,.05)'; });
+                            item.addEventListener('click', function(ev) {
                                 ev.stopPropagation();
-                                const fid = item.dataset.id;
-                                const fname = item.dataset.name;
-                                const fmime = item.dataset.mime;
-                                if (fmime === 'application/vnd.google-apps.folder') {
-                                    fairLoadFolder(fid, fname, true);
+                                if (file.mimeType === 'application/vnd.google-apps.folder') {
+                                    fairLoadFolder(file.id, file.name, true);
                                 } else {
-                                    fairPreview(fid, fname);
+                                    fairShowOptions(file.id, file.name, file.mimeType, ev);
                                 }
                             });
                             grid.appendChild(item);
-                        }
-                        if (nextToken) {
-                            btn.dataset.token = nextToken;
+                        });
+                        if (data2.nextPageToken) {
+                            btn.dataset.token = data2.nextPageToken;
+                            btn.disabled = false; btn.textContent = '🔄 Load More';
                         } else {
                             btn.remove();
                         }
                     }
-                } catch(e) {
-                    alert('Load more failed: ' + e.message);
+                } catch (err2) {
+                    btn.disabled = false; btn.textContent = '⚠️ Retry';
+                    alert('Error loading more: ' + err2.message);
                 }
             });
         });
-        
+
     } catch (err) {
+        clearInterval(fakeTimer);
         loader.style.display = 'none';
-        errorDiv.style.display = 'block';
-        errorDiv.innerHTML = `❌ Error: ${err.message}`;
+        errDiv.style.display = 'block';
+        errDiv.innerHTML = '<div style="font-size:2rem;margin-bottom:8px;">❌</div>' +
+            '<div>' + fairEscape(err.message) + '</div>' +
+            '<button onclick="fairLoadFolder(\'' + folderId + '\',\'' + fairEscape(folderName || 'Root') + '\',false)" ' +
+            'style="margin-top:14px;background:rgba(0,243,255,.1);border:1px solid #00f3ff;color:#00f3ff;padding:7px 20px;border-radius:20px;cursor:pointer;">🔄 Retry</button>';
     }
 }
 
-// Start
 window.loadFairCopies = function() {
     fairHistory = [];
-    fairLoadFolder(FAIR_ROOT_ID, 'Root', true);
+    fairLoadFolder(FAIR_ROOT_ID, 'Fair Copies', true);
 };
-        // Helper to prevent XSS
-        function escapeHtml(str) {
-            if (!str) return '';
-            return str.replace(/[&<>]/g, function (m) {
-                if (m === '&') return '&amp;';
-                if (m === '<') return '&lt;';
-                if (m === '>') return '&gt;';
-                return m;
-            });
-        }
-
-        // Load files when the fair copies section becomes active
-        // We'll use the SPA's lifecycle: on section change, if we go to section-game-fair, call loadFairCopies
         // Override the MapsTo function? Better to hook into the existing mechanism: add an observer or modify MapsTo.
         // Since we already have `MapsTo` and a section change handler, we can call loadFairCopies when currentSection === 'section-game-fair'.
 
