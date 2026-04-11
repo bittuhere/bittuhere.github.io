@@ -3313,7 +3313,8 @@
 
         /* ═══ FAIR FILE VIEWER MODAL ═══ */
         #fair-viewer { display:none; position:fixed; inset:0; z-index:100000;
-            background:rgba(8,6,20,0.98); flex-direction:column; }
+            background:rgba(8,6,20,0.98); flex-direction:column;
+            will-change:transform; isolation:isolate; contain:layout; }
         #fair-viewer.open { display:flex; }
         #fair-viewer-bar { display:flex; align-items:center; gap:10px;
             padding:10px 16px; background:#0d0b22;
@@ -3327,14 +3328,112 @@
         .fair-viewer-btn:hover { background:rgba(255,255,255,.13); }
         #fair-viewer-progress { display:flex; flex-direction:column; align-items:center;
             justify-content:center; flex:1; gap:12px; }
-        #fair-viewer-content { flex:1; overflow:auto; display:none;
-            -webkit-overflow-scrolling:touch; background:#111; }
-        #fair-viewer-content canvas { display:block; margin:0 auto 8px; max-width:100%; }
+        #fair-viewer-content { flex:1; overflow:scroll; display:none;
+            -webkit-overflow-scrolling:touch; background:#111;
+            will-change:transform; transform:translateZ(0); contain:strict; }
+        #fair-viewer-content canvas { display:block; margin:0 auto 8px; will-change:transform; transform:translateZ(0); max-width:100%; }
         #fair-viewer-content img { display:block; margin:auto; max-width:100%; max-height:100%; }
         #fair-viewer-content pre { color:#e0e0e0; font-size:.85rem; padding:20px;
             white-space:pre-wrap; word-break:break-all; font-family:monospace;
             background:#0d0b22; margin:0; min-height:100%; }
         .fair-viewer-unsupported { text-align:center; padding:40px; color:rgba(255,255,255,.5); }
+
+        
+        /* ═══════════════ QUIZ SYSTEM ═══════════════ */
+        #section-quiz{background:linear-gradient(135deg,#0a0a18,#0f0c29,#1a0a2e);min-height:100vh;overflow-y:auto;}
+        .quiz-inner{max-width:520px;margin:0 auto;padding:20px 16px 80px;}
+        .quiz-back-btn{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);color:white;padding:8px 16px;border-radius:20px;cursor:pointer;font-family:Teko,sans-serif;font-size:1rem;letter-spacing:1px;transition:.2s;}
+        .quiz-back-btn:hover{background:rgba(255,255,255,.12);}
+        /* LOBBY */
+        #quiz-lobby{display:flex;flex-direction:column;gap:14px;}
+        .quiz-lobby-card{background:rgba(255,255,255,.04);border:1px solid rgba(0,243,255,.25);border-radius:20px;padding:24px;text-align:center;}
+        .quiz-title-big{font-family:Teko,sans-serif;font-size:3rem;letter-spacing:4px;background:linear-gradient(90deg,#00f3ff,#ff00ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin:0;line-height:1;}
+        .quiz-subtitle{color:rgba(255,255,255,.4);font-size:.78rem;letter-spacing:2px;margin:6px 0 14px;}
+        .quiz-week-badge{background:rgba(0,243,255,.1);border:1px solid rgba(0,243,255,.3);border-radius:12px;padding:7px 16px;font-size:.82rem;color:#00f3ff;letter-spacing:1px;display:inline-block;margin-bottom:10px;}
+        .quiz-info-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0;}
+        .quiz-info-item{background:rgba(255,255,255,.04);border-radius:12px;padding:10px;}
+        .quiz-info-val{font-family:Teko,sans-serif;font-size:1.5rem;color:#00f3ff;}
+        .quiz-info-lbl{font-size:.65rem;color:rgba(255,255,255,.4);letter-spacing:1px;}
+        .quiz-start-btn{width:100%;padding:16px;background:linear-gradient(45deg,#00f3ff,#0066ff);border:none;border-radius:14px;color:white;font-family:Teko,sans-serif;font-size:1.4rem;letter-spacing:2px;cursor:pointer;transition:.2s;margin-top:8px;box-shadow:0 4px 20px rgba(0,243,255,.3);}
+        .quiz-start-btn:hover{transform:scale(1.02);}
+        .quiz-start-btn:disabled{opacity:.35;cursor:not-allowed;transform:none;}
+        .quiz-rules-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:16px;text-align:left;}
+        .quiz-rules-title{font-family:Teko,sans-serif;font-size:1.2rem;color:#00f3ff;letter-spacing:2px;margin-bottom:10px;}
+        .quiz-rule{display:flex;align-items:flex-start;gap:10px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:.82rem;color:rgba(255,255,255,.7);line-height:1.4;}
+        .quiz-rule:last-child{border-bottom:none;}
+        .quiz-ban-card{background:rgba(231,76,60,.1);border:2px solid rgba(231,76,60,.5);border-radius:16px;padding:20px;text-align:center;}
+        .quiz-ban-title{font-family:Teko,sans-serif;font-size:1.8rem;color:#e74c3c;letter-spacing:3px;}
+        .quiz-ban-timer{font-family:Teko,sans-serif;font-size:3rem;color:white;margin:10px 0;}
+        .quiz-ban-sub{font-size:.8rem;color:rgba(255,255,255,.5);}
+        /* GAME */
+        .quiz-top-bar{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+        .quiz-progress-wrap{flex:1;background:rgba(255,255,255,.08);border-radius:20px;height:8px;overflow:hidden;}
+        .quiz-progress-fill{height:100%;background:linear-gradient(90deg,#00f3ff,#0066ff);border-radius:20px;transition:width .5s ease;}
+        .quiz-q-counter{font-family:Teko,sans-serif;font-size:1rem;color:rgba(255,255,255,.5);white-space:nowrap;}
+        .quiz-timer-ring{position:relative;width:52px;height:52px;flex-shrink:0;}
+        .quiz-timer-ring svg{transform:rotate(-90deg);}
+        .quiz-timer-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:Teko,sans-serif;font-size:1.1rem;color:white;font-weight:600;}
+        .quiz-subject-tag{background:rgba(0,102,255,.2);border:1px solid rgba(0,102,255,.4);border-radius:6px;padding:2px 10px;font-size:.65rem;color:#00f3ff;letter-spacing:1px;font-family:Teko,sans-serif;margin-bottom:10px;display:inline-block;}
+        .quiz-question-card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:18px;padding:20px;margin-bottom:14px;}
+        .quiz-question-text{font-size:1.05rem;color:white;line-height:1.55;font-weight:500;}
+        .quiz-options{display:flex;flex-direction:column;gap:10px;}
+        .quiz-opt{background:rgba(255,255,255,.05);border:2px solid rgba(255,255,255,.12);border-radius:14px;padding:14px 18px;cursor:pointer;color:white;font-size:.95rem;transition:.18s;display:flex;align-items:center;gap:10px;user-select:none;}
+        .quiz-opt:hover:not([data-locked]){background:rgba(0,243,255,.08);border-color:rgba(0,243,255,.4);}
+        .quiz-opt.selected{background:rgba(0,102,255,.2);border-color:#0066ff;}
+        .quiz-opt.correct{background:rgba(46,204,113,.2);border-color:#2ecc71;color:#2ecc71;}
+        .quiz-opt.wrong{background:rgba(231,76,60,.2);border-color:#e74c3c;color:#e74c3c;}
+        .quiz-opt.reveal-correct{background:rgba(46,204,113,.12);border-color:rgba(46,204,113,.5);}
+        .quiz-opt-letter{width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-family:Teko,sans-serif;font-size:.9rem;flex-shrink:0;}
+        .quiz-next-btn{width:100%;padding:14px;background:linear-gradient(45deg,#00f3ff,#0066ff);border:none;border-radius:14px;color:white;font-family:Teko,sans-serif;font-size:1.3rem;letter-spacing:2px;cursor:pointer;transition:.2s;display:none;margin-top:12px;}
+        .quiz-next-btn:hover{transform:scale(1.02);}
+        /* RESULTS */
+        .quiz-result-hero{background:rgba(255,255,255,.04);border:1px solid rgba(0,243,255,.25);border-radius:20px;padding:24px;text-align:center;}
+        .quiz-result-score{font-family:Teko,sans-serif;font-size:3.5rem;color:#00f3ff;line-height:1;}
+        .quiz-stat-row{display:flex;justify-content:space-around;background:rgba(255,255,255,.03);border-radius:12px;padding:12px;margin-top:10px;}
+        .quiz-stat{text-align:center;}
+        .quiz-stat-v{font-family:Teko,sans-serif;font-size:1.6rem;color:white;}
+        .quiz-stat-l{font-size:.62rem;color:rgba(255,255,255,.4);letter-spacing:1px;}
+        .quiz-play-again-btn{width:100%;padding:14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.2);border-radius:14px;color:white;font-family:Teko,sans-serif;font-size:1.2rem;letter-spacing:1px;cursor:pointer;transition:.2s;margin-top:10px;}
+        .quiz-play-again-btn:hover{background:rgba(255,255,255,.1);}
+        /* LB in quiz */
+        .quiz-lb-card{background:rgba(255,255,255,.04);border:1px solid rgba(0,243,255,.15);border-radius:16px;padding:16px;}
+        .quiz-lb-title{font-family:Teko,sans-serif;font-size:1.2rem;color:#ffd700;letter-spacing:2px;margin-bottom:12px;}
+        .quiz-lb-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;margin-bottom:6px;transition:.15s;cursor:pointer;}
+        .quiz-lb-item:hover{background:rgba(255,255,255,.05);}
+        .quiz-lb-item.lb-me{background:rgba(46,204,113,.08);border:1px solid rgba(46,204,113,.2);}
+        .quiz-lb-rank{font-family:Teko,sans-serif;font-size:1.2rem;min-width:32px;text-align:center;}
+        .quiz-lb-name{flex:1;font-family:Teko,sans-serif;font-size:1.1rem;letter-spacing:1px;}
+        .quiz-lb-time{font-family:Teko,sans-serif;font-size:1rem;color:#00f3ff;}
+        .quiz-reset-info{text-align:center;font-size:.7rem;color:rgba(255,255,255,.3);margin-top:8px;letter-spacing:1px;}
+        /* MEDALS */
+        .prof-medals-card{background:rgba(255,215,0,.05);border:1px solid rgba(255,215,0,.2);border-radius:16px;padding:16px;grid-column:span 2;}
+        .prof-medals-title{font-family:Teko,sans-serif;font-size:1.2rem;color:#ffd700;letter-spacing:2px;margin-bottom:12px;}
+        .prof-medals-row{display:flex;flex-wrap:wrap;gap:10px;}
+        .prof-medal-item{display:flex;flex-direction:column;align-items:center;gap:4px;background:rgba(255,255,255,.04);border-radius:12px;padding:10px 14px;min-width:72px;border:1px solid rgba(255,255,255,.08);}
+        .prof-medal-icon{font-size:2rem;}
+        .prof-medal-label{font-size:.6rem;color:rgba(255,255,255,.5);letter-spacing:1px;text-align:center;}
+        .prof-medal-count{font-family:Teko,sans-serif;font-size:1rem;color:#ffd700;}
+        .prof-medals-empty{color:rgba(255,255,255,.3);font-size:.82rem;text-align:center;padding:10px;}
+        /* ANTI-CHEAT OVERLAY */
+        #quiz-cheat-overlay{position:fixed;inset:0;z-index:999999;background:rgba(0,0,0,.97);display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px;text-align:center;padding:24px;}
+        #quiz-cheat-overlay.show{display:flex;}
+        .qco-icon{font-size:5rem;}
+        .qco-title{font-family:Teko,sans-serif;font-size:2.2rem;color:#e74c3c;letter-spacing:4px;}
+        .qco-sub{color:rgba(255,255,255,.6);font-size:.88rem;max-width:320px;line-height:1.5;}
+        .qco-btn{background:linear-gradient(45deg,#e74c3c,#c0392b);border:none;border-radius:12px;color:white;font-family:Teko,sans-serif;font-size:1.3rem;padding:12px 32px;cursor:pointer;letter-spacing:2px;}
+        .qco-btn:disabled{opacity:.4;cursor:not-allowed;}
+        /* RULES MODAL */
+        #quiz-rules-modal{position:fixed;inset:0;z-index:999998;background:rgba(0,0,0,.92);display:none;flex-direction:column;align-items:center;justify-content:center;padding:20px;}
+        #quiz-rules-modal.show{display:flex;}
+        .qrm-box{background:rgba(15,12,40,.98);border:2px solid rgba(0,243,255,.4);border-radius:20px;max-width:420px;width:100%;padding:28px;max-height:90vh;overflow-y:auto;}
+        .qrm-title{font-family:Teko,sans-serif;font-size:2rem;color:#00f3ff;letter-spacing:3px;margin-bottom:4px;text-align:center;}
+        .qrm-sub{text-align:center;color:rgba(255,255,255,.4);font-size:.75rem;letter-spacing:1px;margin-bottom:18px;}
+        .qrm-rule{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.06);font-size:.85rem;color:rgba(255,255,255,.8);line-height:1.45;}
+        .qrm-rule:last-of-type{border-bottom:none;}
+        .qrm-rule-i{flex-shrink:0;font-size:1rem;}
+        .qrm-ok-btn{width:100%;margin-top:20px;padding:15px;background:linear-gradient(45deg,#00f3ff,#0066ff);border:none;border-radius:14px;color:white;font-family:Teko,sans-serif;font-size:1.3rem;letter-spacing:2px;cursor:pointer;transition:.2s;}
+        .qrm-ok-btn:disabled{opacity:.35;cursor:not-allowed;}
+        .qrm-countdown{font-family:Teko,sans-serif;font-size:1rem;color:#f39c12;text-align:center;margin-top:8px;}
 
         </style>
 </head>
@@ -3569,7 +3668,7 @@
                     <div class="game-list-grid">
                         <div onclick="openGame('fair')" class="game-btn btn-fair full-width"><span>&#128221;</span> Fair Copies
                         </div>
-                        <!-- Annual Exam Answers removed -->
+                        <div onclick="quizOpenRulesModal()" class="game-btn full-width" style="background:linear-gradient(45deg,#6c3483,#2980b9);"><span>🧠</span> Weekly Quiz<br><span style="font-size:.7rem;opacity:.7;font-family:Segoe UI,sans-serif;">Class 8 · Maths &amp; Science</span></div>
                     </div>
                 </div>
                 <div id="hub-multi" class="hub-hidden">
@@ -4173,6 +4272,124 @@
         }
     </style>
     <!-- LEADERBOARD -->
+
+    <!-- ═══════════ QUIZ RULES MODAL ═══════════ -->
+    <div id="quiz-rules-modal">
+        <div class="qrm-box">
+            <div class="qrm-title">📋 QUIZ RULES</div>
+            <div class="qrm-sub">READ CAREFULLY BEFORE STARTING</div>
+            <div class="qrm-rule"><span class="qrm-rule-i">⏱️</span><span><b>60 seconds</b> per question — auto-skips on timeout</span></div>
+            <div class="qrm-rule"><span class="qrm-rule-i">📅</span><span>Same <b>20 questions</b> for everyone this week — resets every Monday</span></div>
+            <div class="qrm-rule"><span class="qrm-rule-i">🔒</span><span><b>One attempt per week</b> — scores only improve if you do better</span></div>
+            <div class="qrm-rule"><span class="qrm-rule-i">🚫</span><span><b>Do NOT switch tabs, minimize, or open DevTools</b> during quiz — instant ban</span></div>
+            <div class="qrm-rule"><span class="qrm-rule-i">⛔</span><span>1st cheat = <b>2 hr ban</b>. Each extra cheat adds <b>+1 min</b> to ban</span></div>
+            <div class="qrm-rule"><span class="qrm-rule-i">⏳</span><span>If you leave for <b>less than 60 seconds</b> and return, no ban (treated as accidental)</span></div>
+            <div class="qrm-rule"><span class="qrm-rule-i">🏆</span><span>Leaderboard ranks by <b>fastest total time</b> (only correct answers counted)</span></div>
+            <div class="qrm-rule"><span class="qrm-rule-i">🥇</span><span>Top 3 each week earn <b>Gold/Silver/Bronze medals</b> on profile</span></div>
+            <div class="qrm-rule"><span class="qrm-rule-i">❓</span><span>Questions AND options are shuffled per-week — everyone sees same content</span></div>
+            <div class="qrm-rule"><span class="qrm-rule-i">💡</span><span>Tip: Stay focused, don't open any other app or tab while quiz runs</span></div>
+            <button class="qrm-ok-btn" id="qrm-ok-btn" disabled onclick="quizStartFromModal()">I UNDERSTAND — START QUIZ</button>
+            <div class="qrm-countdown" id="qrm-countdown">Please read the rules... <span id="qrm-sec">5</span>s</div>
+        </div>
+    </div>
+
+    <!-- ═══════════ QUIZ SECTION ═══════════ -->
+    <div id="section-quiz" class="spa-section hidden-right">
+        <div class="quiz-inner">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+                <button class="quiz-back-btn" onclick="MapsTo('section-hub','left')">← Back</button>
+                <div id="quiz-week-info" style="font-size:.72rem;color:rgba(255,255,255,.4);letter-spacing:1px;"></div>
+            </div>
+
+            <!-- LOBBY -->
+            <div id="quiz-lobby">
+                <div class="quiz-lobby-card">
+                    <div class="quiz-title-big">WEEKLY QUIZ</div>
+                    <div class="quiz-subtitle">CLASS 8 · D.A.V. SCHOOL</div>
+                    <div class="quiz-week-badge" id="quiz-week-badge">📅 Loading...</div>
+                    <div class="quiz-info-grid">
+                        <div class="quiz-info-item"><div class="quiz-info-val">20</div><div class="quiz-info-lbl">QUESTIONS</div></div>
+                        <div class="quiz-info-item"><div class="quiz-info-val">60s</div><div class="quiz-info-lbl">PER QUESTION</div></div>
+                        <div class="quiz-info-item"><div class="quiz-info-val" id="quiz-lobby-best">—</div><div class="quiz-info-lbl">YOUR BEST</div></div>
+                        <div class="quiz-info-item"><div class="quiz-info-val" id="quiz-lobby-rank">—</div><div class="quiz-info-lbl">YOUR RANK</div></div>
+                    </div>
+                    <button class="quiz-start-btn" id="quiz-start-btn" onclick="quizOpenRulesModal()">🚀 START QUIZ</button>
+                    <div id="quiz-already-played" style="display:none;margin-top:10px;background:rgba(0,243,255,.08);border:1px solid rgba(0,243,255,.2);border-radius:10px;padding:10px;font-size:.82rem;color:#00f3ff;text-align:center;">
+                        ✅ You already played this week! Your score is saved. Come back next Monday for a new quiz.
+                    </div>
+                </div>
+                <div class="quiz-ban-card" id="quiz-ban-card" style="display:none;">
+                    <div style="font-size:3rem;">🚫</div>
+                    <div class="quiz-ban-title">QUIZ BANNED</div>
+                    <div style="font-size:.8rem;color:rgba(255,255,255,.5);margin:8px 0;">Cheating detected — access suspended</div>
+                    <div class="quiz-ban-timer" id="quiz-ban-timer">—</div>
+                    <div class="quiz-ban-sub">Ban lifts automatically. Each ban adds +1 min.</div>
+                </div>
+                <div class="quiz-lb-card">
+                    <div class="quiz-lb-title">🏆 THIS WEEK'S TOP</div>
+                    <div id="quiz-lb-list"><div style="text-align:center;padding:14px;color:rgba(255,255,255,.3);font-size:.82rem;">Loading...</div></div>
+                    <div class="quiz-reset-info" id="quiz-reset-info"></div>
+                </div>
+                <div class="quiz-rules-card">
+                    <div class="quiz-rules-title">📋 QUICK RULES</div>
+                    <div class="quiz-rule"><span>⏱️</span><span>60s per question · Tab switch = ban · One attempt/week</span></div>
+                    <div class="quiz-rule"><span>🏆</span><span>Fastest time wins · Top 3 get medals on profile</span></div>
+                    <div class="quiz-rule"><span>🔄</span><span>Resets every Monday · Same Qs for everyone</span></div>
+                </div>
+            </div>
+
+            <!-- GAME -->
+            <div id="quiz-game" style="display:none;flex-direction:column;gap:0;">
+                <div class="quiz-top-bar">
+                    <div class="quiz-progress-wrap"><div class="quiz-progress-fill" id="quiz-prog-fill" style="width:0%;"></div></div>
+                    <div class="quiz-q-counter" id="quiz-q-counter">1/20</div>
+                    <div class="quiz-timer-ring">
+                        <svg width="52" height="52" viewBox="0 0 52 52">
+                            <circle fill="none" stroke="rgba(255,255,255,.1)" stroke-width="4" cx="26" cy="26" r="22"/>
+                            <circle id="quiz-timer-circle" fill="none" stroke="#00f3ff" stroke-width="4" stroke-linecap="round"
+                                cx="26" cy="26" r="22" stroke-dasharray="138.2" stroke-dashoffset="0"/>
+                        </svg>
+                        <div class="quiz-timer-num" id="quiz-timer-num">60</div>
+                    </div>
+                </div>
+                <div id="quiz-subject-tag" class="quiz-subject-tag">MATHS</div>
+                <div class="quiz-question-card">
+                    <div class="quiz-question-text" id="quiz-q-text"></div>
+                </div>
+                <div class="quiz-options" id="quiz-opts"></div>
+                <button class="quiz-next-btn" id="quiz-next-btn" onclick="quizNext()">NEXT →</button>
+            </div>
+
+            <!-- RESULTS -->
+            <div id="quiz-result" style="display:none;flex-direction:column;gap:14px;">
+                <div class="quiz-result-hero">
+                    <div style="font-size:4rem;margin-bottom:6px;" id="quiz-res-icon">🎉</div>
+                    <div class="quiz-result-score" id="quiz-res-score">—/20</div>
+                    <div style="color:rgba(255,255,255,.5);font-size:.8rem;letter-spacing:2px;margin:4px 0 14px;">QUESTIONS CORRECT</div>
+                    <div class="quiz-stat-row">
+                        <div class="quiz-stat"><div class="quiz-stat-v" id="quiz-res-time">—</div><div class="quiz-stat-l">TOTAL TIME</div></div>
+                        <div class="quiz-stat"><div class="quiz-stat-v" id="quiz-res-avg">—</div><div class="quiz-stat-l">AVG / QUESTION</div></div>
+                        <div class="quiz-stat"><div class="quiz-stat-v" id="quiz-res-rank">—</div><div class="quiz-stat-l">YOUR RANK</div></div>
+                    </div>
+                </div>
+                <div class="quiz-lb-card">
+                    <div class="quiz-lb-title">🏆 UPDATED LEADERBOARD</div>
+                    <div id="quiz-result-lb"></div>
+                </div>
+                <button class="quiz-play-again-btn" onclick="quizShowLobby()">← Back to Lobby</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ANTI-CHEAT OVERLAY -->
+    <div id="quiz-cheat-overlay">
+        <div class="qco-icon">🚨</div>
+        <div class="qco-title">CHEAT DETECTED</div>
+        <div class="qco-sub" id="qco-sub">You left the quiz tab. The quiz has been cancelled.</div>
+        <div id="qco-ban-info" style="font-family:Teko,sans-serif;font-size:1.1rem;color:#f39c12;margin:4px 0;"></div>
+        <button class="qco-btn" id="qco-btn" onclick="quizDismissCheat()" disabled>OK, I UNDERSTAND (<span id="qco-sec">3</span>)</button>
+    </div>
+
     <div id="section-leaderboard" class="spa-section hidden-right"
         style="background:linear-gradient(135deg,#0a0a18,#0f0c29,#1a0a2e);">
         <div class="lb-inner">
@@ -4193,6 +4410,7 @@
                     <button class="lb-game-tab" onclick="lbSelectGame('dino_highscore',this)">🦕 Dino</button>
                     <button class="lb-game-tab" onclick="lbSelectGame('snake_highscore',this)">🐍 Snake</button>
                     <button class="lb-game-tab" onclick="lbSelectGame('pacman_highscore',this)">ᗧ Pac-Man</button>
+                    <button class="lb-game-tab" onclick="lbSelectGame('__quiz__',this)" style="background:linear-gradient(45deg,rgba(108,52,131,.4),rgba(41,128,185,.3));border-color:rgba(108,52,131,.5);color:#bb8fce;">🧠 Quiz</button>
                 </div>
                 <div id="lb-loading"
                     style="text-align:center;color:rgba(255,255,255,0.3);padding:20px;font-size:0.85rem;letter-spacing:1px;">
@@ -4241,6 +4459,10 @@
                 </div>
             </div>
             <div class="prof-stats-grid" id="my-prof-stats"></div>
+            <div class="prof-medals-card" id="my-medals-card" style="display:none;">
+                <div class="prof-medals-title">🏅 QUIZ MEDALS</div>
+                <div class="prof-medals-row" id="my-medals-row"></div>
+            </div>
             <div class="prof-card">
                 <div class="prof-card-title">⚙️ Account</div>
                 <button class="prof-action-btn" onclick="openUnameChangeModal()">✏️ Request Username Change <span
@@ -10282,7 +10504,7 @@ function disableGlobalZoom() {
         }
 
         // openGame: mounts iframe lazily BEFORE navigating so srcdoc is ready
-        const gameMap = { dino: 'section-game-dino', flappy: 'section-game-flappy', pacman: 'section-game-pacman', car: 'section-game-car', snake: 'section-game-snake', fair: 'section-game-fair', rps: 'section-game-rps', rpsrand: 'section-game-rpsrand', ttt: 'section-game-ttt', multittt: 'section-game-multittt', multicar: 'section-game-multicar' };
+        const gameMap = { quiz: 'section-quiz', dino: 'section-game-dino', flappy: 'section-game-flappy', pacman: 'section-game-pacman', car: 'section-game-car', snake: 'section-game-snake', fair: 'section-game-fair', rps: 'section-game-rps', rpsrand: 'section-game-rpsrand', ttt: 'section-game-ttt', multittt: 'section-game-multittt', multicar: 'section-game-multicar' };
         function openGame(k) {
     const s = gameMap[k];
     if (!s) return;
@@ -11231,12 +11453,16 @@ function disableGlobalZoom() {
             return window.innerWidth < window.innerHeight && Math.min(window.screen.width, window.screen.height) <= 900;
         }
         function _updateRotateOverlay() {
+            // Skip entirely when PDF viewer is open — browser zoom fires resize
+            // at 60fps, and this fn causes forced layout reflow = zoom lag
+            var fv = document.getElementById('fair-viewer');
+            if (fv && fv.classList.contains('open')) return;
             var el = document.getElementById('rotate-overlay');
             if (!el) return;
             if (_GAME_SECTIONS.has(currentSection) && !_fsActive && _isMobilePortrait()) { el.classList.add('rotate-show'); }
             else { el.classList.remove('rotate-show'); }
         }
-        window.addEventListener('resize', function () { _updateRotateOverlay(); });
+        window.addEventListener('resize', function () { _updateRotateOverlay(); }, { passive: true });
         (screen.orientation
             ? screen.orientation.addEventListener('change', _updateRotateOverlay)
             : window.addEventListener('orientationchange', _updateRotateOverlay));
@@ -12047,7 +12273,7 @@ showSection('global', document.querySelector('.admin-btn'));
                 if (banner && banner.style.display !== 'none') {
                     updateBannerHeight();
                 }
-            });
+            }, { passive: true });
         })();
 
         (function boot() {
@@ -12794,6 +13020,668 @@ window.loadFairCopies = function() {
         // In MapsTo, after the inner requestAnimationFrame block, where we set _navLock to false,
         // add: checkAndLoadFair();
 
+
+        // ═══════════════════════════════════════════════════════════════════════
+        //  QUIZ SYSTEM v2 — Weekly MCQ, GitHub JSON, Advanced Anti-Cheat
+        //  Firebase: quiz/week_N/lb/<user>  users/<u>/quiz_ban  users/<u>/quiz_medals
+        //  Questions fetched from GitHub raw URL below
+        // ═══════════════════════════════════════════════════════════════════════
+        (function () {
+            'use strict';
+
+            // ── CONFIG ─────────────────────────────────────────────────────────
+            // ⚠️  Update this URL after uploading quiz_questions.json to your GitHub repo
+            var QUIZ_JSON_URL = './quiz_questions.json';
+            var QUIZ_PER_WEEK = 20;
+            var TIME_PER_Q   = 60;
+            var BAN_BASE_MS  = 2 * 60 * 60 * 1000;   // 2 hrs
+            var BAN_EXTRA_MS = 60 * 1000;              // +1 min per extra ban
+            var ABSENT_GRACE = 60 * 1000;              // 60s grace — no ban if back within this
+            var LETTERS      = ['A', 'B', 'C', 'D'];
+
+            // ── STATE ──────────────────────────────────────────────────────────
+            var _allQ       = [];    // all loaded questions
+            var _weekNum    = 0;
+            var _weekKey    = '';
+            var _qList      = [];    // 20 questions this week
+            var _qIdx       = 0;
+            var _qCorrect   = 0;
+            var _qAnswered  = false;
+            var _qTimerInt  = null;
+            var _qTimeLeft  = TIME_PER_Q;
+            var _qQStart    = 0;
+            var _qTotalTime = 0;
+            var _qRunning   = false;
+            var _qCheatCount= 0;
+            var _qBannedUntil = 0;
+            var _qCheatActive = false;
+            var _qAbsentSince = 0;   // when user left tab
+            var _qAbsentTimer = null;
+            var _rulesCountdown = null;
+
+            // ── SEEDED RNG (mulberry32) ────────────────────────────────────────
+            function _rng(seed) {
+                return function () {
+                    seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+                    var t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+                    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+                    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+                };
+            }
+            function _shuffle(arr, seed) {
+                var a = arr.slice(), r = _rng(seed);
+                for (var i = a.length - 1; i > 0; i--) {
+                    var j = Math.floor(r() * (i + 1));
+                    var tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+                }
+                return a;
+            }
+
+            // ── WEEK ───────────────────────────────────────────────────────────
+            function _calcWeek() {
+                return Math.floor((Date.now() - new Date(2024, 0, 1)) / (7 * 864e5));
+            }
+
+            // ── LOAD QUESTIONS from GitHub ─────────────────────────────────────
+            function _loadQuestions(cb) {
+                if (_allQ.length > 0) { cb(_allQ); return; }
+                fetch(QUIZ_JSON_URL + '?v=' + _weekNum)
+                    .then(function (r) { return r.json(); })
+                    .then(function (d) {
+                        _allQ = d.questions || [];
+                        cb(_allQ);
+                    })
+                    .catch(function () {
+                        cb([]); // fallback empty
+                    });
+            }
+
+            // Pick 20 questions for the week (same for everyone — seeded shuffle)
+            // Also shuffle OPTIONS for each question with a per-question seed
+            function _buildWeekQuestions(all, weekN) {
+                // Fetch optional AI question from Firebase
+                var base = _shuffle(all, weekN * 31337);
+                var picked = base.slice(0, QUIZ_PER_WEEK);
+                picked = _shuffle(picked, weekN * 99991);
+
+                // Shuffle options (but track new correct index)
+                return picked.map(function (q) {
+                    var optSeed = weekN * 7 + q.id.charCodeAt(0) * 13;
+                    var indices = _shuffle([0, 1, 2, 3], optSeed);
+                    var newOpts = indices.map(function (i) { return q.o[i]; });
+                    var newAns  = indices.indexOf(q.a);
+                    return Object.assign({}, q, { o: newOpts, a: newAns });
+                });
+            }
+
+            // ── BAN SYSTEM ────────────────────────────────────────────────────
+            function _checkBan(cb) {
+                var pn = (localStorage.getItem('playerName') || '').toLowerCase().trim();
+                if (!pn) { cb(false); return; }
+                db.ref('users/' + pn + '/quiz_ban').once('value').then(function (s) {
+                    var b = s.val() || {};
+                    _qCheatCount  = b.count || 0;
+                    _qBannedUntil = b.until || 0;
+                    cb(Date.now() < _qBannedUntil);
+                }).catch(function () { cb(false); });
+            }
+            function _applyBan() {
+                var pn = (localStorage.getItem('playerName') || '').toLowerCase().trim();
+                if (!pn) return;
+                _qCheatCount++;
+                _qBannedUntil = Date.now() + BAN_BASE_MS + (_qCheatCount - 1) * BAN_EXTRA_MS;
+                db.ref('users/' + pn + '/quiz_ban').set({ until: _qBannedUntil, count: _qCheatCount });
+            }
+            function _fmtBan(ms) {
+                if (ms <= 0) return '00:00';
+                var s = Math.ceil(ms / 1000), h = Math.floor(s / 3600); s %= 3600;
+                var m = Math.floor(s / 60); s %= 60;
+                return h > 0 ? h + 'h ' + m + 'm ' + s + 's' : ('0'+m).slice(-2) + ':' + ('0'+s).slice(-2);
+            }
+            function _fmtMs(ms) {
+                var s = Math.floor(ms / 1000), m = Math.floor(s / 60); s %= 60;
+                return (m > 0 ? m + 'm ' : '') + s + 's';
+            }
+
+            // ── ANTI-CHEAT ────────────────────────────────────────────────────
+            var _vis = null, _blr = null, _pha = null;
+            function _attachCheat() {
+                _vis = function () {
+                    if (!_qRunning) return;
+                    if (document.hidden) {
+                        _qAbsentSince = Date.now();
+                        _qAbsentTimer = setTimeout(function () {
+                            if (_qRunning && document.hidden) _triggerCheat();
+                        }, ABSENT_GRACE);
+                    } else {
+                        // Came back
+                        if (_qAbsentTimer) { clearTimeout(_qAbsentTimer); _qAbsentTimer = null; }
+                        _qAbsentSince = 0;
+                    }
+                };
+                _blr = function () {
+                    if (!_qRunning) return;
+                    _qAbsentSince = Date.now();
+                    _qAbsentTimer = setTimeout(function () {
+                        if (_qRunning) _triggerCheat();
+                    }, ABSENT_GRACE);
+                };
+                _pha = function () {
+                    if (!_qRunning) return;
+                    _triggerCheat();
+                };
+                document.addEventListener('visibilitychange', _vis);
+                window.addEventListener('blur', _blr);
+                window.addEventListener('pagehide', _pha);
+                // DevTools detection
+                window.addEventListener('keydown', _devToolsBlock, true);
+                document.addEventListener('contextmenu', _rcBlock, true);
+            }
+            function _detachCheat() {
+                if (_vis) document.removeEventListener('visibilitychange', _vis);
+                if (_blr) window.removeEventListener('blur', _blr);
+                if (_pha) window.removeEventListener('pagehide', _pha);
+                window.removeEventListener('keydown', _devToolsBlock, true);
+                document.removeEventListener('contextmenu', _rcBlock, true);
+                if (_qAbsentTimer) { clearTimeout(_qAbsentTimer); _qAbsentTimer = null; }
+            }
+            function _devToolsBlock(e) {
+                // Block F12, Ctrl+Shift+I/J/C/U, Ctrl+U
+                if (e.key === 'F12' ||
+                    (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key.toUpperCase())) ||
+                    (e.ctrlKey && e.key.toUpperCase() === 'U')) {
+                    e.preventDefault(); e.stopPropagation();
+                    if (_qRunning) _triggerCheat();
+                    return false;
+                }
+            }
+            function _rcBlock(e) {
+                if (_qRunning) { e.preventDefault(); return false; }
+            }
+            function _triggerCheat() {
+                if (!_qRunning || _qCheatActive) return;
+                _qRunning = false; _qCheatActive = true;
+                _stopTimer(); _detachCheat();
+                _applyBan();
+                var ov = document.getElementById('quiz-cheat-overlay');
+                var info = document.getElementById('qco-ban-info');
+                var sub  = document.getElementById('qco-sub');
+                if (sub)  sub.innerText = 'You left the quiz tab/window. Quiz cancelled.';
+                if (info) info.innerText = '⏳ Ban: ' + _fmtBan(BAN_BASE_MS + (_qCheatCount - 1) * BAN_EXTRA_MS) + ' (Ban #' + _qCheatCount + ')';
+                if (ov) ov.classList.add('show');
+                // 3 second forced wait on dismiss button
+                var btn = document.getElementById('qco-btn');
+                var sec = document.getElementById('qco-sec');
+                var cnt = 3;
+                if (btn) btn.disabled = true;
+                var t = setInterval(function () {
+                    cnt--;
+                    if (sec) sec.innerText = cnt;
+                    if (cnt <= 0) {
+                        clearInterval(t);
+                        if (btn) { btn.disabled = false; btn.innerText = 'OK, I UNDERSTAND'; }
+                    }
+                }, 1000);
+            }
+            window.quizDismissCheat = function () {
+                _qCheatActive = false;
+                var ov = document.getElementById('quiz-cheat-overlay');
+                if (ov) ov.classList.remove('show');
+                quizShowLobby();
+            };
+
+            // ── RULES MODAL ───────────────────────────────────────────────────
+            window.quizOpenRulesModal = function () {
+                // Check ban first
+                _checkBan(function (banned) {
+                    if (banned) {
+                        // Open quiz section and show ban UI
+                        MapsTo('section-quiz', 'right');
+                        setTimeout(function () {
+                            window.initQuizSection && window.initQuizSection();
+                        }, 380);
+                        return;
+                    }
+                    var modal = document.getElementById('quiz-rules-modal');
+                    var btn   = document.getElementById('qrm-ok-btn');
+                    var cntEl = document.getElementById('qrm-sec');
+                    var cdEl  = document.getElementById('qrm-countdown');
+                    if (!modal) return;
+                    modal.classList.add('show');
+                    if (btn) btn.disabled = true;
+                    var sec = 5;
+                    if (cntEl) cntEl.innerText = sec;
+                    if (_rulesCountdown) clearInterval(_rulesCountdown);
+                    _rulesCountdown = setInterval(function () {
+                        sec--;
+                        if (cntEl) cntEl.innerText = sec;
+                        if (sec <= 0) {
+                            clearInterval(_rulesCountdown); _rulesCountdown = null;
+                            if (btn) btn.disabled = false;
+                            if (cdEl) cdEl.innerText = '✅ You may now proceed';
+                        }
+                    }, 1000);
+                });
+            };
+            window.quizStartFromModal = function () {
+                var modal = document.getElementById('quiz-rules-modal');
+                if (modal) modal.classList.remove('show');
+                // Navigate to quiz section, then start
+                if (typeof currentSection !== 'undefined' && currentSection !== 'section-quiz') {
+                    MapsTo('section-quiz', 'right');
+                    setTimeout(function () {
+                        window.initQuizSection && window.initQuizSection(true);
+                    }, 380);
+                } else {
+                    window.initQuizSection && window.initQuizSection(true);
+                }
+            };
+
+            // ── TIMER ─────────────────────────────────────────────────────────
+            function _startTimer() {
+                _qTimeLeft = TIME_PER_Q; _qQStart = Date.now();
+                _updTimer();
+                _qTimerInt = setInterval(function () {
+                    _qTimeLeft--;
+                    _updTimer();
+                    if (_qTimeLeft <= 0) { _stopTimer(); _autoSkip(); }
+                }, 1000);
+            }
+            function _stopTimer() { if (_qTimerInt) { clearInterval(_qTimerInt); _qTimerInt = null; } }
+            function _updTimer() {
+                var n = document.getElementById('quiz-timer-num');
+                var c = document.getElementById('quiz-timer-circle');
+                if (n) n.innerText = _qTimeLeft;
+                var pct = _qTimeLeft / TIME_PER_Q;
+                if (c) {
+                    c.style.strokeDashoffset = 138.2 * (1 - pct);
+                    c.style.stroke = _qTimeLeft > 20 ? '#00f3ff' : _qTimeLeft > 10 ? '#f39c12' : '#e74c3c';
+                }
+                if (n) n.style.color = _qTimeLeft > 10 ? 'white' : '#e74c3c';
+            }
+            function _autoSkip() {
+                var q = _qList[_qIdx];
+                _revealAnswer(-1, q.a);
+                var nb = document.getElementById('quiz-next-btn');
+                if (nb) nb.style.display = 'block';
+                _qAnswered = true;
+            }
+
+            // ── RENDER QUESTION ───────────────────────────────────────────────
+            function _renderQ() {
+                var q = _qList[_qIdx]; _qAnswered = false;
+                document.getElementById('quiz-prog-fill').style.width = ((_qIdx / QUIZ_PER_WEEK) * 100) + '%';
+                document.getElementById('quiz-q-counter').innerText = (_qIdx + 1) + '/' + QUIZ_PER_WEEK;
+                var tag = document.getElementById('quiz-subject-tag');
+                if (tag) {
+                    tag.innerText = (q.s || 'Science').toUpperCase();
+                    var isM = q.s === 'Maths';
+                    tag.style.background = isM ? 'rgba(0,102,255,.2)' : 'rgba(46,204,113,.15)';
+                    tag.style.borderColor = isM ? 'rgba(0,102,255,.4)' : 'rgba(46,204,113,.3)';
+                    tag.style.color = isM ? '#00f3ff' : '#2ecc71';
+                }
+                document.getElementById('quiz-q-text').innerText = q.q;
+                var optsEl = document.getElementById('quiz-opts');
+                optsEl.innerHTML = '';
+                q.o.forEach(function (opt, i) {
+                    var btn = document.createElement('div');
+                    btn.className = 'quiz-opt';
+                    btn.innerHTML = '<span class="quiz-opt-letter">' + LETTERS[i] + '</span><span>' + opt + '</span>';
+                    btn.onclick = function () { if (!_qAnswered) _selectAns(i); };
+                    optsEl.appendChild(btn);
+                });
+                document.getElementById('quiz-next-btn').style.display = 'none';
+                _startTimer();
+            }
+            function _selectAns(idx) {
+                if (_qAnswered) return; _qAnswered = true; _stopTimer();
+                var elapsed = Date.now() - _qQStart;
+                var q = _qList[_qIdx];
+                if (idx === q.a) { _qCorrect++; _qTotalTime += elapsed; }
+                _revealAnswer(idx, q.a);
+                document.getElementById('quiz-next-btn').style.display = 'block';
+            }
+            function _revealAnswer(selected, correct) {
+                document.querySelectorAll('.quiz-opt').forEach(function (btn, i) {
+                    btn.onclick = null;
+                    btn.setAttribute('data-locked', '1');
+                    if (i === correct) {
+                        btn.classList.add(selected === i ? 'correct' : 'reveal-correct');
+                    } else if (i === selected) {
+                        btn.classList.add('wrong');
+                    }
+                });
+            }
+
+            // ── NEXT / FINISH ─────────────────────────────────────────────────
+            window.quizNext = function () {
+                _qIdx++;
+                if (_qIdx >= _qList.length) { _finishQuiz(); } else { _renderQ(); }
+            };
+
+            function _finishQuiz() {
+                _stopTimer(); _qRunning = false; _detachCheat();
+                var pn = (localStorage.getItem('playerName') || '').toLowerCase().trim();
+                // Show result panel
+                document.getElementById('quiz-game').style.display = 'none';
+                var res = document.getElementById('quiz-result');
+                res.style.display = 'flex'; res.style.flexDirection = 'column';
+                var icons = ['📚', '😊', '🎉', '🏆'];
+                document.getElementById('quiz-res-icon').innerText = icons[Math.min(3, Math.floor(_qCorrect / 6))];
+                document.getElementById('quiz-res-score').innerText = _qCorrect + '/20';
+                var avgMs = _qCorrect > 0 ? Math.round(_qTotalTime / _qCorrect) : 0;
+                document.getElementById('quiz-res-time').innerText = _fmtMs(_qTotalTime);
+                document.getElementById('quiz-res-avg').innerText = _fmtMs(avgMs);
+                if (!pn) { document.getElementById('quiz-res-rank').innerText = '—'; return; }
+                // Save score — only improve (more correct > less, or same correct + faster)
+                var entry = { score: _qCorrect, time: _qTotalTime, correct: _qCorrect, ts: Date.now() };
+                db.ref('quiz/' + _weekKey + '/lb/' + pn).transaction(function (cur) {
+                    if (!cur) return entry;
+                    if (_qCorrect > cur.correct) return entry;
+                    if (_qCorrect === cur.correct && _qTotalTime < cur.time) return entry;
+                    return cur; // no improvement
+                }).then(function () {
+                    // Mark as played this week
+                    db.ref('users/' + pn + '/quiz_played/' + _weekKey).set(true);
+                    _loadLb('quiz-result-lb', function (rank) {
+                        document.getElementById('quiz-res-rank').innerText = rank > 0 ? '#' + rank : '—';
+                        _awardMedals();
+                    });
+                });
+            }
+
+            // ── MEDAL AWARD ───────────────────────────────────────────────────
+            function _awardMedals() {
+                db.ref('quiz/' + _weekKey + '/lb').once('value').then(function (snap) {
+                    var entries = _sortEntries(snap);
+                    var meds = ['gold', 'silver', 'bronze'];
+                    entries.slice(0, 3).forEach(function (e, i) {
+                        db.ref('users/' + e.id + '/quiz_medals/' + meds[i]).transaction(function (v) { return (v || 0) + 1; });
+                    });
+                });
+            }
+
+            // ── LEADERBOARD ───────────────────────────────────────────────────
+            function _sortEntries(snap) {
+                var entries = [];
+                snap.forEach(function (c) { entries.push({ id: c.key, d: c.val() }); });
+                entries.sort(function (a, b) {
+                    if (b.d.correct !== a.d.correct) return b.d.correct - a.d.correct;
+                    return a.d.time - b.d.time;
+                });
+                return entries;
+            }
+            function _loadLb(targetId, cb) {
+                var pn = (localStorage.getItem('playerName') || '').toLowerCase().trim();
+                var el = document.getElementById(targetId);
+                if (!el) { if (cb) cb(0); return; }
+                el.innerHTML = '<div style="text-align:center;padding:10px;color:rgba(255,255,255,.3);font-size:.8rem;">Loading...</div>';
+                db.ref('quiz/' + _weekKey + '/lb').once('value').then(function (snap) {
+                    var entries = _sortEntries(snap);
+                    if (!entries.length) {
+                        el.innerHTML = '<div style="text-align:center;padding:14px;color:rgba(255,255,255,.3);font-size:.82rem;">No entries yet this week!</div>';
+                        if (cb) cb(0); return;
+                    }
+                    var meds = ['🥇', '🥈', '🥉']; var myRank = 0; el.innerHTML = '';
+                    entries.forEach(function (e, i) {
+                        var isMe = e.id === pn;
+                        if (isMe) myRank = i + 1;
+                        var row = document.createElement('div');
+                        row.className = 'quiz-lb-item' + (isMe ? ' lb-me' : '');
+                        row.innerHTML = '<span class="quiz-lb-rank">' + (i < 3 ? meds[i] : '#' + (i + 1)) + '</span>' +
+                            '<span class="quiz-lb-name">' + e.id.charAt(0).toUpperCase() + e.id.slice(1) + (isMe ? ' <span style="color:#2ecc71;font-size:.65rem;">YOU</span>' : '') + '</span>' +
+                            '<div><div class="quiz-lb-time">' + _fmtMs(e.d.time) + '</div><div style="font-size:.68rem;color:rgba(255,255,255,.4);">' + e.d.correct + '/20</div></div>';
+                        row.onclick = function () { openProfileCard && openProfileCard(e.id); };
+                        el.appendChild(row);
+                    });
+                    if (cb) cb(myRank);
+                }).catch(function () { if (cb) cb(0); });
+            }
+
+            // ── RESET COUNTDOWN ───────────────────────────────────────────────
+            function _updateReset() {
+                var el = document.getElementById('quiz-reset-info');
+                if (!el) return;
+                var now = new Date(), day = now.getDay();
+                var daysToMon = (8 - day) % 7 || 7;
+                var nextMon = new Date(now); nextMon.setDate(now.getDate() + daysToMon); nextMon.setHours(0, 0, 0, 0);
+                var diff = nextMon - now, h = Math.floor(diff / 3600000); diff %= 3600000;
+                var m = Math.floor(diff / 60000);
+                el.innerText = '🔄 Resets in ' + h + 'h ' + m + 'm (Monday midnight)';
+            }
+
+            // ── PUBLIC INIT ───────────────────────────────────────────────────
+            window.initQuizSection = function (autoStart) {
+                _weekNum = _calcWeek(); _weekKey = 'week_' + _weekNum;
+                var badge = document.getElementById('quiz-week-badge');
+                if (badge) badge.innerText = '📅 Week ' + _weekNum;
+                var wi = document.getElementById('quiz-week-info');
+                if (wi) wi.innerText = 'WEEK ' + _weekNum;
+                _updateReset();
+                setInterval(_updateReset, 60000);
+                // Award previous week medals if not done
+                _awardPrevWeek();
+                _checkBan(function (banned) {
+                    if (banned) { _showBanUI(); return; }
+                    var pn = (localStorage.getItem('playerName') || '').toLowerCase().trim();
+                    // Check if already played this week
+                    if (pn) {
+                        db.ref('users/' + pn + '/quiz_played/' + _weekKey).once('value').then(function (s) {
+                            var alreadyPlayed = !!s.val();
+                            _showLobbyUI(alreadyPlayed);
+                            if (autoStart && !alreadyPlayed) {
+                                setTimeout(function () { _doStart(); }, 200);
+                            }
+                        });
+                    } else {
+                        _showLobbyUI(false);
+                    }
+                });
+            };
+
+            function _awardPrevWeek() {
+                var prevKey = 'week_' + (_weekNum - 1);
+                db.ref('quiz/' + prevKey + '/awarded').once('value').then(function (s) {
+                    if (s.val()) return;
+                    db.ref('quiz/' + prevKey + '/lb').once('value').then(function (snap) {
+                        var entries = _sortEntries(snap);
+                        if (!entries.length) return;
+                        var meds = ['gold', 'silver', 'bronze'];
+                        entries.slice(0, 3).forEach(function (e, i) {
+                            db.ref('users/' + e.id + '/quiz_medals/' + meds[i]).transaction(function (v) { return (v || 0) + 1; });
+                        });
+                        db.ref('quiz/' + prevKey + '/awarded').set(true);
+                    });
+                });
+            }
+
+            function _showBanUI() {
+                var bc = document.getElementById('quiz-ban-card');
+                var sb = document.getElementById('quiz-start-btn');
+                if (bc) bc.style.display = 'block';
+                if (sb) sb.disabled = true;
+                var _bi = setInterval(function () {
+                    var rem = _qBannedUntil - Date.now();
+                    var et = document.getElementById('quiz-ban-timer');
+                    if (et) et.innerText = _fmtBan(rem);
+                    if (rem <= 0) {
+                        clearInterval(_bi);
+                        if (bc) bc.style.display = 'none';
+                        if (sb) sb.disabled = false;
+                    }
+                }, 1000);
+                var et = document.getElementById('quiz-ban-timer');
+                if (et) et.innerText = _fmtBan(_qBannedUntil - Date.now());
+            }
+            function _showLobbyUI(alreadyPlayed) {
+                // Load leaderboard
+                _loadLb('quiz-lb-list', null);
+                var apEl = document.getElementById('quiz-already-played');
+                var sb   = document.getElementById('quiz-start-btn');
+                if (alreadyPlayed) {
+                    if (apEl) apEl.style.display = 'block';
+                    // Still allow re-play but score only improves
+                }
+                // Load user best
+                var pn = (localStorage.getItem('playerName') || '').toLowerCase().trim();
+                if (pn) {
+                    db.ref('quiz/' + _weekKey + '/lb/' + pn).once('value').then(function (s) {
+                        var d = s.val();
+                        if (d) {
+                            var be = document.getElementById('quiz-lobby-best');
+                            if (be) be.innerText = _fmtMs(d.time);
+                        }
+                    });
+                    db.ref('quiz/' + _weekKey + '/lb').once('value').then(function (snap) {
+                        var entries = _sortEntries(snap);
+                        var idx = entries.findIndex(function (e) { return e.id === pn; });
+                        var rkEl = document.getElementById('quiz-lobby-rank');
+                        if (rkEl) rkEl.innerText = idx >= 0 ? '#' + (idx + 1) : '—';
+                    });
+                }
+                // Build question list
+                _loadQuestions(function (all) {
+                    if (!all.length) return;
+                    db.ref('quiz/' + _weekKey + '/ai_question').once('value').then(function (s) {
+                        var aiQ = s.val();
+                        var pool = aiQ ? all.concat([aiQ]) : all;
+                        _qList = _buildWeekQuestions(pool, _weekNum);
+                    });
+                });
+            }
+
+            function _doStart() {
+                _checkBan(function (banned) {
+                    if (banned) { _showBanUI(); return; }
+                    _qIdx = 0; _qCorrect = 0; _qTotalTime = 0; _qAnswered = false; _qCheatActive = false;
+                    document.getElementById('quiz-lobby').style.display = 'none';
+                    document.getElementById('quiz-result').style.display = 'none';
+                    var g = document.getElementById('quiz-game');
+                    g.style.display = 'flex'; g.style.flexDirection = 'column';
+                    _qRunning = true; _attachCheat();
+                    _renderQ();
+                });
+            }
+            window.quizShowLobby = function () {
+                _qRunning = false; _stopTimer(); _detachCheat();
+                document.getElementById('quiz-game').style.display = 'none';
+                document.getElementById('quiz-result').style.display = 'none';
+                var lb = document.getElementById('quiz-lobby');
+                lb.style.display = 'flex'; lb.style.flexDirection = 'column';
+                _showLobbyUI(false);
+            };
+
+            // ── PROFILE MEDALS ────────────────────────────────────────────────
+            function _loadMedals(pn, cardId, rowId) {
+                if (!pn) return;
+                db.ref('users/' + pn.toLowerCase() + '/quiz_medals').once('value').then(function (s) {
+                    var medals = s.val() || {};
+                    var card = document.getElementById(cardId), row = document.getElementById(rowId);
+                    if (!card || !row) return;
+                    var defs = [{ k: 'gold', i: '🥇' }, { k: 'silver', i: '🥈' }, { k: 'bronze', i: '🥉' }];
+                    row.innerHTML = '';
+                    var any = false;
+                    defs.forEach(function (m) {
+                        var cnt = medals[m.k] || 0;
+                        if (cnt > 0) {
+                            any = true;
+                            var el = document.createElement('div');
+                            el.className = 'prof-medal-item';
+                            el.innerHTML = '<span class="prof-medal-icon">' + m.i + '</span><span class="prof-medal-count">×' + cnt + '</span><span class="prof-medal-label">' + m.k.toUpperCase() + '</span>';
+                            row.appendChild(el);
+                        }
+                    });
+                    if (!any) { row.innerHTML = '<div class="prof-medals-empty">No quiz medals yet — play the weekly quiz!</div>'; any = true; }
+                    card.style.display = any ? 'block' : 'none';
+                });
+            }
+            // Patch initProfile
+            setTimeout(function () {
+                var orig = window.initProfile;
+                if (typeof orig === 'function') {
+                    window.initProfile = function () {
+                        orig.apply(this, arguments);
+                        var pn = localStorage.getItem('playerName');
+                        if (pn) _loadMedals(pn, 'my-medals-card', 'my-medals-row');
+                    };
+                }
+            }, 400);
+            // Patch openProfileCard to show medals in profile card overlay
+            setTimeout(function () {
+                var orig = window.openProfileCard;
+                if (typeof orig === 'function') {
+                    window.openProfileCard = function (uid) {
+                        orig.apply(this, arguments);
+                        setTimeout(function () {
+                            db.ref('users/' + uid + '/quiz_medals').once('value').then(function (s) {
+                                var medals = s.val() || {};
+                                var ex = document.getElementById('pc-medals-row'); if (ex) ex.remove();
+                                var parts = [{ k: 'gold', i: '🥇' }, { k: 'silver', i: '🥈' }, { k: 'bronze', i: '🥉' }]
+                                    .filter(function (m) { return (medals[m.k] || 0) > 0; })
+                                    .map(function (m) { return '<span style="font-size:1.2rem;" title="' + m.k + '">' + m.i + '×' + medals[m.k] + '</span>'; });
+                                if (!parts.length) return;
+                                var row = document.createElement('div');
+                                row.id = 'pc-medals-row';
+                                row.style.cssText = 'display:flex;justify-content:center;gap:12px;margin:6px 0 2px;background:rgba(255,215,0,.06);border:1px solid rgba(255,215,0,.2);border-radius:10px;padding:7px;';
+                                row.innerHTML = '<span style="font-size:.65rem;color:#ffd700;letter-spacing:1px;align-self:center;">🏅 QUIZ</span>' + parts.join('');
+                                var sr = document.getElementById('pc-stats-row');
+                                if (sr) sr.parentNode.insertBefore(row, sr.nextSibling);
+                            });
+                        }, 500);
+                    };
+                }
+            }, 500);
+
+            // ── PATCH lbSelectGame for Quiz tab ───────────────────────────────
+            setTimeout(function () {
+                var orig = window.lbSelectGame;
+                if (typeof orig === 'function') {
+                    window.lbSelectGame = function (gk, btn) {
+                        if (gk === '__quiz__') {
+                            document.querySelectorAll('.lb-game-tab').forEach(function (b) { b.classList.remove('active'); });
+                            if (btn) btn.classList.add('active');
+                            var list = document.getElementById('lb-score-list');
+                            var loading = document.getElementById('lb-loading');
+                            if (loading) loading.style.display = 'none';
+                            if (!list) return;
+                            var wn = _calcWeek();
+                            list.innerHTML = '<div style="text-align:center;padding:10px;color:rgba(255,255,255,.4);font-size:.75rem;letter-spacing:1px;">🧠 QUIZ · WEEK ' + wn + '</div>';
+                            var pn = (localStorage.getItem('playerName') || '').toLowerCase().trim();
+                            db.ref('quiz/week_' + wn + '/lb').once('value').then(function (snap) {
+                                var entries = _sortEntries(snap);
+                                if (!entries.length) { list.innerHTML += '<div style="text-align:center;padding:16px;color:rgba(255,255,255,.3);font-size:.82rem;">No quiz entries yet this week</div>'; return; }
+                                var meds = ['🥇', '🥈', '🥉'];
+                                entries.forEach(function (e, i) {
+                                    var isMe = e.id === pn;
+                                    var div = document.createElement('div');
+                                    div.className = 'rank-item' + (isMe ? ' rank-me' : '');
+                                    div.innerHTML = '<span style="font-size:' + (i < 3 ? '1.4rem' : '.9rem') + ';min-width:28px;text-align:center;">' + (i < 3 ? meds[i] : '#' + (i + 1)) + '</span>' +
+                                        '<span style="flex:1;font-family:Teko,sans-serif;font-size:1.2rem;letter-spacing:1px;color:' + (isMe ? '#2ecc71' : 'white') + ';">' + e.id.charAt(0).toUpperCase() + e.id.slice(1) + '</span>' +
+                                        '<div style="text-align:right;"><div style="font-family:Teko,sans-serif;color:#00f3ff;">' + _fmtMs(e.d.time) + '</div><div style="font-size:.7rem;color:rgba(255,255,255,.4);">' + e.d.correct + '/20</div></div>';
+                                    list.appendChild(div);
+                                });
+                            });
+                            return;
+                        }
+                        orig(gk, btn);
+                    };
+                }
+            }, 250);
+
+            // ── PATCH MapsTo to init quiz section ─────────────────────────────
+            setTimeout(function () {
+                var orig = window.MapsTo;
+                if (typeof orig === 'function') {
+                    window.MapsTo = function (targetId, direction) {
+                        orig.apply(this, arguments);
+                        if (targetId === 'section-quiz') {
+                            setTimeout(function () { window.initQuizSection && window.initQuizSection(); }, 380);
+                        }
+                    };
+                }
+            }, 600);
+
+        })(); // end quiz IIFE
         // For clarity, I'll provide the modified MapsTo section for you to copy/paste (only the part that changes).
     </script>
 </body>
