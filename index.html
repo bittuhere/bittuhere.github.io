@@ -3796,550 +3796,611 @@
         <div class="admin-section-inner">
             <div class="admin-header-bar">
                 <h1>⚡ ADMIN CONTROL</h1>
-                <button class="admin-back-btn" onclick="MapsTo('section-hub','left')">← Back to Hub</button>
+                <button class="admin-back-btn" onclick="MapsTo('section-hub','left')">← Hub</button>
             </div>
-
-            <!-- Admin Panel UI (Directly from admin.html) -->
-            <div style="width:100%; max-width:750px; background: rgba(0,0,0,0.2); border-radius: 12px; padding: 20px;">
-                <div class="menu-container" style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
-                    <button class="admin-btn" onclick="adminShowSection('global', this)">📢 Global Msg</button>
-                    <button class="admin-btn" onclick="adminShowSection('specific', this)">✉️ Private Msg</button>
-                    <button class="admin-btn" onclick="adminShowSection('users', this)">🚫 Users</button>
-                    <button class="admin-btn" onclick="adminShowSection('rename', this)">✏️ Rename</button>
-                    <button class="admin-btn" onclick="adminShowSection('rooms', this)">🏠 Rooms</button>
-                    <button class="admin-btn" onclick="adminShowSection('info', this)">📊 Scores</button>
+            <div style="width:100%;max-width:780px;background:rgba(0,0,0,.2);border-radius:14px;padding:16px;">
+                <div class="menu-container" style="display:flex;gap:7px;margin-bottom:16px;flex-wrap:wrap;">
+                    <button class="admin-btn" onclick="adminShowSection('dashboard',this)">📊 Dashboard</button>
+                    <button class="admin-btn" onclick="adminShowSection('users',this)">👥 Users</button>
+                    <button class="admin-btn" onclick="adminShowSection('rename',this)">✏️ Rename</button>
+                    <button class="admin-btn" onclick="adminShowSection('delete',this)">🗑️ Delete</button>
+                    <button class="admin-btn" onclick="adminShowSection('scores',this)">🏆 Scores</button>
+                    <button class="admin-btn" onclick="adminShowSection('global',this)">📢 Announce</button>
+                    <button class="admin-btn" onclick="adminShowSection('specific',this)">✉️ DM</button>
+                    <button class="admin-btn" onclick="adminShowSection('rooms',this)">🏠 Rooms</button>
+                    <button class="admin-btn" onclick="adminShowSection('quiz',this)">🧠 Quiz</button>
+                    <button class="admin-btn" onclick="adminShowSection('online',this)">🟢 Online</button>
                 </div>
 
-                <div id="admin-section-global" class="admin-section" style="display: block;">
-                    <h3 style="color: #2ecc71;">📢 Global Announcement</h3>
-                    <textarea id="adminGlobalText" placeholder="Message for all players..."
-                        style="width:100%; padding:10px; margin:8px 0; border-radius:5px; border:none; background:#111; color:white;"></textarea>
-                    <button class="send-btn" onclick="adminSendGlobal()"
-                        style="width:100%; background:#2ecc71; color:black; border:none; padding:12px; border-radius:50px; cursor:pointer; font-weight:bold;">PUBLISH
-                        TO ALL</button>
-                    <div id="adminGlobalMsgList" class="msg-list"
-                        style="margin-top:20px; max-height:300px; overflow-y:auto;"></div>
+                <!-- DASHBOARD -->
+                <div id="admin-section-dashboard" class="admin-section" style="display:block;">
+                    <div class="adm-h3">📊 Dashboard</div>
+                    <div id="adm-stats-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;"></div>
+                    <div id="adm-recent"></div>
                 </div>
 
-                <div id="admin-section-specific" class="admin-section" style="display: none;">
-                    <h3 style="color: #2ecc71;">✉️ Private Notification</h3>
-                    <input type="text" id="adminTargetUser" placeholder="Username (e.g. player123)"
-                        oninput="adminLoadPrivateMsgs()"
-                        style="width:100%; padding:10px; margin:8px 0; border-radius:5px; border:none; background:#111; color:white;">
-                    <textarea id="adminSpecificText" placeholder="Private message..."
-                        style="width:100%; padding:10px; margin:8px 0; border-radius:5px; border:none; background:#111; color:white;"></textarea>
-                    <button class="send-btn" onclick="adminSendSpecific()"
-                        style="width:100%; background:#3498db; color:white; border:none; padding:12px; border-radius:50px; cursor:pointer; font-weight:bold;">SEND
-                        TO PLAYER</button>
-                    <div id="adminPrivateMsgList" class="msg-list"
-                        style="margin-top:20px; max-height:300px; overflow-y:auto;"></div>
-                </div>
-
-                <div id="admin-section-users" class="admin-section" style="display: none;">
-                    <h3 style="color: #2ecc71;">🚫 User Access Control</h3>
-                    <input type="text" id="adminUserSearch" placeholder="Search users..." oninput="adminFilterUsers()"
-                        style="width:100%; padding:10px; margin-bottom:10px; border-radius:5px; border:none; background:#111; color:white;">
-                    <table style="width:100%; border-collapse:collapse;">
-                        <thead>
-                            <tr>
-                                <th style="text-align:left; color:#2ecc71;">User</th>
-                                <th style="color:#2ecc71;">Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
+                <!-- USERS -->
+                <div id="admin-section-users" class="admin-section" style="display:none;">
+                    <div class="adm-h3">👥 User Management</div>
+                    <input id="adminUserSearch" type="text" placeholder="🔍 Search users..." oninput="adminFilterUsers()" class="adm-input">
+                    <div style="overflow-x:auto;">
+                    <table class="adm-table">
+                        <thead><tr>
+                            <th>User</th><th>Status</th><th>Joined</th><th>Actions</th>
+                        </tr></thead>
                         <tbody id="adminUserTableBody"></tbody>
                     </table>
+                    </div>
                 </div>
 
-                <div id="admin-section-rename" class="admin-section" style="display: none;">
-                    <h3 style="color: #2ecc71;">✏️ Rename User</h3>
-                    <input type="text" id="adminOldName" placeholder="Old Username"
-                        style="width:100%; padding:10px; margin:8px 0; border-radius:5px; border:none; background:#111; color:white;">
-                    <input type="text" id="adminNewName" placeholder="New Username"
-                        style="width:100%; padding:10px; margin:8px 0; border-radius:5px; border:none; background:#111; color:white;">
-                    <button class="send-btn" onclick="adminRenameUser()"
-                        style="width:100%; background:#f1c40f; color:black; border:none; padding:12px; border-radius:50px; cursor:pointer; font-weight:bold;">RENAME</button>
-                    <div id="adminRenameStatus" style="margin-top:10px; font-size:0.9rem; color:#888;"></div>
+                <!-- RENAME -->
+                <div id="admin-section-rename" class="admin-section" style="display:none;">
+                    <div class="adm-h3">✏️ Rename User</div>
+                    <p class="adm-hint">Migrates profile, friends, chats, scores, medals, quiz data → new key. Old entry fully removed.</p>
+                    <input id="adminOldName" type="text" placeholder="Current username" class="adm-input">
+                    <input id="adminNewName" type="text" placeholder="New username (a-z 0-9 only)" class="adm-input">
+                    <button onclick="adminRenameUser()" class="adm-action-btn" style="background:#f1c40f;color:#000;">✏️ RENAME USER</button>
+                    <div id="adminRenameStatus" class="adm-status"></div>
                 </div>
 
-                <div id="admin-section-rooms" class="admin-section" style="display: none;">
-                    <h3 style="color: #2ecc71;">🏠 Active Car Game Rooms</h3>
-                    <table style="width:100%; border-collapse:collapse;">
-                        <thead>
-                            <tr>
-                                <th style="color:#2ecc71;">Room ID</th>
-                                <th style="color:#2ecc71;">Players</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="adminRoomTableBody"></tbody>
-                    </table>
+                <!-- DELETE -->
+                <div id="admin-section-delete" class="admin-section" style="display:none;">
+                    <div class="adm-h3">🗑️ Delete User</div>
+                    <p class="adm-hint">Permanently removes account, friends, status, invites, requests. Cannot be undone.</p>
+                    <input id="adminDeleteName" type="text" placeholder="Username to delete" class="adm-input">
+                    <button onclick="adminDeleteUser()" class="adm-action-btn" style="background:#e74c3c;color:#fff;">🗑️ DELETE PERMANENTLY</button>
+                    <div id="adminDeleteStatus" class="adm-status"></div>
                 </div>
 
-                <div id="admin-section-info" class="admin-section" style="display: none;">
-                    <h3 style="color: #2ecc71;">📊 Highscore Information</h3>
-                    <table style="width:100%; border-collapse:collapse;">
-                        <thead>
-                            <tr>
-                                <th style="color:#2ecc71;">User</th>
-                                <th style="color:#2ecc71;">🐦Flappy</th>
-                                <th style="color:#2ecc71;">🦕Dino</th>
-                                <th style="color:#2ecc71;">🐍Snake</th>
-                                <th style="color:#2ecc71;">ᗧPacMan</th>
-                            </tr>
-                        </thead>
+                <!-- SCORES -->
+                <div id="admin-section-scores" class="admin-section" style="display:none;">
+                    <div class="adm-h3">🏆 Score Management</div>
+                    <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
+                        <input id="adminScoreUser" type="text" placeholder="Username" class="adm-input" style="flex:1;min-width:100px;margin:0;">
+                        <select id="adminScoreGame" class="adm-input" style="flex:1;min-width:110px;margin:0;">
+                            <option value="">All games</option>
+                            <option value="flappy_highscore">🐦 Flappy</option>
+                            <option value="dino_highscore">🦕 Dino</option>
+                            <option value="snake_highscore">🐍 Snake</option>
+                            <option value="pacman_highscore">ᗧ Pac-Man</option>
+                        </select>
+                    </div>
+                    <div style="display:flex;gap:7px;margin-bottom:10px;flex-wrap:wrap;">
+                        <button onclick="adminViewScore()" style="flex:1;background:#3498db;color:#fff;border:none;padding:9px;border-radius:8px;cursor:pointer;font-family:Teko,sans-serif;font-size:1rem;">👁 VIEW</button>
+                        <button onclick="adminResetScore()" style="flex:1;background:#e74c3c;color:#fff;border:none;padding:9px;border-radius:8px;cursor:pointer;font-family:Teko,sans-serif;font-size:1rem;">🗑 RESET</button>
+                        <button onclick="adminSetScore()" style="flex:1;background:#f1c40f;color:#000;border:none;padding:9px;border-radius:8px;cursor:pointer;font-family:Teko,sans-serif;font-size:1rem;">✏️ SET</button>
+                    </div>
+                    <div id="adminScoreStatus" class="adm-status"></div>
+                    <div style="overflow-x:auto;">
+                    <table class="adm-table">
+                        <thead><tr><th>User</th><th>🐦</th><th>🦕</th><th>🐍</th><th>ᗧ</th></tr></thead>
                         <tbody id="adminInfoTableBody"></tbody>
                     </table>
+                    </div>
+                </div>
+
+                <!-- ANNOUNCE -->
+                <div id="admin-section-global" class="admin-section" style="display:none;">
+                    <div class="adm-h3">📢 Global Announcement</div>
+                    <textarea id="adminGlobalText" placeholder="Message shown to ALL players..." class="adm-textarea"></textarea>
+                    <button onclick="adminSendGlobal()" class="adm-action-btn" style="background:#2ecc71;color:#000;">📢 PUBLISH TO ALL</button>
+                    <div id="adminGlobalMsgList" class="msg-list" style="margin-top:14px;max-height:260px;overflow-y:auto;"></div>
+                </div>
+
+                <!-- PRIVATE DM -->
+                <div id="admin-section-specific" class="admin-section" style="display:none;">
+                    <div class="adm-h3">✉️ Private Message</div>
+                    <input id="adminTargetUser" type="text" placeholder="Target username" oninput="adminLoadPrivateMsgs()" class="adm-input">
+                    <textarea id="adminSpecificText" placeholder="Private message text..." class="adm-textarea"></textarea>
+                    <button onclick="adminSendSpecific()" class="adm-action-btn" style="background:#3498db;color:#fff;">✉️ SEND TO PLAYER</button>
+                    <div id="adminPrivateMsgList" class="msg-list" style="margin-top:14px;max-height:220px;overflow-y:auto;"></div>
+                </div>
+
+                <!-- ROOMS -->
+                <div id="admin-section-rooms" class="admin-section" style="display:none;">
+                    <div class="adm-h3">🏠 Multiplayer Rooms</div>
+                    <div style="display:flex;gap:8px;margin-bottom:10px;">
+                        <button onclick="adminLoadRooms()" style="background:#2ecc71;color:#000;border:none;padding:8px 16px;border-radius:8px;cursor:pointer;font-weight:bold;">🔄 Refresh</button>
+                        <button onclick="adminCleanRooms()" style="background:#e74c3c;color:#fff;border:none;padding:8px 16px;border-radius:8px;cursor:pointer;font-weight:bold;">🗑 Clean Empty</button>
+                    </div>
+                    <div style="overflow-x:auto;">
+                    <table class="adm-table">
+                        <thead><tr><th>Room</th><th>Players</th><th>Last Active</th><th>Action</th></tr></thead>
+                        <tbody id="adminRoomTableBody"></tbody>
+                    </table>
+                    </div>
+                    <div id="adminRoomStatus" class="adm-status"></div>
+                </div>
+
+                <!-- QUIZ -->
+                <div id="admin-section-quiz" class="admin-section" style="display:none;">
+                    <div class="adm-h3">🧠 Quiz Management</div>
+                    <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+                        <button onclick="adminLoadQuizLb()" style="background:#8e44ad;color:#fff;border:none;padding:8px 16px;border-radius:8px;cursor:pointer;font-weight:bold;">📊 Leaderboard</button>
+                        <button onclick="adminResetQuizWeek()" style="background:#e74c3c;color:#fff;border:none;padding:8px 16px;border-radius:8px;cursor:pointer;font-weight:bold;">🔄 Reset This Week</button>
+                    </div>
+                    <div style="background:rgba(142,68,173,.1);border:1px solid rgba(142,68,173,.3);border-radius:10px;padding:14px;margin-bottom:12px;">
+                        <div style="font-size:.75rem;color:#8e44ad;letter-spacing:1px;margin-bottom:8px;font-family:Teko,sans-serif;">📝 SET WEEKLY SPECIAL QUESTION</div>
+                        <input id="aqSubject" type="text" placeholder="Subject (Maths / Science)" class="adm-input" style="margin:3px 0;">
+                        <input id="aqQuestion" type="text" placeholder="Question text" class="adm-input" style="margin:3px 0;">
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;">
+                            <input id="aqOpt0" type="text" placeholder="Option A" class="adm-input" style="margin:2px 0;">
+                            <input id="aqOpt1" type="text" placeholder="Option B" class="adm-input" style="margin:2px 0;">
+                            <input id="aqOpt2" type="text" placeholder="Option C" class="adm-input" style="margin:2px 0;">
+                            <input id="aqOpt3" type="text" placeholder="Option D" class="adm-input" style="margin:2px 0;">
+                        </div>
+                        <select id="aqAns" class="adm-input" style="margin:4px 0;">
+                            <option value="0">Correct: A</option><option value="1">Correct: B</option>
+                            <option value="2">Correct: C</option><option value="3">Correct: D</option>
+                        </select>
+                        <button onclick="adminSetAiQuestion()" style="width:100%;background:#8e44ad;color:#fff;border:none;padding:10px;border-radius:8px;cursor:pointer;font-weight:bold;margin-top:6px;">✅ SET FOR THIS WEEK</button>
+                    </div>
+                    <div id="adminQuizLb" style="max-height:260px;overflow-y:auto;"></div>
+                    <div id="adminQuizStatus" class="adm-status"></div>
+                </div>
+
+                <!-- ONLINE -->
+                <div id="admin-section-online" class="admin-section" style="display:none;">
+                    <div class="adm-h3">🟢 Online Users</div>
+                    <button onclick="adminLoadOnline()" style="background:#2ecc71;color:#000;border:none;padding:8px 18px;border-radius:8px;cursor:pointer;font-weight:bold;margin-bottom:10px;">🔄 Refresh</button>
+                    <div id="adminOnlineList" style="max-height:380px;overflow-y:auto;"></div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Admin Panel JavaScript (must be placed AFTER the HTML) -->
+    <!-- Admin JavaScript -->
     <script>
-        (function () {
-            // --- Admin Panel JavaScript (namespaced to avoid conflicts) ---
-            // Admin panel initialized
+    (function () {
+        var ADMIN_KEY = 'anuragAdmin@123';
+        var _adminAllUsers = [];
 
-            // Store all users data
-            let adminAllUsers = [];
-
-            // --- UI Navigation ---
-            window.adminShowSection = function (name, btn) {
-                document.querySelectorAll('.admin-section').forEach(s => s.style.display = 'none');
-                document.querySelectorAll('.admin-btn').forEach(b => b.classList.remove('active'));
-                const target = document.getElementById('admin-section-' + name);
-                if (target) target.style.display = 'block';
-                if (btn) btn.classList.add('active');
-
-                // Load data when section is shown
-                if (name === 'global') adminLoadGlobalMessages();
-                if (name === 'users') adminLoadUsers();
-                if (name === 'rooms') adminLoadRooms();
-                if (name === 'info') adminLoadUserInfo();
+        // ── NAV ──────────────────────────────────────────────────────────────
+        window.adminShowSection = function (name, btn) {
+            document.querySelectorAll('.admin-section').forEach(function(s){ s.style.display='none'; });
+            document.querySelectorAll('.admin-btn').forEach(function(b){ b.classList.remove('active'); });
+            var el = document.getElementById('admin-section-' + name);
+            if (el) el.style.display = 'block';
+            if (btn) btn.classList.add('active');
+            var loaders = {
+                dashboard: adminLoadDashboard, users: adminLoadUsers,
+                rooms: adminLoadRooms, scores: adminLoadUserInfo,
+                online: adminLoadOnline, quiz: adminLoadQuizLb,
+                global: adminLoadGlobalMessages
             };
+            if (loaders[name]) loaders[name]();
+        };
 
-            // --- Global Messages ---
-            window.adminSendGlobal = function () {
-                const text = document.getElementById('adminGlobalText').value.trim();
-                if (!text) return showNotify("Enter a message first!", "error");
-                db.ref('notifications/global').push({
-                    message: text,
-                    time: Date.now(),
-                    _k: (function () { return ['anurag', 'Admin', '@123'].join(''); })()  //key
-                })
-                    .then(() => {
-                        document.getElementById('adminGlobalText').value = "";
-                        showNotify('✅ Published to all players!', 'success');
-                        adminLoadGlobalMessages();
-                    }).catch(function (e) { showNotify('❌ ' + e.message, 'error'); });
-            };
+        // ── DASHBOARD ────────────────────────────────────────────────────────
+        function adminLoadDashboard() {
+            var grid = document.getElementById('adm-stats-grid');
+            var recent = document.getElementById('adm-recent');
+            if (!grid) return;
+            grid.innerHTML = '<div style="grid-column:span 2;color:#888;font-size:.8rem;padding:8px;">Loading...</div>';
+            var weekNum = Math.floor((Date.now() - new Date(2024,0,1)) / (7*864e5));
+            Promise.all([
+                db.ref('users').once('value'),
+                db.ref('status').once('value'),
+                db.ref('car_world').once('value'),
+                db.ref('quiz/week_'+weekNum+'/lb').once('value')
+            ]).then(function(r) {
+                var users=r[0].val()||{}, statuses=r[1].val()||{}, rooms=r[2].val()||{};
+                var now=Date.now();
+                var total=0, blocked=0, online=0;
+                Object.entries(users).forEach(function(e){
+                    if(e[1]._deleted) return;
+                    total++;
+                    if(e[1].blocked) blocked++;
+                });
+                Object.values(statuses).forEach(function(s){
+                    if(s.online||(s.last_changed&&now-s.last_changed<300000)) online++;
+                });
+                var activeRooms=Object.keys(rooms).length;
+                var quizP=r[3].exists()?Object.keys(r[3].val()).length:0;
+                var stats=[
+                    {l:'TOTAL USERS',v:total,c:'#00f3ff'},
+                    {l:'ONLINE NOW',v:online,c:'#2ecc71'},
+                    {l:'BLOCKED',v:blocked,c:'#e74c3c'},
+                    {l:'CAR ROOMS',v:activeRooms,c:'#f1c40f'},
+                    {l:'QUIZ PLAYERS',v:quizP,c:'#8e44ad'},
+                    {l:'WEEK',v:weekNum,c:'#888'},
+                ];
+                grid.innerHTML = stats.map(function(s){
+                    return '<div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px 8px;text-align:center;"><div style="font-size:1.7rem;color:'+s.c+';font-family:Teko,sans-serif;">'+s.v+'</div><div style="font-size:.6rem;color:#888;letter-spacing:1px;">'+s.l+'</div></div>';
+                }).join('');
+                if (recent) {
+                    var r2 = Object.entries(users).filter(function(e){return e[1].lastLogin&&!e[1]._deleted;})
+                        .sort(function(a,b){return (b[1].lastLogin||0)-(a[1].lastLogin||0);}).slice(0,5);
+                    recent.innerHTML = '<div style="font-size:.72rem;color:#888;letter-spacing:1px;margin-bottom:6px;font-family:Teko,sans-serif;">RECENT LOGINS</div>'+
+                        r2.map(function(e){
+                            var t=new Date(e[1].lastLogin).toLocaleString('en-IN',{timeZone:'Asia/Kolkata',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit',hour12:true});
+                            return '<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.06);font-size:.8rem;"><span style="color:'+(e[1].blocked?'#e74c3c':'white')+';">'+e[0]+'</span><span style="color:#888;">'+t+'</span></div>';
+                        }).join('');
+                }
+            }).catch(function(e){ if(grid) grid.innerHTML='<div style="color:#e74c3c;font-size:.8rem;">'+e.message+'</div>'; });
+        }
 
-            // ── adminSendSpecific: Send private notification to specific user ──
-            window.adminSendSpecific = function () {
-                const user = document.getElementById('adminTargetUser').value.toLowerCase().trim();
-                const text = document.getElementById('adminSpecificText').value.trim();
-                if (!user) return showNotify('Enter a username!', 'error');
-                if (!text) return showNotify('Enter a message!', 'error');
-                db.ref('notifications/private/' + user).push({
-                    message: text,
-                    time: Date.now(),
-                    _k: (function () { return ['anurag', 'Admin', '@123'].join(''); })()  //key
-                })
-                    .then(() => {
-                        document.getElementById('adminSpecificText').value = '';
-                        showNotify('✅ Sent to ' + user + '!', 'success');
-                        adminLoadPrivateMsgs();
-                    })
-                    .catch(function (e) { showNotify('❌ ' + e.message, 'error'); });
-            };
+        // ── GLOBAL ANNOUNCE ──────────────────────────────────────────────────
+        window.adminSendGlobal = function() {
+            var text=document.getElementById('adminGlobalText').value.trim();
+            if(!text) return showNotify('Enter a message!','error');
+            var key=db.ref('notifications/global').push().key;
+            db.ref('notifications/global/'+key).set({message:text,time:Date.now(),_k:ADMIN_KEY})
+                .then(function(){ showNotify('✅ Published!','success'); document.getElementById('adminGlobalText').value=''; adminLoadGlobalMessages(); })
+                .catch(function(e){ showNotify('❌ '+e.message,'error'); });
+        };
+        function adminLoadGlobalMessages() {
+            var list=document.getElementById('adminGlobalMsgList'); if(!list) return;
+            LC.fb('section-admin', db.ref('notifications/global'), 'value', function(snap) {
+                var msgs=[]; snap.forEach(function(c){ msgs.unshift({id:c.key,text:c.val().message||c.val().text}); });
+                list.innerHTML=msgs.length?msgs.map(function(m){
+                    return '<div class="msg-card" style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start;"><span style="font-size:.83rem;color:white;flex:1;">'+m.text+'</span><button onclick="adminDeleteMsg(\'global\',\''+m.id+'\')" class="mini-btn" style="background:#e74c3c;color:#fff;flex-shrink:0;">DEL</button></div>';
+                }).join(''):'<div style="color:#888;font-size:.8rem;padding:8px;">No announcements yet.</div>';
+            });
+        }
+        window.adminDeleteMsg = function(path, key) {
+            db.ref('notifications/'+path+'/'+key).remove()
+                .then(function(){ showNotify('Deleted','success'); if(path==='global') adminLoadGlobalMessages(); else adminLoadPrivateMsgs(); })
+                .catch(function(e){ showNotify('❌ '+e.message,'error'); });
+        };
 
-            function adminLoadGlobalMessages() {
-                var listEl = document.getElementById('adminGlobalMsgList');
-                if (!listEl) return;
-                // Use LC.fb for real-time updates (mirrors original pattern)
-                LC.fb('section-admin', db.ref('notifications/global'), 'value', function (snap) {
-                    listEl.innerHTML = '';
-                    if (!snap.exists()) {
-                        listEl.innerHTML = "<p style='color:#666;'>No messages</p>";
-                        return;
+        // ── PRIVATE DM ───────────────────────────────────────────────────────
+        window.adminSendSpecific = function() {
+            var target=document.getElementById('adminTargetUser').value.toLowerCase().trim();
+            var text=document.getElementById('adminSpecificText').value.trim();
+            if(!target||!text) return showNotify('Fill both fields!','error');
+            var key=db.ref('notifications/private/'+target).push().key;
+            db.ref('notifications/private/'+target+'/'+key).set({message:text,time:Date.now(),_k:ADMIN_KEY})
+                .then(function(){ showNotify('✅ Sent to '+target,'success'); document.getElementById('adminSpecificText').value=''; adminLoadPrivateMsgs(); })
+                .catch(function(e){ showNotify('❌ '+e.message,'error'); });
+        };
+        window.adminLoadPrivateMsgs = function() {
+            var target=document.getElementById('adminTargetUser').value.toLowerCase().trim();
+            var list=document.getElementById('adminPrivateMsgList'); if(!list||!target) return;
+            db.ref('notifications/private/'+target).orderByChild('time').limitToLast(10).once('value').then(function(snap){
+                var msgs=[]; snap.forEach(function(c){ msgs.unshift({id:c.key,text:c.val().message||c.val().text}); });
+                list.innerHTML=msgs.length?msgs.map(function(m){
+                    return '<div class="msg-card" style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start;"><span style="font-size:.83rem;color:white;flex:1;">'+m.text+'</span><button onclick="adminDeleteMsg(\'private/'+target+'\',\''+m.id+'\')" class="mini-btn" style="background:#e74c3c;color:#fff;flex-shrink:0;">DEL</button></div>';
+                }).join(''):'<div style="color:#888;font-size:.8rem;padding:8px;">No messages for this user.</div>';
+            });
+        };
+
+        // ── USERS ────────────────────────────────────────────────────────────
+        function adminLoadUsers() {
+            db.ref('users').once('value').then(function(snap){
+                _adminAllUsers=[];
+                snap.forEach(function(c){ var d=c.val(); if(!d._deleted) _adminAllUsers.push(Object.assign({id:c.key},d)); });
+                _adminAllUsers.sort(function(a,b){return(b.lastLogin||0)-(a.lastLogin||0);});
+                adminRenderUserTable(_adminAllUsers);
+            }).catch(function(e){ showNotify('❌ '+e.message,'error'); });
+        }
+        function adminRenderUserTable(users) {
+            var tbody=document.getElementById('adminUserTableBody'); if(!tbody) return;
+            tbody.innerHTML=users.map(function(u){
+                var bl=!!u.blocked;
+                var j=u.createdAt?new Date(u.createdAt).toLocaleDateString('en-IN'):'—';
+                return '<tr><td style="color:'+(bl?'#e74c3c':'white')+';">'+u.id+'</td>'+
+                    '<td style="text-align:center;"><span style="font-size:.7rem;padding:2px 7px;border-radius:10px;background:'+(bl?'rgba(231,76,60,.2)':'rgba(46,204,113,.2)')+';color:'+(bl?'#e74c3c':'#2ecc71')+'">'+(bl?'BLOCKED':'ACTIVE')+'</span></td>'+
+                    '<td style="font-size:.74rem;color:#888;">'+j+'</td>'+
+                    '<td style="white-space:nowrap;">'+
+                    '<button onclick="adminToggleBlock(\''+u.id+'\','+(bl?'false':'true')+')" style="background:'+(bl?'#2ecc71':'#e74c3c')+';border:none;color:'+(bl?'#000':'#fff')+';padding:4px 8px;border-radius:4px;cursor:pointer;font-size:.74rem;margin:2px;">'+(bl?'UNBLOCK':'BLOCK')+'</button>'+
+                    '<button onclick="adminResetPass(\''+u.id+'\')" style="background:#3498db;border:none;color:#fff;padding:4px 8px;border-radius:4px;cursor:pointer;font-size:.74rem;margin:2px;">RESET PW</button>'+
+                    '</td></tr>';
+            }).join('')||'<tr><td colspan="4" style="text-align:center;padding:14px;color:#888;">No users.</td></tr>';
+        }
+        window.adminFilterUsers = function() {
+            var q=document.getElementById('adminUserSearch').value.toLowerCase();
+            adminRenderUserTable(q?_adminAllUsers.filter(function(u){return u.id.includes(q);}):_adminAllUsers);
+        };
+        window.adminToggleBlock = function(uid,state) {
+            state=(state==='true'||state===true);
+            showConfirm((state?'🚫 BLOCK':'✅ UNBLOCK')+' user "'+uid+'"?', function(){
+                db.ref('users/'+uid).update({blocked:state,_admin:true,_adminKey:ADMIN_KEY})
+                    .then(function(){ showNotify((state?'🚫 Blocked: ':'✅ Unblocked: ')+uid,state?'error':'success'); adminLoadUsers(); })
+                    .catch(function(e){ showNotify('❌ '+e.message,'error'); });
+            }, state?'🚫':'✅');
+        };
+        window.adminResetPass = function(uid) {
+            showInputModal('RESET PASSWORD — '+uid.toUpperCase(), 'New password (min 3 chars)...', function(newPass){
+                if(!newPass||newPass.length<3){ showNotify('Min 3 chars!','error'); return; }
+                crypto.subtle.digest('SHA-1',new TextEncoder().encode(newPass)).then(function(buf){
+                    var hash=Array.from(new Uint8Array(buf)).map(function(b){return b.toString(16).padStart(2,'0');}).join('');
+                    db.ref('users/'+uid).update({password:hash,_admin:true,_adminKey:ADMIN_KEY})
+                        .then(function(){ showNotify('✅ Password reset: '+uid,'success'); })
+                        .catch(function(e){ showNotify('❌ '+e.message,'error'); });
+                });
+            });
+        };
+
+        // ── RENAME ───────────────────────────────────────────────────────────
+        // Full migration: profile → friends → chats → requests → status/invites → quiz
+        // Then old user is overwritten with adminKey tombstone, then removed.
+        // Requires Firebase rule: !newData.exists() && data.child('_adminKey').val()==='anuragAdmin@123'
+        window.adminRenameUser = async function() {
+            var oldN=document.getElementById('adminOldName').value.toLowerCase().trim();
+            var newN=document.getElementById('adminNewName').value.toLowerCase().trim();
+            var st=document.getElementById('adminRenameStatus');
+            if(!oldN||!newN) return showNotify('Fill both fields!','error');
+            if(oldN===newN) return showNotify('Names are identical!','error');
+            if(!/^[a-z0-9]+$/.test(newN)) return showNotify('New name: letters & numbers only!','error');
+            var S=function(msg,c){ st.style.color=c||'#888'; st.innerHTML=msg; };
+            S('🔍 Step 1/8: Validating...');
+            try {
+                var [newSnap,oldSnap]=await Promise.all([db.ref('users/'+newN).once('value'),db.ref('users/'+oldN).once('value')]);
+                if(newSnap.exists()) return S('❌ "'+newN+'" is already taken!','#ff3366');
+                if(!oldSnap.exists()) return S('❌ User "'+oldN+'" not found!','#ff3366');
+
+                // Clean old user data — strip internal admin markers
+                var userData=Object.assign({},oldSnap.val());
+                delete userData._admin; delete userData._adminKey; delete userData._deleted; delete userData._deletedAt; delete userData._renamedTo;
+
+                // 2: Create new user (rule: !data.exists() → allowed)
+                S('📋 Step 2/8: Copying profile...');
+                await db.ref('users/'+newN).set(userData);
+
+                // 3: Friends
+                S('👥 Step 3/8: Migrating friends...');
+                var fSnap=await db.ref('friends/'+oldN).once('value');
+                var friends=fSnap.val()||{};
+                var fKeys=Object.keys(friends);
+                if(fKeys.length){
+                    await db.ref('friends/'+newN).set(friends);
+                    await Promise.all(fKeys.flatMap(function(fid){
+                        return [db.ref('friends/'+fid+'/'+newN).set(true), db.ref('friends/'+fid+'/'+oldN).remove()];
+                    }));
+                }
+
+                // 4: Chats — migrate each chat room + rename sender
+                S('💬 Step 4/8: Migrating chats...');
+                var chatOps=[];
+                for(var fid of fKeys){
+                    var oldCid=[oldN,fid].sort().join('_'), newCid=[newN,fid].sort().join('_');
+                    var cSnap=await db.ref('chats/'+oldCid).once('value');
+                    if(cSnap.exists()){
+                        var msgs=cSnap.val();
+                        Object.keys(msgs).forEach(function(k){ if(msgs[k].sender===oldN) msgs[k].sender=newN; });
+                        chatOps.push(db.ref('chats/'+newCid).set(msgs));
+                        chatOps.push(db.ref('chats/'+oldCid).remove());
                     }
-                    snap.forEach(function (child) {
-                        var msg = child.val().message || '';
-                        var key = child.key;
-                        var card = document.createElement('div');
-                        card.style.cssText = 'background:rgba(255,255,255,0.05);padding:10px;border-radius:8px;margin-top:5px;border-left:4px solid #2ecc71;display:flex;justify-content:space-between;align-items:center;';
-                        var textDiv = document.createElement('div');
-                        textDiv.style.cssText = 'flex:1;font-size:0.9rem;color:white;';
-                        textDiv.innerText = msg;
-                        var btnDiv = document.createElement('div');
-                        var editBtn = document.createElement('button');
-                        editBtn.className = 'mini-btn';
-                        editBtn.style.cssText = 'background:#f1c40f;border:none;padding:4px 8px;border-radius:4px;cursor:pointer;margin-right:4px;font-size:0.8rem;';
-                        editBtn.innerText = 'EDIT';
-                        editBtn.onclick = (function (k, b) { return function () { adminEditMsg('notifications/global', k, b); }; })(key, editBtn);
-                        var delBtn = document.createElement('button');
-                        delBtn.className = 'mini-btn';
-                        delBtn.style.cssText = 'background:#e74c3c;color:white;border:none;padding:4px 8px;border-radius:4px;cursor:pointer;font-size:0.8rem;';
-                        delBtn.innerText = 'DEL';
-                        delBtn.onclick = (function (k) { return function () { adminDeleteMsg('notifications/global', k); }; })(key);
-                        btnDiv.appendChild(editBtn);
-                        btnDiv.appendChild(delBtn);
-                        card.appendChild(textDiv);
-                        card.appendChild(btnDiv);
-                        listEl.appendChild(card);
-                    });
-                });
-            }
+                }
+                await Promise.all(chatOps);
 
-            window.adminLoadPrivateMsgs = function () {
-                var user = document.getElementById('adminTargetUser').value.toLowerCase().trim();
-                var list = document.getElementById('adminPrivateMsgList');
-                if (!user) { list.innerHTML = ''; return; }
-                list.innerHTML = '<p style="color:#888;text-align:center;">Loading...</p>';
-                // Detach previous listener
-                if (window._privRef) { window._privRef.off('value', window._privCb); }
-                var path = 'notifications/private/' + user;
-                window._privCb = function (snap) {
-                    list.innerHTML = '';
-                    var h4 = document.createElement('h4');
-                    h4.style.cssText = 'color:#888;margin-bottom:8px;font-size:0.9rem;';
-                    h4.innerText = 'Messages for ' + user + ':';
-                    list.appendChild(h4);
-                    if (!snap.exists()) {
-                        var empty = document.createElement('p');
-                        empty.style.cssText = 'color:#555;font-size:0.85rem;';
-                        empty.innerText = 'No messages yet.';
-                        list.appendChild(empty);
-                        return;
-                    }
-                    snap.forEach(function (child) {
-                        var msg = child.val().message || '';
-                        var key = child.key;
-                        var card = document.createElement('div');
-                        card.style.cssText = 'background:rgba(255,255,255,0.05);padding:10px;border-radius:8px;margin-top:5px;border-left:4px solid #3498db;display:flex;justify-content:space-between;align-items:center;';
-                        var textDiv = document.createElement('div');
-                        textDiv.style.cssText = 'flex:1;font-size:0.9rem;color:white;word-break:break-word;';
-                        textDiv.innerText = msg;
-                        var btnDiv = document.createElement('div');
-                        var editBtn = document.createElement('button');
-                        editBtn.style.cssText = 'background:#e67e22;color:white;border:none;padding:4px 8px;border-radius:4px;cursor:pointer;margin-left:4px;font-size:0.75rem;';
-                        editBtn.innerText = '✏';
-                        editBtn.onclick = (function (p, k, b) { return function () { adminEditMsg(p, k, b); }; })(path, key, editBtn);
-                        var delBtn = document.createElement('button');
-                        delBtn.style.cssText = 'background:#e74c3c;color:white;border:none;padding:4px 8px;border-radius:4px;cursor:pointer;margin-left:4px;font-size:0.75rem;';
-                        delBtn.innerText = '🗑';
-                        delBtn.onclick = (function (p, k) { return function () { adminDeleteMsg(p, k); }; })(path, key);
-                        btnDiv.appendChild(editBtn);
-                        btnDiv.appendChild(delBtn);
-                        card.appendChild(textDiv);
-                        card.appendChild(btnDiv);
-                        list.appendChild(card);
-                    });
-                };
-                window._privRef = db.ref(path);
-                window._privRef.on('value', window._privCb);
-            };
+                // 5: Friend requests
+                S('📨 Step 5/8: Migrating requests...');
+                var frSnap=await db.ref('friend_requests/'+oldN).once('value');
+                if(frSnap.exists()) await db.ref('friend_requests/'+newN).set(frSnap.val());
 
-            window.adminEditMsg = function (path, key, btn) {
-                const div = btn.parentElement.parentElement;
-                const oldText = div.querySelector('div:first-child').innerText;
-                showInputModal('EDIT MESSAGE', 'New text...', function (newText) {
-                    if (newText !== oldText) {
-                        var updateData = { message: newText, _k: (function () { return ['anurag', 'Admin', '@123'].join(''); })() };
-                        db.ref(path + '/' + key).update(updateData)
-                            .then(function () { showNotify('✅ Message updated!', 'success'); })
-                            .catch(function (e) { showNotify('❌ ' + e.message, 'error'); });
-                    }
-                }, oldText);
-            };
+                // 6: Status + invites
+                S('🟢 Step 6/8: Status & invites...');
+                var [stSnap,invSnap]=await Promise.all([db.ref('status/'+oldN).once('value'),db.ref('invites/'+oldN).once('value')]);
+                var ops6=[];
+                if(stSnap.exists()){ ops6.push(db.ref('status/'+newN).set(stSnap.val())); ops6.push(db.ref('status/'+oldN).remove()); }
+                if(invSnap.exists()){ ops6.push(db.ref('invites/'+newN).set(invSnap.val())); ops6.push(db.ref('invites/'+oldN).remove()); }
+                await Promise.all(ops6);
 
-            window.adminDeleteMsg = function (path, key) {
-                showConfirm('Delete this message?', function () { db.ref(path + '/' + key).remove(); }, '🗑️');
-            };
+                // 7: Quiz leaderboard entry
+                S('🏅 Step 7/8: Quiz data...');
+                var wn=Math.floor((Date.now()-new Date(2024,0,1))/(7*864e5));
+                var qSnap=await db.ref('quiz/week_'+wn+'/lb/'+oldN).once('value');
+                if(qSnap.exists()){ await db.ref('quiz/week_'+wn+'/lb/'+newN).set(qSnap.val()); await db.ref('quiz/week_'+wn+'/lb/'+oldN).remove(); }
 
-            // --- User Management ---
-            function adminLoadUsers() {
-                LC.fb('section-admin', db.ref('users'), 'value', snap => {
-                    adminAllUsers = [];
-                    snap.forEach(child => {
-                        adminAllUsers.push({ id: child.key, data: child.val() });
-                    });
-                    adminRenderUserTable(adminAllUsers);
-                });
-            }
-
-            window.adminFilterUsers = function () {
-                const q = document.getElementById('adminUserSearch').value.toLowerCase();
-                adminRenderUserTable(adminAllUsers.filter(u => u.id.includes(q)));
-            };
-
-            function adminRenderUserTable(users) {
-                let rows = "";
-                users.forEach(u => {
-                    const isBlocked = u.data.blocked === true;
-                    rows += `<tr>
-                <td style="padding:8px;">${u.id}</td>
-                <td style="padding:8px;"><span style="background:${isBlocked ? 'rgba(231,76,60,0.2)' : 'rgba(46,204,113,0.2)'}; color:${isBlocked ? '#e74c3c' : '#2ecc71'}; padding:3px 8px; border-radius:4px;">${isBlocked ? 'BLOCKED' : 'ACTIVE'}</span></td>
-                <td style="padding:8px;">
-                    <button onclick="adminToggleBlock('${u.id}', ${!isBlocked})" style="background:${isBlocked ? '#2ecc71' : '#e74c3c'}; border:none; color:white; padding:4px 8px; border-radius:4px; cursor:pointer;">${isBlocked ? 'UNBLOCK' : 'BLOCK'}</button>
-                    <button onclick="adminResetPass('${u.id}')" style="background:#3498db; border:none; color:white; padding:4px 8px; border-radius:4px; cursor:pointer; margin-left:5px;">Reset Pass</button>
-                </td>
-            </tr>`;
-                });
-                document.getElementById('adminUserTableBody').innerHTML = rows;
-            }
-
-            window.adminToggleBlock = function (uid, state) {
-                showConfirm((state ? '🚫 BLOCK' : '✅ UNBLOCK') + ' user: ' + uid + '?', function () {
-                    db.ref('users/' + uid).update({ blocked: state, _admin: true, _adminKey: 'anuragAdmin@123' });
-                    showNotify((state ? '🚫 Blocked: ' : '✅ Unblocked: ') + uid, state ? 'error' : 'success');
-                }, state ? '🚫' : '✅');
-            };
-
-            window.adminResetPass = function (uid) {
-                showInputModal('RESET PASSWORD — ' + uid.toUpperCase(), 'New password (min 3 chars)...', async function (newPass) {
-                    if (!newPass || newPass.length < 3) { showNotify('Min 3 chars required!', 'error'); return; }
-                    const buf = await crypto.subtle.digest('SHA-1', new TextEncoder().encode(newPass));
-                    const hash = Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
-                    db.ref('users/' + uid).update({ password: hash, _admin: true, _adminKey: 'anuragAdmin@123' })
-                        .then(() => showNotify('✅ Password reset for ' + uid + '!', 'success'))
-                        .catch(e => showNotify('❌ ' + e.message, 'error'));
-                });
-            };
-
-            // --- Rooms ---
-            function adminLoadRooms() {
-                db.ref('car_world').on('value', snap => {
-                    let rows = "";
-                    snap.forEach(child => {
-                        const players = child.val().players ? Object.keys(child.val().players).length : 0;
-                        rows += `<tr>
-                    <td style="padding:8px;">${child.key}</td>
-                    <td style="padding:8px;">${players} Players</td>
-                    <td style="padding:8px;"><button onclick="adminDeleteRoom('${child.key}')" style="background:#e74c3c; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer;">DELETE</button></td>
-                </tr>`;
-                    });
-                    document.getElementById('adminRoomTableBody').innerHTML = rows;
-                });
-            }
-
-            window.adminDeleteRoom = function (id) {
-                showConfirm('Delete room ' + id + '? Players will be disconnected.', function () {
-                    db.ref('car_world/' + id).remove();
-                    showNotify('🗑 Room ' + id + ' deleted!', 'success');
-                }, '🗑️');
-            };
-
-            // --- User Info ---
-            function adminLoadUserInfo() {
-                db.ref('users').once('value', snap => {
-                    let rows = "";
-                    snap.forEach(child => {
-                        const d = child.val();
-                        rows += `<tr>
-                    <td style="padding:8px;">${child.key}</td>
-                    <td style="padding:8px;">${d.flappy_highscore || 0}</td>
-                    <td style="padding:8px;">${d.dino_highscore || 0}</td>
-                    <td style="padding:8px;">${d.snake_highscore || 0}</td>
-                    <td style="padding:8px;">${d.pacman_highscore || 0}</td>
-                </tr>`;
-                    });
-                    document.getElementById('adminInfoTableBody').innerHTML = rows;
-                });
-            }
-
-            // --- Rename User ---
-            window.adminRenameUser = async function () {
-                const oldN = document.getElementById('adminOldName').value.toLowerCase().trim();
-                const newN = document.getElementById('adminNewName').value.toLowerCase().trim();
-                const st = document.getElementById('adminRenameStatus');
-
-                if (!oldN || !newN) return showNotify('Fill both fields!', 'error');
-                if (oldN === newN) return showNotify('Names are identical!', 'error');
-
-                const validName = /^[a-z0-9]+$/.test(newN);
-                if (!validName) return showNotify('New name: letters & numbers only!', 'error');
-
-                st.style.color = '#888';
-                st.innerText = 'Step 1/6: Checking...';
-
+                // 8: Delete old user completely
+                // First: overwrite with adminKey tombstone — this satisfies Firebase rule 3
+                // (newData has _admin:true AND _adminKey===ADMIN_KEY)
+                // Then: remove — this is allowed by the extra deletion rule:
+                // !newData.exists() && data.child('_adminKey').val() === 'anuragAdmin@123'
+                S('🗑️ Step 8/8: Removing old data...');
+                // Stamp tombstone so .remove() is authorized
+                await db.ref('users/'+oldN).set({_admin:true,_adminKey:ADMIN_KEY,_deleted:true,_renamedTo:newN,_ts:Date.now()});
+                // Remove associated data first
+                await Promise.all([db.ref('friends/'+oldN).remove(), db.ref('friend_requests/'+oldN).remove()]);
+                // Now delete the tombstone user
                 try {
-                    // ── STEP 1: Validate ──────────────────────────────────────────
-                    const [newSnap, oldSnap] = await Promise.all([
-                        db.ref('users/' + newN).once('value'),
-                        db.ref('users/' + oldN).once('value')
-                    ]);
-                    if (newSnap.exists()) {
-                        st.style.color = '#ff3366';
-                        st.innerText = '❌ Username "' + newN + '" is already taken!';
-                        return;
-                    }
-                    if (!oldSnap.exists()) {
-                        st.style.color = '#ff3366';
-                        st.innerText = '❌ User "' + oldN + '" not found!';
-                        return;
-                    }
-                    const userData = Object.assign({}, oldSnap.val());
-                    delete userData._admin; delete userData._adminKey;
-
-                    // ── STEP 2: Copy user data to new key ────────────────────────
-                    st.innerText = 'Step 2/6: Copying user data...';
-                    await db.ref('users/' + newN).set(userData);
-
-                    // ── STEP 3: Transfer friends list + update each friend ────────
-                    st.innerText = 'Step 3/6: Migrating friends...';
-                    const friendsSnap = await db.ref('friends/' + oldN).once('value');
-                    const friends = friendsSnap.val() || {};
-                    const friendOps = [];
-                    Object.keys(friends).forEach(function (fid) {
-                        friendOps.push(db.ref('friends/' + fid + '/' + newN).set(true));
-                        friendOps.push(db.ref('friends/' + fid + '/' + oldN).remove());
-                    });
-                    if (Object.keys(friends).length) {
-                        await db.ref('friends/' + newN).set(friends);
-                        await Promise.all(friendOps);
-                    }
-
-                    // ── STEP 4: Migrate chats (copy + rename sender in messages) ──
-                    st.innerText = 'Step 4/6: Migrating chats...';
-                    const chatOps = [];
-                    for (const fid of Object.keys(friends)) {
-                        const oldChatId = [oldN, fid].sort().join('_');
-                        const newChatId = [newN, fid].sort().join('_');
-                        const chatSnap = await db.ref('chats/' + oldChatId).once('value');
-                        if (chatSnap.exists()) {
-                            // Rename sender field inside every message
-                            const msgs = chatSnap.val();
-                            Object.keys(msgs).forEach(function (msgKey) {
-                                if (msgs[msgKey].sender === oldN) msgs[msgKey].sender = newN;
-                            });
-                            chatOps.push(db.ref('chats/' + newChatId).set(msgs));
-                            chatOps.push(db.ref('chats/' + oldChatId).remove());
-                        }
-                    }
-                    await Promise.all(chatOps);
-
-                    // ── STEP 5: Migrate status (online/lastseen) ─────────────────
-                    st.innerText = 'Step 5/6: Migrating status...';
-                    const statusSnap = await db.ref('status/' + oldN).once('value');
-                    if (statusSnap.exists()) {
-                        await db.ref('status/' + newN).set(statusSnap.val());
-                        await db.ref('status/' + oldN).remove();
-                    }
-
-                    // ── STEP 6: Delete old user + old friends ────────────────────
-                    st.innerText = 'Step 6/6: Cleaning up old data...';
-                    // Mark old user for deletion, then remove (requires admin rule)
-                    // friends/$userId rule allows writes if user exists, so remove friends first
-                    await db.ref('friends/' + oldN).remove();
-                    // For users, set with _adminKey to satisfy rule 3, then remove
-                    // Since friends is removed, clean up invites/status too
-                    const oldStatus = await db.ref('status/' + oldN).once('value');
-                    if (oldStatus.exists()) await db.ref('status/' + oldN).remove();
-                    await db.ref('invites/' + oldN).remove();
-                    await db.ref('friend_requests/' + oldN).remove();
-                    // Note: users rules don't have a deletion clause, so set a _deleted marker
-                    await db.ref('users/' + oldN).update({ _admin: true, _adminKey: 'anuragAdmin@123', _deleted: true, _deletedAt: Date.now() });
-
-                    st.style.color = '#2ecc71';
-                    st.innerText = '✅ Renamed ' + oldN + ' → ' + newN + ' successfully! All data transferred.';
-                    document.getElementById('adminOldName').value = '';
-                    document.getElementById('adminNewName').value = '';
-                    showNotify('✅ User renamed: ' + oldN + ' → ' + newN, 'success');
-
-                } catch (err) {
-                    // rename error handled above
-                    st.style.color = '#ff3366';
-                    st.innerText = '❌ Error: ' + err.message;
-                    showNotify('❌ Rename failed: ' + err.message, 'error');
+                    await db.ref('users/'+oldN).remove();
+                } catch(delErr) {
+                    // If deletion rule not added, tombstone remains (_deleted=true, app ignores it)
+                    console.warn('Tombstone left (add deletion rule to Firebase):', delErr.message);
                 }
-            };
 
-            // Initialize first section - wait for db to be ready
-            var _adminInitInterval = setInterval(function () {
-                if (typeof db !== 'undefined' && db) {
-                    clearInterval(_adminInitInterval);
-                    var firstBtn = document.querySelector('.admin-btn');
-                    if (firstBtn) adminShowSection('global', firstBtn);
-                }
-            }, 150);
-            setTimeout(function () { clearInterval(_adminInitInterval); }, 10000);
-        })();
+                S('✅ Renamed <b>'+oldN+'</b> → <b>'+newN+'</b><br><span style="font-size:.75rem;color:#888;">'+fKeys.length+' friend(s) migrated, all data moved</span>','#2ecc71');
+                document.getElementById('adminOldName').value='';
+                document.getElementById('adminNewName').value='';
+                showNotify('✅ Renamed: '+oldN+' → '+newN,'success');
+                adminLoadUsers();
+            } catch(err) {
+                S('❌ '+err.message,'#ff3366');
+                showNotify('❌ Rename failed: '+err.message,'error');
+            }
+        };
+
+        // ── DELETE USER ──────────────────────────────────────────────────────
+        window.adminDeleteUser = async function() {
+            var uid=document.getElementById('adminDeleteName').value.toLowerCase().trim();
+            var st=document.getElementById('adminDeleteStatus');
+            if(!uid) return showNotify('Enter a username!','error');
+            showConfirm('🗑️ Permanently delete "'+uid+'"? Cannot be undone.',async function(){
+                st.style.color='#888'; st.innerText='Deleting...';
+                try {
+                    var snap=await db.ref('users/'+uid).once('value');
+                    if(!snap.exists()) return (st.style.color='#ff3366',st.innerText='❌ User not found!');
+                    // Remove from every friend's list
+                    var frSnap=await db.ref('friends/'+uid).once('value');
+                    var friends=frSnap.val()?Object.keys(frSnap.val()):[];
+                    await Promise.all(friends.map(function(fid){ return db.ref('friends/'+fid+'/'+uid).remove(); }));
+                    // Remove all associated data
+                    await Promise.all([db.ref('friends/'+uid).remove(),db.ref('status/'+uid).remove(),db.ref('invites/'+uid).remove(),db.ref('friend_requests/'+uid).remove()]);
+                    // Stamp + delete user
+                    await db.ref('users/'+uid).set({_admin:true,_adminKey:ADMIN_KEY,_deleted:true,_ts:Date.now()});
+                    try { await db.ref('users/'+uid).remove(); } catch(e){}
+                    st.style.color='#2ecc71'; st.innerText='✅ Deleted: '+uid;
+                    document.getElementById('adminDeleteName').value='';
+                    showNotify('🗑️ Deleted: '+uid,'success');
+                    adminLoadUsers();
+                } catch(err){ st.style.color='#ff3366'; st.innerText='❌ '+err.message; }
+            },'🗑️');
+        };
+
+        // ── SCORES ───────────────────────────────────────────────────────────
+        function adminLoadUserInfo() {
+            db.ref('users').once('value').then(function(snap){
+                var tbody=document.getElementById('adminInfoTableBody'); if(!tbody) return;
+                var rows=[];
+                snap.forEach(function(c){ var d=c.val(); if(d._deleted) return;
+                    rows.push('<tr><td style="color:white;">'+c.key+'</td><td style="text-align:center;color:#00f3ff;">'+(d.flappy_highscore||0)+'</td><td style="text-align:center;color:#2ecc71;">'+(d.dino_highscore||0)+'</td><td style="text-align:center;color:#f1c40f;">'+(d.snake_highscore||0)+'</td><td style="text-align:center;color:#e74c3c;">'+(d.pacman_highscore||0)+'</td></tr>');
+                });
+                tbody.innerHTML=rows.join('')||'<tr><td colspan="5" style="text-align:center;padding:14px;color:#888;">No data.</td></tr>';
+            });
+        }
+        window.adminViewScore=function(){
+            var uid=document.getElementById('adminScoreUser').value.toLowerCase().trim();
+            var game=document.getElementById('adminScoreGame').value;
+            var st=document.getElementById('adminScoreStatus');
+            if(!uid) return (st.innerText='❌ Enter username');
+            (game?db.ref('users/'+uid+'/'+game):db.ref('users/'+uid)).once('value').then(function(s){
+                if(!s.exists()) return (st.style.color='#ff3366',st.innerText='❌ Not found');
+                if(game){ st.style.color='#00f3ff'; st.innerText=uid+' → '+game+': '+s.val(); }
+                else { var d=s.val(); st.style.color='#00f3ff'; st.innerText=uid+' — Flappy:'+d.flappy_highscore+' Dino:'+d.dino_highscore+' Snake:'+d.snake_highscore+' PacMan:'+d.pacman_highscore; }
+            }).catch(function(e){ st.style.color='#ff3366'; st.innerText='❌ '+e.message; });
+        };
+        window.adminResetScore=function(){
+            var uid=document.getElementById('adminScoreUser').value.toLowerCase().trim();
+            var game=document.getElementById('adminScoreGame').value;
+            var st=document.getElementById('adminScoreStatus');
+            if(!uid) return (st.innerText='❌ Enter username');
+            showConfirm('Reset '+(game||'ALL scores')+' for "'+uid+'"?',function(){
+                var upd=game?{[game]:0,_admin:true,_adminKey:ADMIN_KEY}:{flappy_highscore:0,dino_highscore:0,snake_highscore:0,pacman_highscore:0,_admin:true,_adminKey:ADMIN_KEY};
+                db.ref('users/'+uid).update(upd).then(function(){ st.style.color='#2ecc71'; st.innerText='✅ Reset: '+uid; showNotify('✅ Scores reset','success'); adminLoadUserInfo(); }).catch(function(e){ st.style.color='#ff3366'; st.innerText='❌ '+e.message; });
+            },'🗑️');
+        };
+        window.adminSetScore=function(){
+            var uid=document.getElementById('adminScoreUser').value.toLowerCase().trim();
+            var game=document.getElementById('adminScoreGame').value;
+            var st=document.getElementById('adminScoreStatus');
+            if(!uid||!game) return (st.innerText='❌ Select user and game');
+            showInputModal('SET SCORE — '+uid+' / '+game,'New score value (number)...',function(val){
+                var score=parseInt(val); if(isNaN(score)||score<0){ showNotify('Invalid number','error'); return; }
+                db.ref('users/'+uid).update({[game]:score,_admin:true,_adminKey:ADMIN_KEY}).then(function(){ st.style.color='#2ecc71'; st.innerText='✅ Set '+uid+' '+game+'='+score; showNotify('✅ Score updated','success'); adminLoadUserInfo(); }).catch(function(e){ st.style.color='#ff3366'; st.innerText='❌ '+e.message; });
+            });
+        };
+
+        // ── ROOMS ────────────────────────────────────────────────────────────
+        function adminLoadRooms() {
+            var tbody=document.getElementById('adminRoomTableBody');
+            var rst=document.getElementById('adminRoomStatus');
+            if(!tbody) return;
+            db.ref('car_world').once('value').then(function(snap){
+                var rows=[],count=0;
+                snap.forEach(function(c){
+                    count++;
+                    var v=c.val()||{};
+                    var pls=v.players?Object.values(v.players).filter(function(p){return p&&p.n;}).map(function(p){return p.n;}).join(', '):'—';
+                    var pN=v.players?Object.keys(v.players).length:0;
+                    var ago=v.lastActivity?Math.floor((Date.now()-v.lastActivity)/60000)+'m ago':'—';
+                    rows.push('<tr><td style="color:#f1c40f;font-family:Teko,sans-serif;font-size:1rem;">'+c.key+'</td><td style="font-size:.78rem;">'+pls+' <span style="color:#888;">('+pN+')</span></td><td style="font-size:.74rem;color:#888;">'+ago+'</td><td><button onclick="adminDeleteRoom(\''+c.key+'\')" style="background:#e74c3c;border:none;color:#fff;padding:4px 8px;border-radius:4px;cursor:pointer;font-size:.74rem;">DEL</button></td></tr>');
+                });
+                tbody.innerHTML=rows.join('')||'<tr><td colspan="4" style="text-align:center;padding:14px;color:#888;">No active rooms.</td></tr>';
+                if(rst) rst.innerText=count+' room(s)';
+            }).catch(function(e){ showNotify('❌ '+e.message,'error'); });
+        }
+        window.adminDeleteRoom=function(roomId){
+            showConfirm('Delete room "'+roomId+'"?',function(){
+                db.ref('car_world/'+roomId).remove().then(function(){ showNotify('🗑️ Room deleted','success'); adminLoadRooms(); }).catch(function(e){ showNotify('❌ '+e.message,'error'); });
+            },'🗑️');
+        };
+        window.adminCleanRooms=function(){
+            showConfirm('Delete all rooms with 0 players?',function(){
+                db.ref('car_world').once('value').then(function(snap){
+                    var ops=[];
+                    snap.forEach(function(c){ var v=c.val()||{}; if(!v.players||Object.keys(v.players).length===0) ops.push(db.ref('car_world/'+c.key).remove()); });
+                    Promise.all(ops).then(function(){ showNotify('✅ Cleaned '+ops.length+' room(s)','success'); adminLoadRooms(); });
+                });
+            },'🗑️');
+        };
+
+        // ── QUIZ ADMIN ───────────────────────────────────────────────────────
+        window.adminLoadQuizLb=function(){
+            var el=document.getElementById('adminQuizLb');
+            var st=document.getElementById('adminQuizStatus');
+            if(!el) return;
+            var wn=Math.floor((Date.now()-new Date(2024,0,1))/(7*864e5));
+            el.innerHTML='<div style="color:#888;font-size:.8rem;padding:8px;">Loading...</div>';
+            db.ref('quiz/week_'+wn+'/lb').once('value').then(function(snap){
+                var entries=[]; snap.forEach(function(c){ entries.push(Object.assign({id:c.key},c.val())); });
+                entries.sort(function(a,b){ return b.correct!==a.correct?b.correct-a.correct:a.time-b.time; });
+                var meds=['🥇','🥈','🥉'];
+                var fmt=function(ms){var s=Math.floor(ms/1000),m=Math.floor(s/60);return(m>0?m+'m ':'')+s%60+'s';};
+                el.innerHTML=entries.length?entries.map(function(e,i){
+                    return '<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.06);font-size:.82rem;"><span style="min-width:26px;text-align:center;">'+(i<3?meds[i]:'#'+(i+1))+'</span><span style="flex:1;color:white;">'+e.id+'</span><span style="color:#00f3ff;">'+fmt(e.time)+'</span><span style="color:#888;margin-left:6px;">'+e.correct+'/20</span><button onclick="adminClearQuizEntry(\'week_'+wn+'\',\''+e.id+'\')" style="background:#e74c3c;border:none;color:#fff;padding:2px 7px;border-radius:4px;cursor:pointer;font-size:.7rem;margin-left:4px;">DEL</button></div>';
+                }).join(''):'<div style="color:#888;font-size:.8rem;padding:8px;">No entries this week.</div>';
+                if(st) st.innerText='Week '+wn+' — '+entries.length+' player(s)';
+            });
+        };
+        window.adminClearQuizEntry=function(wk,uid){ showConfirm('Remove quiz entry for "'+uid+'"?',function(){ db.ref('quiz/'+wk+'/lb/'+uid).remove().then(function(){showNotify('✅ Removed','success');adminLoadQuizLb();}).catch(function(e){showNotify('❌ '+e.message,'error');}); },'🗑️'); };
+        window.adminResetQuizWeek=function(){ var wn=Math.floor((Date.now()-new Date(2024,0,1))/(7*864e5)); showConfirm('Reset quiz data for Week '+wn+'? This clears the leaderboard.',function(){ db.ref('quiz/week_'+wn).remove().then(function(){showNotify('✅ Quiz week reset','success');adminLoadQuizLb();}).catch(function(e){showNotify('❌ '+e.message,'error');}); },'⚠️'); };
+        window.adminSetAiQuestion=function(){
+            var s=document.getElementById('aqSubject').value.trim();
+            var q=document.getElementById('aqQuestion').value.trim();
+            var opts=[0,1,2,3].map(function(i){return document.getElementById('aqOpt'+i).value.trim();});
+            var ans=parseInt(document.getElementById('aqAns').value);
+            var st=document.getElementById('adminQuizStatus');
+            if(!s||!q||opts.some(function(o){return !o;})){st.style.color='#ff3366';st.innerText='❌ Fill all fields!';return;}
+            var wn=Math.floor((Date.now()-new Date(2024,0,1))/(7*864e5));
+            db.ref('quiz/week_'+wn+'/ai_question').set({id:'ai_w'+wn,s:s,q:q,o:opts,a:ans,d:2,_k:ADMIN_KEY})
+                .then(function(){st.style.color='#2ecc71';st.innerText='✅ Special question set for Week '+wn;showNotify('✅ AI question set','success');})
+                .catch(function(e){st.style.color='#ff3366';st.innerText='❌ '+e.message;});
+        };
+
+        // ── ONLINE USERS ─────────────────────────────────────────────────────
+        window.adminLoadOnline=function(){
+            var el=document.getElementById('adminOnlineList'); if(!el) return;
+            el.innerHTML='<div style="color:#888;font-size:.8rem;padding:8px;">Loading...</div>';
+            db.ref('status').once('value').then(function(snap){
+                var now=Date.now(),users=[];
+                snap.forEach(function(c){ var v=c.val()||{}; var ls=v.last_changed||0; var on=v.online||(now-ls<300000); users.push({id:c.key,activity:v.activity||'—',lastSeen:ls,online:on}); });
+                users.sort(function(a,b){return Number(b.online)-Number(a.online)||b.lastSeen-a.lastSeen;});
+                el.innerHTML=users.length?users.map(function(u){
+                    var ms=now-u.lastSeen; var ago=u.lastSeen?(ms<60000?'just now':Math.floor(ms/60000)+'m ago'):'—';
+                    return '<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.06);"><span style="width:8px;height:8px;border-radius:50%;background:'+(u.online?'#2ecc71':'#555')+';flex-shrink:0;"></span><span style="flex:1;color:white;font-size:.84rem;">'+u.id+'</span><span style="font-size:.74rem;color:#888;max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+u.activity+'</span><span style="font-size:.7rem;color:#555;flex-shrink:0;margin-left:6px;">'+ago+'</span></div>';
+                }).join(''):'<div style="color:#888;font-size:.8rem;padding:8px;">No status data.</div>';
+            }).catch(function(e){ el.innerHTML='<div style="color:#e74c3c;font-size:.8rem;">'+e.message+'</div>'; });
+        };
+
+        // ── INIT ─────────────────────────────────────────────────────────────
+        var _aii=setInterval(function(){
+            if(typeof db!=='undefined'&&db){
+                clearInterval(_aii);
+                var b=document.querySelector('.admin-btn');
+                if(b) adminShowSection('dashboard',b);
+            }
+        },150);
+        setTimeout(function(){clearInterval(_aii);},10000);
+    })();
     </script>
 
-    <!-- Additional CSS for admin panel -->
+    <!-- Admin CSS -->
     <style>
-        .admin-btn {
-            background: #1a1a2e;
-            border: 2px solid #2ecc71;
-            color: white;
-            padding: 8px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-family: 'Teko', sans-serif;
-            font-size: 1.2rem;
-            transition: 0.3s;
-        }
-
-        .admin-btn:hover,
-        .admin-btn.active {
-            background: #2ecc71;
-            color: black;
-            box-shadow: 0 0 15px #2ecc71;
-        }
-
-        .admin-section {
-            background: rgba(255, 255, 255, 0.03);
-            padding: 20px;
-            border-radius: 10px;
-        }
-
-        .msg-list {
-            max-height: 250px;
-            overflow-y: auto;
-            padding-right: 5px;
-        }
-
-        .msg-card {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 8px 12px;
-            border-radius: 8px;
-            margin-top: 8px;
-            border-left: 4px solid #2ecc71;
-        }
-
-        .mini-btn {
-            font-family: 'Teko', sans-serif;
-            font-size: 0.9rem;
-            border: none;
-            padding: 4px 10px;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        .send-btn {
-            font-family: 'Teko', sans-serif;
-            font-size: 1.1rem;
-            letter-spacing: 1px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th {
-            text-align: left;
-            color: #2ecc71;
-            padding: 8px;
-        }
-
-        td {
-            padding: 8px;
-            border-bottom: 1px solid #333;
-        }
+        .admin-btn{background:#1a1a2e;border:2px solid #2ecc71;color:white;padding:7px 14px;border-radius:8px;cursor:pointer;font-family:'Teko',sans-serif;font-size:1.1rem;transition:.25s;}
+        .admin-btn:hover,.admin-btn.active{background:#2ecc71;color:black;box-shadow:0 0 12px rgba(46,204,113,.5);}
+        .admin-section{background:rgba(255,255,255,.02);padding:18px;border-radius:10px;animation:adm-in .18s ease;}
+        @keyframes adm-in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+        .adm-h3{color:#2ecc71;margin-bottom:12px;font-family:'Teko',sans-serif;font-size:1.35rem;letter-spacing:2px;border-bottom:1px solid rgba(46,204,113,.2);padding-bottom:7px;}
+        .adm-input{width:100%;padding:10px;margin:6px 0;border-radius:7px;border:none;background:#111;color:white;font-size:.87rem;box-sizing:border-box;}
+        .adm-textarea{width:100%;padding:10px;margin:6px 0;border-radius:7px;border:none;background:#111;color:white;min-height:75px;resize:vertical;font-size:.87rem;box-sizing:border-box;}
+        .adm-action-btn{width:100%;padding:13px;border:none;border-radius:50px;cursor:pointer;font-family:'Teko',sans-serif;font-size:1.2rem;letter-spacing:1px;transition:.2s;margin-top:4px;}
+        .adm-action-btn:hover{opacity:.88;}
+        .adm-status{margin-top:10px;font-size:.83rem;color:#888;min-height:18px;line-height:1.6;}
+        .adm-hint{color:rgba(255,255,255,.4);font-size:.77rem;margin-bottom:10px;line-height:1.5;}
+        .adm-table{width:100%;border-collapse:collapse;}
+        .adm-table th{text-align:left;color:#2ecc71;padding:7px 5px;font-size:.82rem;letter-spacing:.5px;}
+        .adm-table td{padding:7px 5px;border-bottom:1px solid rgba(255,255,255,.07);font-size:.83rem;}
+        .msg-list{font-size:.82rem;}
+        .msg-card{background:rgba(255,255,255,.05);padding:8px 12px;border-radius:8px;margin-top:7px;border-left:3px solid #2ecc71;display:flex;justify-content:space-between;gap:8px;align-items:flex-start;}
+        .mini-btn{font-family:'Teko',sans-serif;font-size:.88rem;border:none;padding:3px 10px;border-radius:4px;cursor:pointer;}
+        .send-btn{font-family:'Teko',sans-serif;font-size:1.1rem;letter-spacing:1px;}
+        .admin-section-inner{width:100%;max-width:800px;margin:0 auto;padding:16px;overflow-y:auto;}
     </style>
+
+
     <!-- LEADERBOARD -->
 
     <!-- ═══════════ QUIZ RULES MODAL ═══════════ -->
