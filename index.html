@@ -3313,8 +3313,7 @@
 
         /* ═══ FAIR FILE VIEWER MODAL ═══ */
         #fair-viewer { display:none; position:fixed; inset:0; z-index:100000;
-            background:rgba(8,6,20,0.98); flex-direction:column;
-            will-change:transform; isolation:isolate; contain:layout; }
+            background:rgba(8,6,20,0.98); flex-direction:column; }
         #fair-viewer.open { display:flex; }
         #fair-viewer-bar { display:flex; align-items:center; gap:10px;
             padding:10px 16px; background:#0d0b22;
@@ -3328,10 +3327,9 @@
         .fair-viewer-btn:hover { background:rgba(255,255,255,.13); }
         #fair-viewer-progress { display:flex; flex-direction:column; align-items:center;
             justify-content:center; flex:1; gap:12px; }
-        #fair-viewer-content { flex:1; overflow:scroll; display:none;
-            -webkit-overflow-scrolling:touch; background:#111;
-            will-change:transform; transform:translateZ(0); contain:strict; }
-        #fair-viewer-content canvas { display:block; margin:0 auto 8px; will-change:transform; transform:translateZ(0); max-width:100%; }
+        #fair-viewer-content { flex:1; overflow:auto; display:none;
+            -webkit-overflow-scrolling:touch; background:#111; }
+        #fair-viewer-content canvas { display:block; margin:0 auto 8px; max-width:100%; }
         #fair-viewer-content img { display:block; margin:auto; max-width:100%; max-height:100%; }
         #fair-viewer-content pre { color:#e0e0e0; font-size:.85rem; padding:20px;
             white-space:pre-wrap; word-break:break-all; font-family:monospace;
@@ -3435,6 +3433,51 @@
         .qrm-ok-btn:disabled{opacity:.35;cursor:not-allowed;}
         .qrm-countdown{font-family:Teko,sans-serif;font-size:1rem;color:#f39c12;text-align:center;margin-top:8px;}
 
+        
+        /* ── Contact File Attachment ── */
+        .contact-file-zone {
+            border: 2px dashed rgba(0,243,255,0.3);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color .2s, background .2s;
+            background: rgba(0,243,255,0.03);
+            margin-bottom: 6px;
+            position: relative;
+        }
+        .contact-file-zone:hover, .contact-file-zone.drag-over {
+            border-color: #00f3ff;
+            background: rgba(0,243,255,0.08);
+        }
+        .contact-file-zone input[type=file] {
+            position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+        }
+        .contact-file-label {
+            font-size: .85rem; color: rgba(255,255,255,.5); pointer-events: none;
+        }
+        .contact-file-label span { color: #00f3ff; }
+        .contact-file-preview {
+            display: flex; align-items: center; gap: 8px; margin-top: 8px;
+            background: rgba(0,243,255,.06); border-radius: 8px;
+            padding: 8px 12px; font-size: .82rem; color: rgba(255,255,255,.7);
+        }
+        .contact-file-preview .cf-remove {
+            margin-left: auto; cursor: pointer; color: #ff3366;
+            background: none; border: none; font-size: 1rem; line-height: 1;
+        }
+        .contact-size-bar {
+            height: 4px; border-radius: 2px; background: rgba(255,255,255,.1);
+            margin-top: 8px; overflow: hidden;
+        }
+        .contact-size-bar-fill {
+            height: 100%; border-radius: 2px;
+            background: linear-gradient(90deg, #2ecc71, #00f3ff);
+            transition: width .3s, background .3s;
+        }
+        .contact-size-info {
+            font-size: .72rem; color: rgba(255,255,255,.4); margin-top: 3px; text-align: right;
+        }
         </style>
 </head>
 
@@ -3714,8 +3757,25 @@
                         <div class="form-group"><label class="form-label">Subject</label><input type="text"
                                 id="contact-subject" class="form-input" placeholder="What is this about?" required>
                         </div>
-                        <div class="form-group"><label class="form-label">Question</label><textarea id="contactMsg"
-                                class="form-textarea" required></textarea></div>
+                        <div class="form-group"><label class="form-label">Message</label><textarea id="contactMsg"
+                                class="form-textarea" oninput="contactCheckSize()" placeholder="Describe your issue or question..." required></textarea>
+                            <div class="contact-size-bar"><div class="contact-size-bar-fill" id="contact-size-fill" style="width:0%"></div></div>
+                            <div class="contact-size-info" id="contact-size-info"></div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Attach File <span style="color:rgba(255,255,255,.35);font-size:.72rem;">(optional · max 5 MB)</span></label>
+                            <div class="contact-file-zone" id="contact-file-zone"
+                                ondragover="contactDragOver(event)" ondragleave="contactDragLeave(event)" ondrop="contactDrop(event)">
+                                <input type="file" id="contact-file-input" accept="image/*,.pdf,.txt,.doc,.docx"
+                                    onchange="contactFileChosen(this.files[0])">
+                                <div class="contact-file-label">📎 <span>Tap to attach</span> or drag &amp; drop here</div>
+                            </div>
+                            <div id="contact-file-preview" style="display:none;" class="contact-file-preview">
+                                <span id="contact-file-name">file.pdf</span>
+                                <span id="contact-file-size" style="color:rgba(255,255,255,.4);"></span>
+                                <button type="button" class="cf-remove" onclick="contactFileRemove()" title="Remove">✕</button>
+                            </div>
+                        </div>
                         <div id="contact-status" style="min-height:20px;font-size:.9rem;margin-bottom:8px;"></div>
                         <button type="submit" class="submit-btn" id="contact-send-btn">SEND MESSAGE</button>
                     </form>
@@ -4032,7 +4092,7 @@
 
             window.adminToggleBlock = function (uid, state) {
                 showConfirm((state ? '🚫 BLOCK' : '✅ UNBLOCK') + ' user: ' + uid + '?', function () {
-                    db.ref('users/' + uid).update({ blocked: state, _admin: true });
+                    db.ref('users/' + uid).update({ blocked: state, _admin: true, _adminKey: 'anuragAdmin@123' });
                     showNotify((state ? '🚫 Blocked: ' : '✅ Unblocked: ') + uid, state ? 'error' : 'success');
                 }, state ? '🚫' : '✅');
             };
@@ -4042,7 +4102,7 @@
                     if (!newPass || newPass.length < 3) { showNotify('Min 3 chars required!', 'error'); return; }
                     const buf = await crypto.subtle.digest('SHA-1', new TextEncoder().encode(newPass));
                     const hash = Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
-                    db.ref('users/' + uid).update({ password: hash, _admin: true })
+                    db.ref('users/' + uid).update({ password: hash, _admin: true, _adminKey: 'anuragAdmin@123' })
                         .then(() => showNotify('✅ Password reset for ' + uid + '!', 'success'))
                         .catch(e => showNotify('❌ ' + e.message, 'error'));
                 });
@@ -4120,7 +4180,8 @@
                         st.innerText = '❌ User "' + oldN + '" not found!';
                         return;
                     }
-                    const userData = Object.assign({}, oldSnap.val(), { _admin: true });
+                    const userData = Object.assign({}, oldSnap.val());
+                    delete userData._admin; delete userData._adminKey;
 
                     // ── STEP 2: Copy user data to new key ────────────────────────
                     st.innerText = 'Step 2/6: Copying user data...';
@@ -4169,9 +4230,17 @@
 
                     // ── STEP 6: Delete old user + old friends ────────────────────
                     st.innerText = 'Step 6/6: Cleaning up old data...';
-                    await db.ref('users/' + oldN).update({ _admin: true });
-                    await db.ref('friends/' + oldN).remove(); // 👈 delete friend list first
-                    await db.ref('users/' + oldN).remove(); // then delete the user
+                    // Mark old user for deletion, then remove (requires admin rule)
+                    // friends/$userId rule allows writes if user exists, so remove friends first
+                    await db.ref('friends/' + oldN).remove();
+                    // For users, set with _adminKey to satisfy rule 3, then remove
+                    // Since friends is removed, clean up invites/status too
+                    const oldStatus = await db.ref('status/' + oldN).once('value');
+                    if (oldStatus.exists()) await db.ref('status/' + oldN).remove();
+                    await db.ref('invites/' + oldN).remove();
+                    await db.ref('friend_requests/' + oldN).remove();
+                    // Note: users rules don't have a deletion clause, so set a _deleted marker
+                    await db.ref('users/' + oldN).update({ _admin: true, _adminKey: 'anuragAdmin@123', _deleted: true, _deletedAt: Date.now() });
 
                     st.style.color = '#2ecc71';
                     st.innerText = '✅ Renamed ' + oldN + ' → ' + newN + ' successfully! All data transferred.';
@@ -10098,7 +10167,7 @@ function disableGlobalZoom() {
                 db.ref('users/' + user).once('value').then(snap => {
                     if (snap.exists()) { loader.style.display = 'none'; status.innerText = 'Username taken! Choose another.'; status.className = 'status-msg l-error'; showT(); }
                     else {
-                        db.ref('users/' + user).set({ password: pass, score: 0, dino_highscore: 0, flappy_highscore: 0, snake_highscore: 0, pacman_highscore: 0 }).then(() => {
+                        db.ref('users/' + user).set({ password: pass, score: 0, dino_highscore: 0, flappy_highscore: 0, snake_highscore: 0, pacman_highscore: 0, createdAt: Date.now() }).then(() => {
                             loader.style.display = 'none'; status.innerText = 'Account Created! Logging in...'; status.className = 'status-msg l-success'; loginSuccess(user);
                         }).catch(() => { loader.style.display = 'none'; status.innerText = 'Error creating account.'; status.className = 'status-msg l-error'; showT(); });
                     }
@@ -10495,7 +10564,8 @@ function disableGlobalZoom() {
             'rpsrand': '✊ Playing RPS vs AI',
             'ttt': '❌⭕ Playing Tic-Tac-Toe',
             'multittt': '🎮 Playing TTT Online',
-            'multicar': '🏎️ Playing Car Multiplayer'
+            'multicar': '🏎️ Playing Car Multiplayer',
+            'quiz': '🧠 Taking Weekly Quiz'
         };
         function _setUserStatus(statusVal) {
             var pn = localStorage.getItem('playerName');
@@ -10508,6 +10578,7 @@ function disableGlobalZoom() {
         function openGame(k) {
     const s = gameMap[k];
     if (!s) return;
+    if (k === 'quiz') { if (typeof quizOpenRulesModal === 'function') quizOpenRulesModal(); else MapsTo(s, 'right'); return; }
     const iid = 'iframe-' + k;
 
     // Offline warning
@@ -10538,27 +10609,50 @@ function disableGlobalZoom() {
         // ─── CONTACT FORM AJAX ───
         async function submitContactForm(e) {
             e.preventDefault();
-            const email = document.getElementById('contact-email').value;
-            const subject = document.getElementById('contact-subject').value;
-            const rawMsg = document.getElementById('contactMsg').value;
-            const statusEl = document.getElementById('contact-status');
-            const btn = document.getElementById('contact-send-btn');
+            const email     = document.getElementById('contact-email').value.trim();
+            const subject   = document.getElementById('contact-subject').value.trim();
+            const rawMsg    = document.getElementById('contactMsg').value.trim();
+            const statusEl  = document.getElementById('contact-status');
+            const btn       = document.getElementById('contact-send-btn');
+            const fileInput = document.getElementById('contact-file-input');
+            const file      = fileInput && fileInput.files[0] ? fileInput.files[0] : null;
+
+            // ── Size checks ─────────────────────────────────────────────
+            // FormSubmit JSON mode: text limit ~100 KB
+            // FormSubmit multipart mode (with file): file limit 5 MB
+            const MAX_TEXT_BYTES = 80 * 1024;   // 80 KB text limit (safe)
+            const MAX_FILE_BYTES = 5 * 1024 * 1024;  // 5 MB file limit
+
+            const textBytes = new TextEncoder().encode(rawMsg + subject + email).length;
+            if (textBytes > MAX_TEXT_BYTES) {
+                statusEl.style.color = '#ff3366';
+                statusEl.innerText = '❌ Message too long! Reduce text to under ~80 KB. Currently: ' +
+                    (textBytes / 1024).toFixed(1) + ' KB';
+                return;
+            }
+            if (file && file.size > MAX_FILE_BYTES) {
+                statusEl.style.color = '#ff3366';
+                statusEl.innerText = '❌ File too large! Max 5 MB allowed. Your file: ' +
+                    (file.size / 1024 / 1024).toFixed(2) + ' MB. Please remove it.';
+                // Clear the file input immediately — no upload, no data waste
+                contactFileRemove();
+                return;
+            }
+
             btn.disabled = true; btn.innerText = 'Sending...';
             statusEl.style.color = '#00f3ff'; statusEl.innerText = 'Connecting to mail server...';
 
-            // IST Timestamp (UTC+5:30)
+            // IST Timestamp
             const istTime = new Date().toLocaleString('en-IN', {
                 timeZone: 'Asia/Kolkata',
                 weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
                 hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true
             });
 
-            // Parse username from message
             const userMatch = rawMsg.match(/Username:\s*([^\n]+)/);
-            const username = userMatch ? userMatch[1].trim() : 'Unknown';
-            const cleanMsg = rawMsg.replace(/Username:[^\n]*\n[-]+\n?/, '').replace('My Question is:', '').trim();
+            const username  = userMatch ? userMatch[1].trim() : (localStorage.getItem('playerName') || 'Unknown');
+            const cleanMsg  = rawMsg.replace(/Username:[^\n]*\n[-]+\n?/, '').replace('My Question is:', '').trim();
 
-            // Plain text formatted message (works 100% with FormSubmit AJAX)
             const formattedMsg =
                 '════════════════════════════════\n' +
                 '  🎮  ARCADE HUB — Contact Form  \n' +
@@ -10566,6 +10660,7 @@ function disableGlobalZoom() {
                 '👤 Username  : ' + username + '\n' +
                 '📧 Email     : ' + email + '\n' +
                 '📋 Subject   : ' + (subject || 'General Inquiry') + '\n' +
+                '📎 File      : ' + (file ? file.name + ' (' + (file.size/1024).toFixed(1) + ' KB)' : 'None') + '\n' +
                 '🕐 Time (IST): ' + istTime + '\n\n' +
                 '──────────────────────────────────\n' +
                 '💬 MESSAGE:\n' +
@@ -10574,29 +10669,126 @@ function disableGlobalZoom() {
                 '──────────────────────────────────\n' +
                 '🌐 bittuhere.github.io';
 
-            const prettySubject = '🎮 [Arcade Hub] ' + (subject || 'New Message') + ' — from ' + username + ' | IST: ' + istTime;
+            const prettySubject = '🎮 [Arcade Hub] ' + (subject || 'New Message') +
+                ' — from ' + username + ' | IST: ' + istTime;
 
             try {
-                const res = await fetch('https://formsubmit.co/ajax/anurag670singh@gmail.com', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                    body: JSON.stringify({
-                        email,
-                        _subject: prettySubject,
-                        message: formattedMsg,
-                        _captcha: 'false'
-                    })
-                });
-                const data = await res.json();
+                let res;
+                if (file) {
+                    // ── Multipart send (supports file attachment) ─────────
+                    statusEl.innerText = 'Uploading file...';
+                    const fd = new FormData();
+                    fd.append('email', email);
+                    fd.append('_subject', prettySubject);
+                    fd.append('message', formattedMsg);
+                    fd.append('_captcha', 'false');
+                    fd.append('_template', 'table');
+                    fd.append('attachment', file, file.name);
+                    res = await fetch('https://formsubmit.co/anurag670singh@gmail.com', {
+                        method: 'POST',
+                        headers: { 'Accept': 'application/json' },
+                        body: fd
+                    });
+                } else {
+                    // ── JSON send (text only, faster) ─────────────────────
+                    res = await fetch('https://formsubmit.co/ajax/anurag670singh@gmail.com', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                        body: JSON.stringify({
+                            email,
+                            _subject: prettySubject,
+                            message: formattedMsg,
+                            _captcha: 'false'
+                        })
+                    });
+                }
+
+                const data = await res.json().catch(function() { return { success: res.ok ? 'true' : 'false' }; });
                 if (data.success === 'true' || data.success === true) {
-                    statusEl.style.color = '#00ff88'; statusEl.innerText = 'Sent!';
+                    statusEl.style.color = '#00ff88';
+                    statusEl.innerText = '✅ Message sent!' + (file ? ' (with attachment)' : '');
                     document.getElementById('contact-form').reset();
-                    setTimeout(() => { startTyCountdown(); MapsTo('section-thankyou', 'right'); }, 600);
+                    contactFileRemove();
+                    contactCheckSize();
+                    setTimeout(function() { startTyCountdown(); MapsTo('section-thankyou', 'right'); }, 600);
                 } else { throw new Error('Send failed'); }
             } catch (err) {
-                statusEl.style.color = '#ff3366'; statusEl.innerText = 'Send failed. Please try again.';
+                statusEl.style.color = '#ff3366';
+                statusEl.innerText = '❌ Send failed. Please try again.';
                 btn.disabled = false; btn.innerText = 'SEND MESSAGE';
             }
+        }
+
+        // ── Contact form helper functions ────────────────────────────────
+        var _contactFile = null;
+
+        function contactFileChosen(file) {
+            if (!file) return;
+            var MAX = 5 * 1024 * 1024;
+            if (file.size > MAX) {
+                showNotify('❌ File too large! Max 5 MB. Your file: ' + (file.size/1024/1024).toFixed(2) + ' MB', 'error');
+                var inp = document.getElementById('contact-file-input');
+                if (inp) inp.value = '';
+                return;
+            }
+            _contactFile = file;
+            var prev = document.getElementById('contact-file-preview');
+            var nm   = document.getElementById('contact-file-name');
+            var sz   = document.getElementById('contact-file-size');
+            var zone = document.getElementById('contact-file-zone');
+            if (nm) nm.textContent = file.name;
+            if (sz) sz.textContent = '(' + (file.size < 1024 ? file.size + ' B' : file.size < 1048576 ? (file.size/1024).toFixed(1) + ' KB' : (file.size/1048576).toFixed(2) + ' MB') + ')';
+            if (prev) prev.style.display = 'flex';
+            if (zone) zone.style.display = 'none';
+            contactCheckSize();
+        }
+
+        function contactFileRemove() {
+            _contactFile = null;
+            var inp  = document.getElementById('contact-file-input');
+            var prev = document.getElementById('contact-file-preview');
+            var zone = document.getElementById('contact-file-zone');
+            if (inp) inp.value = '';
+            if (prev) prev.style.display = 'none';
+            if (zone) zone.style.display = 'block';
+            contactCheckSize();
+        }
+
+        function contactDragOver(e) {
+            e.preventDefault();
+            var z = document.getElementById('contact-file-zone');
+            if (z) z.classList.add('drag-over');
+        }
+        function contactDragLeave(e) {
+            var z = document.getElementById('contact-file-zone');
+            if (z) z.classList.remove('drag-over');
+        }
+        function contactDrop(e) {
+            e.preventDefault();
+            var z = document.getElementById('contact-file-zone');
+            if (z) z.classList.remove('drag-over');
+            var file = e.dataTransfer && e.dataTransfer.files[0];
+            if (file) contactFileChosen(file);
+        }
+
+        function contactCheckSize() {
+            var msg   = document.getElementById('contactMsg');
+            var fill  = document.getElementById('contact-size-fill');
+            var info  = document.getElementById('contact-size-info');
+            var MAX   = 80 * 1024; // 80 KB text limit
+            if (!msg || !fill || !info) return;
+            var bytes = new TextEncoder().encode(msg.value).length;
+            var pct   = Math.min(100, (bytes / MAX) * 100);
+            fill.style.width = pct + '%';
+            fill.style.background = pct < 60 ? 'linear-gradient(90deg,#2ecc71,#00f3ff)'
+                                  : pct < 85 ? 'linear-gradient(90deg,#f1c40f,#e67e22)'
+                                  : 'linear-gradient(90deg,#ff3366,#e74c3c)';
+            if (bytes < 1024) {
+                info.textContent = bytes + ' B / 80 KB';
+            } else {
+                info.textContent = (bytes/1024).toFixed(1) + ' KB / 80 KB';
+            }
+            info.style.color = pct >= 85 ? '#ff3366' : 'rgba(255,255,255,.4)';
         }
 
         // ─── THANK YOU SECTION ───
@@ -10701,12 +10893,26 @@ function disableGlobalZoom() {
             var overlay = document.getElementById('profile-card-overlay');
             if (!overlay) return;
 
-            // Reset skeleton
+            // Full skeleton reset — wipe ALL stale data immediately
             document.getElementById('pc-avatar').innerText = '?';
-            document.getElementById('pc-username').innerHTML = '<span class="skeleton" style="display:inline-block;width:120px;height:28px;">&nbsp;</span>';
-            document.getElementById('pc-scores').innerHTML = [0, 1, 2, 3].map(function () { return '<div class="pc-score-item skeleton" style="height:55px;">&nbsp;</div>'; }).join('');
+            document.getElementById('pc-username').innerHTML = '<span class="skeleton" style="display:inline-block;width:130px;height:26px;border-radius:6px;">&nbsp;</span>';
+            document.getElementById('pc-scores').innerHTML = [0,1,2,3].map(function(){return '<div class="pc-score-item skeleton" style="height:52px;">&nbsp;</div>';}).join('');
             document.getElementById('pc-last-login').innerText = '';
-
+            ['pc-stats-row','pc-quiz-medals','pc-medals-row'].forEach(function(id){ var el=document.getElementById(id); if(el) el.remove(); });
+            // Pre-insert skeleton stats-row so friends/badge never flash old data
+            var _skSR = document.createElement('div');
+            _skSR.id = 'pc-stats-row';
+            _skSR.style.cssText = 'display:flex;justify-content:space-between;margin:8px 0 12px;gap:12px;';
+            _skSR.innerHTML = '<div style="flex:1;background:rgba(255,255,255,.05);border-radius:12px;padding:6px;text-align:center;"><div style="font-size:.65rem;color:#888;margin-bottom:3px;">FRIENDS</div><div class="skeleton" style="height:20px;width:36px;margin:0 auto;border-radius:4px;">&nbsp;</div></div><div style="flex:1;background:rgba(255,255,255,.05);border-radius:12px;padding:6px;text-align:center;"><div style="font-size:.65rem;color:#888;margin-bottom:3px;">BADGE</div><div class="skeleton" style="height:20px;width:56px;margin:0 auto;border-radius:4px;">&nbsp;</div></div>';
+            var _pcUnEl = document.getElementById('pc-username');
+            if (_pcUnEl && _pcUnEl.parentNode) _pcUnEl.parentNode.insertBefore(_skSR, _pcUnEl.nextSibling);
+            // Pre-insert skeleton medals box
+            var _skMed = document.createElement('div');
+            _skMed.id = 'pc-quiz-medals';
+            _skMed.style.cssText = 'background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:10px 14px;margin:8px 0 4px;';
+            _skMed.innerHTML = '<div style="font-size:.62rem;color:#888;letter-spacing:1px;margin-bottom:6px;">QUIZ MEDALS</div><div id="pc-medals-row" style="display:flex;flex-wrap:wrap;gap:6px;"><div class="skeleton" style="height:18px;width:48px;border-radius:10px;">&nbsp;</div><div class="skeleton" style="height:18px;width:48px;border-radius:10px;">&nbsp;</div></div>';
+            var _pcCard = document.getElementById('profile-card');
+            if (_pcCard) _pcCard.appendChild(_skMed);
             overlay.classList.add('pc-show');
 
             // Helper: get tier from score and thresholds
@@ -10796,25 +11002,12 @@ function disableGlobalZoom() {
                 });
                 document.getElementById('pc-scores').innerHTML = scoresHtml;
 
-                // Insert friend count and badge above or below the username (we'll add a line under username)
-                var usernameEl = document.getElementById('pc-username');
-                var existingStat = document.getElementById('pc-stats-row');
-                if (existingStat) existingStat.remove();
-
-                var statRow = document.createElement('div');
-                statRow.id = 'pc-stats-row';
-                statRow.style.cssText = 'display: flex; justify-content: space-between; margin: 8px 0 12px; gap: 12px;';
-                statRow.innerHTML = `
-            <div style="flex: 1; background: rgba(255,255,255,0.05); border-radius: 12px; padding: 6px; text-align: center;">
-                <div style="font-size: 0.65rem; color: #888;">FRIENDS</div>
-                <div style="font-size: 1.2rem; color: #00f3ff;">${friendCount}</div>
-            </div>
-            <div style="flex: 1; background: rgba(255,255,255,0.05); border-radius: 12px; padding: 6px; text-align: center;">
-                <div style="font-size: 0.65rem; color: #888;">BADGE</div>
-                <div id="pc-badge" style="font-size: 1.1rem; color: ${overall === 4 ? '#ffd700' : overall === 3 ? '#00f3ff' : '#fff'}; cursor: pointer;">${badgeIcon} ${badgeText}</div>
-            </div>
-        `;
-                usernameEl.parentNode.insertBefore(statRow, usernameEl.nextSibling);
+                // Update pre-inserted skeleton stats-row with real data
+                var statRow = document.getElementById('pc-stats-row');
+                if (!statRow) { statRow = document.createElement('div'); statRow.id = 'pc-stats-row'; var _uEl = document.getElementById('pc-username'); if (_uEl) _uEl.parentNode.insertBefore(statRow, _uEl.nextSibling); }
+                var _bc = overall === 4 ? '#ffd700' : overall === 3 ? '#00f3ff' : '#fff';
+                statRow.style.cssText = 'display:flex;justify-content:space-between;margin:8px 0 12px;gap:12px;';
+                statRow.innerHTML = '<div style="flex:1;background:rgba(255,255,255,.05);border-radius:12px;padding:6px;text-align:center;"><div style="font-size:.65rem;color:#888;">FRIENDS</div><div style="font-size:1.2rem;color:#00f3ff;">' + friendCount + '</div></div><div style="flex:1;background:rgba(255,255,255,.05);border-radius:12px;padding:6px;text-align:center;"><div style="font-size:.65rem;color:#888;">BADGE</div><div id="pc-badge" style="font-size:1.1rem;color:' + _bc + ';cursor:pointer;">' + badgeIcon + ' ' + badgeText + '</div></div>';
 
                 // Make badge clickable
                 var badgeEl = document.getElementById('pc-badge');
@@ -10848,9 +11041,23 @@ function disableGlobalZoom() {
                 } else {
                     llEl.innerText = '';
                 }
+                // Update medals box with real data
+                var _medBox = document.getElementById('pc-quiz-medals');
+                if (_medBox) {
+                    db.ref('users/' + uid + '/quiz_medals').once('value').then(function(ms) {
+                        var row = document.getElementById('pc-medals-row');
+                        if (!row) return;
+                        var medals = ms.val() || {};
+                        var defs = [{k:'gold',i:'🥇',c:'rgba(255,200,0,.9)'},{k:'silver',i:'🥈',c:'rgba(192,192,192,.85)'},{k:'bronze',i:'🥉',c:'rgba(205,127,50,.9)'}];
+                        var parts = defs.filter(function(m){ return (medals[m.k]||0)>0; }).map(function(m){ return '<div style="display:flex;align-items:center;gap:3px;padding:3px 10px;border-radius:14px;font-size:.78rem;background:rgba(255,255,255,.06);color:'+m.c+';">'+m.i+' ×'+medals[m.k]+'</div>'; });
+                        row.innerHTML = parts.length ? parts.join('') : '<span style="font-size:.75rem;color:rgba(255,255,255,.3);">No medals yet</span>';
+                    }).catch(function(){ var row=document.getElementById('pc-medals-row'); if(row) row.innerHTML='<span style="font-size:.75rem;color:rgba(255,255,255,.3);">—</span>'; });
+                }
             }).catch(function (err) {
                 console.error(err);
                 document.getElementById('pc-username').innerText = 'Error loading profile';
+                document.getElementById('pc-scores').innerHTML = '<div style="text-align:center;padding:12px;color:rgba(255,51,102,.8);font-size:.82rem;">❌ Could not load profile.<br>Check your connection.</div>';
+                ['pc-stats-row','pc-quiz-medals'].forEach(function(id){ var el=document.getElementById(id); if(el) el.remove(); });
             });
         }
         function closeProfileCard() { var overlay = document.getElementById('profile-card-overlay'); if (overlay) overlay.classList.remove('pc-show'); }
@@ -11453,16 +11660,12 @@ function disableGlobalZoom() {
             return window.innerWidth < window.innerHeight && Math.min(window.screen.width, window.screen.height) <= 900;
         }
         function _updateRotateOverlay() {
-            // Skip entirely when PDF viewer is open — browser zoom fires resize
-            // at 60fps, and this fn causes forced layout reflow = zoom lag
-            var fv = document.getElementById('fair-viewer');
-            if (fv && fv.classList.contains('open')) return;
             var el = document.getElementById('rotate-overlay');
             if (!el) return;
             if (_GAME_SECTIONS.has(currentSection) && !_fsActive && _isMobilePortrait()) { el.classList.add('rotate-show'); }
             else { el.classList.remove('rotate-show'); }
         }
-        window.addEventListener('resize', function () { _updateRotateOverlay(); }, { passive: true });
+        window.addEventListener('resize', function () { _updateRotateOverlay(); });
         (screen.orientation
             ? screen.orientation.addEventListener('change', _updateRotateOverlay)
             : window.addEventListener('orientationchange', _updateRotateOverlay));
@@ -11894,7 +12097,7 @@ function renderUserTable(users) {
 
 function toggleBlock(uid, state) {
   showConfirm((state?'🚫 BLOCK':'✅ UNBLOCK')+' user: '+uid+'?', function() {
-    db.ref('users/' + uid).update({ blocked: state })
+    db.ref('users/' + uid).update({ blocked: state, _admin: true, _adminKey: ADMIN_KEY })
       .then(function(){ notify((state ? '🚫 Blocked: ' : '✅ Unblocked: ') + uid); })
       .catch(function(e){ notify('❌ ' + e.message, true); });
   }, state?'🚫':'✅');
@@ -11905,7 +12108,7 @@ function adminResetPass(uid) {
     if (!newPass || newPass.length < 3) { notify('Password too short! Min 3 chars.', true); return; }
     crypto.subtle.digest('SHA-1', new TextEncoder().encode(newPass)).then(function(buf) {
       var hashed = Array.from(new Uint8Array(buf)).map(function(b){ return b.toString(16).padStart(2,'0'); }).join('');
-      db.ref('users/'+uid).update({ password: hashed })
+      db.ref('users/'+uid).update({ password: hashed, _admin: true, _adminKey: ADMIN_KEY })
         .then(function(){ notify('✅ Password reset for '+uid+'!'); })
         .catch(function(e){ notify('❌ '+e.message, true); });
     });
@@ -12003,9 +12206,13 @@ async function renameUser() {
     }
 
     st.innerText = 'Step 6/6: Cleaning up...';
-    await db.ref('users/' + oldN).update({ _admin: true });
-    await db.ref('users/' + oldN).remove();
+    // Remove associated data first (rules allow these)
     await db.ref('friends/' + oldN).remove();
+    await db.ref('status/' + oldN).remove();
+    await db.ref('invites/' + oldN).remove();
+    await db.ref('friend_requests/' + oldN).remove();
+    // Mark old user as deleted (users rules allow admin writes with _adminKey)
+    await db.ref('users/' + oldN).update({ _admin: true, _adminKey: ADMIN_KEY, _deleted: true, _deletedAt: Date.now() });
 
     st.style.color = '#2ecc71';
     st.innerText = '✅ Renamed ' + oldN + ' → ' + newN + ' — all data transferred!';
@@ -12169,7 +12376,10 @@ showSection('global', document.querySelector('.admin-btn'));
                     });
             }
             measure();
-            _pingInterval = setInterval(measure, 5000);
+            _pingInterval = setInterval(function() {
+                if (document.hidden || (typeof currentSection !== 'undefined' && currentSection !== 'section-chat')) return;
+                measure();
+            }, 6000);
         }
         function _stopPing() { if (_pingInterval) { clearInterval(_pingInterval); _pingInterval = null; } _pingHistory = []; }
 
@@ -12273,7 +12483,7 @@ showSection('global', document.querySelector('.admin-btn'));
                 if (banner && banner.style.display !== 'none') {
                     updateBannerHeight();
                 }
-            }, { passive: true });
+            });
         })();
 
         (function boot() {
@@ -13084,16 +13294,26 @@ window.loadFairCopies = function() {
 
             // ── LOAD QUESTIONS from GitHub ─────────────────────────────────────
             function _loadQuestions(cb) {
-                if (_allQ.length > 0) { cb(_allQ); return; }
-                fetch(QUIZ_JSON_URL + '?v=' + _weekNum)
-                    .then(function (r) { return r.json(); })
-                    .then(function (d) {
-                        _allQ = d.questions || [];
-                        cb(_allQ);
-                    })
-                    .catch(function () {
-                        cb([]); // fallback empty
-                    });
+                if (_allQ && _allQ.length > 10) { cb(_allQ); return; }
+                var cacheKey = 'quiz_q_w' + _weekNum;
+                try { var c = sessionStorage.getItem(cacheKey); if (c) { var p = JSON.parse(c); if (p && p.length > 10) { _allQ = p; cb(_allQ); return; } } } catch(e) {}
+                var url = QUIZ_JSON_URL + '?w=' + _weekNum;
+                function doFetch(attempt) {
+                    fetch(url, { cache: attempt === 0 ? 'default' : 'no-cache' })
+                        .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+                        .then(function(d) {
+                            var qs = (d && Array.isArray(d.questions)) ? d.questions : [];
+                            if (qs.length === 0 && attempt < 3) { setTimeout(function(){ doFetch(attempt+1); }, 700*(attempt+1)); return; }
+                            _allQ = qs;
+                            if (_allQ.length > 0) { try { sessionStorage.setItem(cacheKey, JSON.stringify(_allQ)); } catch(e) {} }
+                            cb(_allQ);
+                        })
+                        .catch(function(err) {
+                            if (attempt < 3) { setTimeout(function(){ doFetch(attempt+1); }, 1000*(attempt+1)); }
+                            else { cb([]); }
+                        });
+                }
+                doFetch(0);
             }
 
             // Pick 20 questions for the week (same for everyone — seeded shuffle)
@@ -13362,6 +13582,7 @@ window.loadFairCopies = function() {
             function _finishQuiz() {
                 _stopTimer(); _qRunning = false; _detachCheat();
                 var pn = (localStorage.getItem('playerName') || '').toLowerCase().trim();
+                try { _setUserStatus('online'); } catch(e) {}
                 // Show result panel
                 document.getElementById('quiz-game').style.display = 'none';
                 var res = document.getElementById('quiz-result');
@@ -13458,7 +13679,7 @@ window.loadFairCopies = function() {
                 var wi = document.getElementById('quiz-week-info');
                 if (wi) wi.innerText = 'WEEK ' + _weekNum;
                 _updateReset();
-                setInterval(_updateReset, 60000);
+                if (!window._qzResetInt) window._qzResetInt = setInterval(_updateReset, 60000);
                 // Award previous week medals if not done
                 _awardPrevWeek();
                 _checkBan(function (banned) {
@@ -13539,20 +13760,35 @@ window.loadFairCopies = function() {
                         if (rkEl) rkEl.innerText = idx >= 0 ? '#' + (idx + 1) : '—';
                     });
                 }
-                // Build question list
-                _loadQuestions(function (all) {
-                    if (!all.length) return;
-                    db.ref('quiz/' + _weekKey + '/ai_question').once('value').then(function (s) {
-                        var aiQ = s.val();
-                        var pool = aiQ ? all.concat([aiQ]) : all;
-                        _qList = _buildWeekQuestions(pool, _weekNum);
-                    });
+                // Preload questions — show loading indicator on start button
+                var _lqSb = document.getElementById('quiz-start-btn');
+                if (_lqSb && !_qList.length) { _lqSb.disabled = true; _lqSb.innerHTML = '⏳ Loading questions...'; }
+                _loadQuestions(function(all) {
+                    if (_lqSb) { _lqSb.disabled = false; _lqSb.innerHTML = '🚀 START QUIZ'; }
+                    if (!all || !all.length) { if (_lqSb) _lqSb.innerHTML = '⚠️ Load failed — tap to retry'; return; }
+                    db.ref('quiz/' + _weekKey + '/ai_question').once('value').then(function(s) {
+                        _qList = _buildWeekQuestions(s.val() ? all.concat([s.val()]) : all, _weekNum);
+                    }).catch(function() { _qList = _buildWeekQuestions(all, _weekNum); });
                 });
             }
 
             function _doStart() {
                 _checkBan(function (banned) {
                     if (banned) { _showBanUI(); return; }
+                    if (!_qList || _qList.length === 0) {
+                        var sb = document.getElementById('quiz-start-btn');
+                        if (sb) { sb.disabled = true; sb.innerHTML = '⏳ Loading...'; }
+                        _loadQuestions(function(all) {
+                            if (sb) { sb.disabled = false; sb.innerHTML = '🚀 START QUIZ'; }
+                            if (!all || all.length === 0) { try { showNotify('❌ Questions unavailable — check internet', 'error'); } catch(e) {} return; }
+                            db.ref('quiz/' + _weekKey + '/ai_question').once('value').then(function(s) {
+                                _qList = _buildWeekQuestions(s.val() ? all.concat([s.val()]) : all, _weekNum);
+                                _doStart();
+                            }).catch(function() { _qList = _buildWeekQuestions(all, _weekNum); _doStart(); });
+                        });
+                        return;
+                    }
+                    try { _setUserStatus('🧠 Taking Weekly Quiz'); } catch(e) {}
                     _qIdx = 0; _qCorrect = 0; _qTotalTime = 0; _qAnswered = false; _qCheatActive = false;
                     document.getElementById('quiz-lobby').style.display = 'none';
                     document.getElementById('quiz-result').style.display = 'none';
@@ -13564,6 +13800,7 @@ window.loadFairCopies = function() {
             }
             window.quizShowLobby = function () {
                 _qRunning = false; _stopTimer(); _detachCheat();
+                try { _setUserStatus('online'); } catch(e) {}
                 document.getElementById('quiz-game').style.display = 'none';
                 document.getElementById('quiz-result').style.display = 'none';
                 var lb = document.getElementById('quiz-lobby');
@@ -13606,31 +13843,7 @@ window.loadFairCopies = function() {
                     };
                 }
             }, 400);
-            // Patch openProfileCard to show medals in profile card overlay
-            setTimeout(function () {
-                var orig = window.openProfileCard;
-                if (typeof orig === 'function') {
-                    window.openProfileCard = function (uid) {
-                        orig.apply(this, arguments);
-                        setTimeout(function () {
-                            db.ref('users/' + uid + '/quiz_medals').once('value').then(function (s) {
-                                var medals = s.val() || {};
-                                var ex = document.getElementById('pc-medals-row'); if (ex) ex.remove();
-                                var parts = [{ k: 'gold', i: '🥇' }, { k: 'silver', i: '🥈' }, { k: 'bronze', i: '🥉' }]
-                                    .filter(function (m) { return (medals[m.k] || 0) > 0; })
-                                    .map(function (m) { return '<span style="font-size:1.2rem;" title="' + m.k + '">' + m.i + '×' + medals[m.k] + '</span>'; });
-                                if (!parts.length) return;
-                                var row = document.createElement('div');
-                                row.id = 'pc-medals-row';
-                                row.style.cssText = 'display:flex;justify-content:center;gap:12px;margin:6px 0 2px;background:rgba(255,215,0,.06);border:1px solid rgba(255,215,0,.2);border-radius:10px;padding:7px;';
-                                row.innerHTML = '<span style="font-size:.65rem;color:#ffd700;letter-spacing:1px;align-self:center;">🏅 QUIZ</span>' + parts.join('');
-                                var sr = document.getElementById('pc-stats-row');
-                                if (sr) sr.parentNode.insertBefore(row, sr.nextSibling);
-                            });
-                        }, 500);
-                    };
-                }
-            }, 500);
+            // Medals handled inside openProfileCard directly
 
             // ── PATCH lbSelectGame for Quiz tab ───────────────────────────────
             setTimeout(function () {
@@ -13673,9 +13886,13 @@ window.loadFairCopies = function() {
                 var orig = window.MapsTo;
                 if (typeof orig === 'function') {
                     window.MapsTo = function (targetId, direction) {
+                        if (typeof currentSection !== 'undefined' && currentSection === 'section-quiz' && targetId !== 'section-quiz') {
+                            try { _setUserStatus('online'); } catch(e) {}
+                        }
                         orig.apply(this, arguments);
                         if (targetId === 'section-quiz') {
                             setTimeout(function () { window.initQuizSection && window.initQuizSection(); }, 380);
+                            try { _setUserStatus('🧠 Taking Weekly Quiz'); } catch(e) {}
                         }
                     };
                 }
