@@ -96,7 +96,6 @@
             --text-muted: #a0a0a0;
             --study: linear-gradient(45deg, #ff9966, #ff5e62);
             --multi: linear-gradient(45deg, #00f3ff, #0099ff);
-            --craft-dirt: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64'%3E%3Crect width='64' height='64' fill='%23865432'/%3E%3Crect x='8' y='8' width='12' height='12' fill='%235a3a1a' opacity='.5'/%3E%3Crect x='28' y='4' width='10' height='10' fill='%235a3a1a' opacity='.4'/%3E%3Crect x='44' y='12' width='14' height='8' fill='%235a3a1a' opacity='.45'/%3E%3Crect x='2' y='28' width='16' height='10' fill='%235a3a1a' opacity='.42'/%3E%3Crect x='36' y='26' width='12' height='12' fill='%235a3a1a' opacity='.48'/%3E%3Crect x='16' y='40' width='10' height='16' fill='%235a3a1a' opacity='.44'/%3E%3Crect x='48' y='42' width='14' height='14' fill='%235a3a1a' opacity='.46'/%3E%3C/svg%3E");
             --single: linear-gradient(45deg, #a8ff78, #78ffd6);
             --contact: linear-gradient(45deg, #FFD700, #ff8c00);
             --pacman: linear-gradient(45deg, #f1c40f, #e67e22);
@@ -106,6 +105,7 @@
             --rps: linear-gradient(45deg, #e74c3c, #c0392b);
             --car: linear-gradient(45deg, #ff00ff, #9900ff);
             --fair: linear-gradient(45deg, #2ecc71, #27ae60);
+            --minecraft: #7a5c3a;
         }
 
         html,
@@ -919,12 +919,6 @@
         .btn-snake {
             background: var(--snake);
         }
-        .btn-craft {
-            background: var(--craft-dirt) center/48px 48px, linear-gradient(135deg,#7b4f2b,#5a3a1a);
-            color: #fff;
-            text-shadow: 1px 1px 3px #000;
-            font-weight: 700;
-        }
 
         .btn-rps {
             background: var(--rps);
@@ -932,6 +926,187 @@
 
         .btn-dino {
             background: var(--dino);
+        }
+
+        /* ArcadeCraft / Eaglercraft — Minecraft dirt texture button */
+        .btn-minecraft {
+            background-color: #7a5c3a;
+            background-image:
+                repeating-linear-gradient(0deg, rgba(0,0,0,0.18) 0px, rgba(0,0,0,0.18) 3px, transparent 3px, transparent 6px),
+                repeating-linear-gradient(90deg, rgba(0,0,0,0.12) 0px, rgba(0,0,0,0.12) 3px, transparent 3px, transparent 6px),
+                radial-gradient(ellipse at 20% 30%, #9b7148 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 70%, #5a3d1e 0%, transparent 50%),
+                linear-gradient(135deg, #8B6340 0%, #6b4a28 40%, #7d5534 70%, #5a3b1a 100%);
+            color: #fff;
+            text-shadow: 2px 2px 0px rgba(0,0,0,0.9), -1px -1px 0px rgba(0,0,0,0.5);
+            font-family: 'Courier New', monospace;
+            border: 2px solid #3d2408 !important;
+            image-rendering: pixelated;
+            letter-spacing: 1px;
+        }
+        .btn-minecraft:hover {
+            filter: brightness(1.15);
+        }
+
+        /* ── ArcadeCraft floating radial button ── */
+        #mc-float-btn {
+            position: fixed;
+            z-index: 9999;
+            cursor: grab;
+            touch-action: none;
+            display: none;
+            /* radial menu + circle in a row */
+            display: none;
+        }
+        #mc-float-btn.mc-visible { display: block; }
+        #mc-float-circle-main {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: rgba(30,20,10,0.60);
+            border: 2px solid rgba(139,99,64,0.75);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.35rem;
+            color: #c8a06b;
+            cursor: pointer;
+            box-shadow: 0 2px 14px rgba(0,0,0,0.55);
+            user-select: none;
+            transition: border-color 0.2s, background 0.2s;
+            position: relative; z-index: 2;
+        }
+        #mc-float-circle-main:hover { background: rgba(60,40,15,0.75); border-color: #c8a06b; }
+        #mc-radial-menu {
+            position: absolute;
+            /* Expand to left of the button */
+            right: 60px;
+            top: 50%;
+            transform: translateY(-50%) scaleX(0.5);
+            transform-origin: right center;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.18s ease, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
+            white-space: nowrap;
+        }
+        #mc-radial-menu.mc-open {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(-50%) scaleX(1);
+        }
+        .mc-radial-pill {
+            background: rgba(20,13,5,0.88);
+            border: 1.5px solid rgba(139,99,64,0.65);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            color: #e8c98a;
+            padding: 7px 14px;
+            border-radius: 22px;
+            font-size: 0.82rem;
+            font-weight: bold;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: background 0.15s, transform 0.12s;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            font-family: 'Courier New', monospace;
+            letter-spacing: 0.5px;
+        }
+        .mc-radial-pill:hover { background: rgba(110,70,25,0.92); transform: scale(1.07); }
+        .mc-radial-pill:active { transform: scale(0.93); }
+        /* ── ArcadeCraft in-game chat overlay ── */
+        #mc-chat-overlay {
+            position: fixed;
+            top: 0; right: 0;
+            width: 320px; max-width: 90vw;
+            height: 100%;
+            background: rgba(10,7,3,0.93);
+            border-left: 2px solid rgba(139,99,64,0.6);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            z-index: 9998;
+            display: flex; flex-direction: column;
+            transform: translateX(110%);
+            transition: transform 0.28s cubic-bezier(0.25,0.46,0.45,0.94);
+            font-family: 'Courier New', monospace;
+        }
+        #mc-chat-overlay.mc-chat-open { transform: translateX(0); }
+        #mc-chat-header {
+            padding: 14px 16px 10px;
+            border-bottom: 1px solid rgba(139,99,64,0.4);
+            display: flex; align-items: center; gap: 10px;
+        }
+        #mc-chat-header h3 { flex: 1; color: #c8a06b; font-size: 1rem; margin: 0; letter-spacing: 1px; }
+        #mc-chat-close {
+            width: 30px; height: 30px; border-radius: 50%;
+            background: rgba(180,50,30,0.3); border: 1px solid rgba(180,50,30,0.6);
+            color: #ff8070; cursor: pointer; display: flex; align-items: center; justify-content: center;
+            font-size: 1rem; transition: background 0.15s;
+        }
+        #mc-chat-close:hover { background: rgba(180,50,30,0.6); }
+        #mc-friends-list-mini {
+            padding: 8px;
+            border-bottom: 1px solid rgba(139,99,64,0.3);
+            max-height: 120px;
+            overflow-y: auto;
+        }
+        #mc-friends-list-mini::-webkit-scrollbar { width: 4px; }
+        #mc-friends-list-mini::-webkit-scrollbar-thumb { background: rgba(139,99,64,0.5); border-radius: 2px; }
+        .mc-friend-chip {
+            display: inline-flex; align-items: center; gap: 5px;
+            background: rgba(139,99,64,0.2); border: 1px solid rgba(139,99,64,0.4);
+            border-radius: 12px; padding: 4px 10px; margin: 3px;
+            cursor: pointer; font-size: 0.75rem; color: #d4a870;
+            transition: background 0.15s;
+        }
+        .mc-friend-chip:hover, .mc-friend-chip.mc-chip-active { background: rgba(139,99,64,0.5); color: #fff; }
+        .mc-friend-chip .mc-dot { width: 7px; height: 7px; border-radius: 50%; background: #555; flex-shrink: 0; }
+        .mc-friend-chip .mc-dot.online { background: #4caf50; }
+        #mc-chat-msgs {
+            flex: 1; overflow-y: auto; padding: 10px 12px;
+            display: flex; flex-direction: column; gap: 6px;
+        }
+        #mc-chat-msgs::-webkit-scrollbar { width: 4px; }
+        #mc-chat-msgs::-webkit-scrollbar-thumb { background: rgba(139,99,64,0.4); border-radius: 2px; }
+        .mc-msg {
+            background: rgba(255,255,255,0.04);
+            border-radius: 8px; padding: 7px 10px;
+            font-size: 0.78rem; color: #ccc; line-height: 1.4;
+            word-break: break-word;
+        }
+        .mc-msg .mc-sender { color: #c8a06b; font-weight: bold; font-size: 0.8rem; }
+        .mc-msg.mine { background: rgba(100,65,20,0.3); align-self: flex-end; }
+        .mc-msg.mine .mc-sender { color: #78ffd6; }
+        #mc-no-friend-sel {
+            flex: 1; display: flex; align-items: center; justify-content: center;
+            color: rgba(200,160,107,0.4); font-size: 0.85rem; text-align: center; padding: 20px;
+        }
+        #mc-chat-input-row {
+            padding: 10px 12px;
+            border-top: 1px solid rgba(139,99,64,0.3);
+            display: flex; gap: 8px;
+        }
+        #mc-chat-input {
+            flex: 1; background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(139,99,64,0.4); border-radius: 8px;
+            color: #fff; font-size: 0.82rem; padding: 8px 10px;
+            outline: none; font-family: 'Courier New', monospace;
+        }
+        #mc-chat-input::placeholder { color: rgba(200,160,107,0.4); }
+        #mc-chat-input:focus { border-color: rgba(139,99,64,0.8); }
+        #mc-chat-send {
+            background: rgba(139,99,64,0.5); border: 1px solid rgba(139,99,64,0.7);
+            color: #e8c98a; border-radius: 8px; padding: 8px 12px;
+            cursor: pointer; font-size: 0.85rem; transition: background 0.15s;
+            font-family: 'Courier New', monospace;
+        }
+        #mc-chat-send:hover { background: rgba(139,99,64,0.8); }
+        #mc-invite-hint {
+            padding: 6px 12px 10px;
+            font-size: 0.7rem; color: rgba(200,160,107,0.55);
+            text-align: center; border-top: 1px solid rgba(139,99,64,0.2);
         }
 
         .hub-hidden {
@@ -1924,19 +2099,18 @@
 
         .cp-eye {
             position: absolute;
-            right: 8px;
-            bottom: 7px;
+            right: 12px;
+            bottom: 10px;
             cursor: pointer;
             width: 22px;
             height: 22px;
-            opacity: .85;
+            opacity: .7;
             transition: opacity .2s;
-            background: #87CEEB;
-            border-radius: 5px;
-            padding: 3px;
-            box-sizing: content-box;
         }
-        .cp-eye:hover { opacity: 1; }
+
+        .cp-eye:hover {
+            opacity: 1;
+        }
 
         #cp-error {
             color: #ff3366;
@@ -2166,18 +2340,13 @@
 
         .al-eye {
             position: absolute;
-            right: 8px;
-            top: 50%;
-            transform: translateY(-50%);
+            right: 12px;
+            bottom: 10px;
             cursor: pointer;
             width: 22px;
             height: 22px;
-            opacity: .85;
-            transition: opacity .2s;
-            background: #87CEEB;
-            border-radius: 5px;
-            padding: 3px;
-            box-sizing: content-box;
+            opacity: .6;
+            filter: hue-rotate(120deg);
         }
 
         .al-btn {
@@ -3326,8 +3495,7 @@
 
         /* ═══ FAIR FILE VIEWER MODAL ═══ */
         #fair-viewer { display:none; position:fixed; inset:0; z-index:100000;
-            background:rgba(8,6,20,0.98); flex-direction:column;
-            will-change:transform; isolation:isolate; }
+            background:rgba(8,6,20,0.98); flex-direction:column; }
         #fair-viewer.open { display:flex; }
         #fair-viewer-bar { display:flex; align-items:center; gap:10px;
             padding:10px 16px; background:#0d0b22;
@@ -3342,8 +3510,7 @@
         #fair-viewer-progress { display:flex; flex-direction:column; align-items:center;
             justify-content:center; flex:1; gap:12px; }
         #fair-viewer-content { flex:1; overflow:auto; display:none;
-            -webkit-overflow-scrolling:touch; background:#111;
-            will-change:transform; transform:translateZ(0); contain:strict; }
+            -webkit-overflow-scrolling:touch; background:#111; }
         #fair-viewer-content canvas { display:block; margin:0 auto 8px; max-width:100%; }
         #fair-viewer-content img { display:block; margin:auto; max-width:100%; max-height:100%; }
         #fair-viewer-content pre { color:#e0e0e0; font-size:.85rem; padding:20px;
@@ -3649,7 +3816,7 @@
                     <input type="password" id="login-password" name="password" placeholder="Password"
                         autocomplete="current-password">
                     <span id="eye-btn" onclick="togglePass()"
-                        style="position:absolute;right:10px;top:8px;cursor:pointer;z-index:10;background:#87CEEB;border-radius:6px;padding:4px;display:inline-flex;align-items:center;justify-content:center;">
+                        style="position:absolute;right:15px;top:13px;cursor:pointer;z-index:10;">
                         <img id="eye-icon"
                             src="data:image/png;base64,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"
                             style="width:25px;height:auto;filter:drop-shadow(0 0 5px var(--neon-blue));">
@@ -3737,8 +3904,8 @@
                         </div>
                         <div onclick="openGame('multicar')" class="game-btn btn-multi full-width"><span>&#128664;</span>
                             Car Game 3D (Multiplayer)</div>
-                        <div onclick="openGame('arcadecraft')" class="game-btn btn-craft full-width">
-                            <span>⛏️</span> ArcadeCraft
+                        <div onclick="openGame('arcadecraft')" class="game-btn btn-minecraft full-width">
+                            <span>⛏️</span> ArcadeCraft<br><span style="font-size:.7rem;opacity:.8;font-family:'Courier New',monospace;">Minecraft 1.8.8 · Multiplayer</span>
                         </div>
                     </div>
                 </div>
@@ -3765,8 +3932,8 @@
                         </div>
                         <div onclick="openGame('rps')" class="game-btn btn-rps full-width"><span>&#9986;&#65039;</span>
                             Rock Paper Scissors</div>
-                        <div onclick="openGame('arcadecraft')" class="game-btn btn-craft full-width">
-                            <span>⛏️</span> ArcadeCraft
+                        <div onclick="openGame('arcadecraft')" class="game-btn btn-minecraft full-width">
+                            <span>⛏️</span> ArcadeCraft<br><span style="font-size:.7rem;opacity:.8;font-family:'Courier New',monospace;">Minecraft 1.8.8 · Singleplayer</span>
                         </div>
                     </div>
                 </div>
@@ -3817,7 +3984,7 @@
         <div class="admin-section-inner">
             <div class="admin-header-bar">
                 <h1>⚡ ADMIN CONTROL</h1>
-                <button class="admin-back-btn" onclick="(function(){var b=document.getElementById('adm-ro-badge');if(b)b.remove();window._adminReadOnly=false;window._adminIsHimanshu=false;MapsTo('section-hub','left');})()">← Hub</button>
+                <button class="admin-back-btn" onclick="MapsTo('section-hub','left')">← Hub</button>
             </div>
             <div style="width:100%;max-width:780px;background:rgba(0,0,0,.2);border-radius:14px;padding:16px;">
                 <div class="menu-container" style="display:flex;gap:7px;margin-bottom:16px;flex-wrap:wrap;">
@@ -3973,19 +4140,7 @@
     <!-- Admin JavaScript -->
     <script>
     (function () {
-        // ── Admin auth helper ──────────────────────────────────────────
-        function _isRealAdmin() {
-            var loggedUser = (localStorage.getItem('playerName') || '').toLowerCase().trim();
-            if (loggedUser !== 'anurag') {
-                showNotify('⛔ You are not the real admin!', 'error');
-                return false;
-            }
-            return true;
-        }
-
         var ADMIN_KEY = 'anuragAdmin@123';
-        // Viewer (himanshu) can only interact with players whose name starts with this prefix
-        var VIEWER_PREFIX = 'example';
         var _adminAllUsers = [];
 
         // ── NAV ──────────────────────────────────────────────────────────────
@@ -4002,17 +4157,6 @@
                 global: adminLoadGlobalMessages
             };
             if (loaders[name]) loaders[name]();
-            // Always show full UI — write permission checked at fn level
-            setTimeout(function() {
-                var badge = document.getElementById('adm-ro-badge');
-                if (badge) badge.remove();
-                document.querySelectorAll('.adm-action-btn, .mini-btn').forEach(function(b) {
-                    b.disabled = false; b.style.opacity = ''; b.title = '';
-                });
-                document.querySelectorAll('.admin-btn').forEach(function(b) {
-                    b.style.display = '';
-                });
-            }, 80);
         };
 
         // ── DASHBOARD ────────────────────────────────────────────────────────
@@ -4020,7 +4164,6 @@
             var grid = document.getElementById('adm-stats-grid');
             var recent = document.getElementById('adm-recent');
             if (!grid) return;
-            if (typeof db === 'undefined' || !db) { grid.innerHTML='<div style="color:#e74c3c;font-size:.8rem;padding:8px;">Database not ready</div>'; return; }
             grid.innerHTML = '<div style="grid-column:span 2;color:#888;font-size:.8rem;padding:8px;">Loading...</div>';
             var weekNum = Math.floor((Date.now() - new Date(2024,0,1)) / (7*864e5));
             Promise.all([
@@ -4067,109 +4210,51 @@
 
         // ── GLOBAL ANNOUNCE ──────────────────────────────────────────────────
         window.adminSendGlobal = function() {
-            if(!_isRealAdmin()) return;
             var text=document.getElementById('adminGlobalText').value.trim();
             if(!text) return showNotify('Enter a message!','error');
-            showConfirm('📢 Publish this message to ALL players?', function(){
-                var key=db.ref('notifications/global').push().key;
-                db.ref('notifications/global/'+key).set({message:text,time:Date.now(),_k:ADMIN_KEY})
-                    .then(function(){ showNotify('✅ Published!','success'); document.getElementById('adminGlobalText').value=''; adminLoadGlobalMessages(); })
-                    .catch(function(e){ showNotify('❌ '+e.message,'error'); });
-            },'📢');
+            var key=db.ref('notifications/global').push().key;
+            db.ref('notifications/global/'+key).set({message:text,time:Date.now(),_k:ADMIN_KEY})
+                .then(function(){ showNotify('✅ Published!','success'); document.getElementById('adminGlobalText').value=''; adminLoadGlobalMessages(); })
+                .catch(function(e){ showNotify('❌ '+e.message,'error'); });
         };
         function adminLoadGlobalMessages() {
             var list=document.getElementById('adminGlobalMsgList'); if(!list) return;
-            db.ref('notifications/global').orderByChild('time').limitToLast(10).once('value').then(function(snap) {
-                var msgs=[]; snap.forEach(function(ch){ msgs.unshift({id:ch.key,text:ch.val().message||ch.val().text||''}); });
-                if (!msgs.length) { list.innerHTML='<div style="color:#888;font-size:.8rem;padding:8px;">No announcements yet.</div>'; return; }
-                list.innerHTML='';
-                msgs.forEach(function(m) {
-                    var row=document.createElement('div');
-                    row.style.cssText='display:flex;justify-content:space-between;gap:6px;align-items:flex-start;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.06);';
-                    var preview=document.createElement('span');
-                    preview.style.cssText='font-size:.83rem;color:white;flex:1;word-break:break-word;';
-                    preview.textContent=m.text.length>120?m.text.slice(0,120)+'...':m.text;
-                    var btns=document.createElement('div');
-                    btns.style.cssText='display:flex;gap:4px;flex-shrink:0;';
-                    var editBtn=document.createElement('button');
-                    editBtn.textContent='EDIT'; editBtn.className='mini-btn';
-                    editBtn.style.cssText='background:#3498db;color:#fff;';
-                    editBtn.onclick=(function(id){ return function(){ adminEditMsg('global',id); }; })(m.id);
-                    // DEL button removed — use EDIT only
-                    btns.appendChild(editBtn);
-                    row.appendChild(preview); row.appendChild(btns);
-                    list.appendChild(row);
-                });
-            }).catch(function(e){ if(list) list.innerHTML='<div style="color:#e74c3c;font-size:.8rem;">'+e.message+'</div>'; });
+            LC.fb('section-admin', db.ref('notifications/global'), 'value', function(snap) {
+                var msgs=[]; snap.forEach(function(c){ msgs.unshift({id:c.key,text:c.val().message||c.val().text}); });
+                list.innerHTML=msgs.length?msgs.map(function(m){
+                    return '<div class="msg-card" style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start;"><span style="font-size:.83rem;color:white;flex:1;">'+m.text+'</span><button onclick="adminDeleteMsg(\'global\',\''+m.id+'\')" class="mini-btn" style="background:#e74c3c;color:#fff;flex-shrink:0;">DEL</button></div>';
+                }).join(''):'<div style="color:#888;font-size:.8rem;padding:8px;">No announcements yet.</div>';
+            });
         }
         window.adminDeleteMsg = function(path, key) {
-            if(!_isRealAdmin()) return;
-            var ak = 'anuragAdmin@123';
-            // Firebase rule requires _k present on write — set tombstone first, then remove
-            db.ref('notifications/'+path+'/'+key).set({_deleted:true, _k:ak})
-                .then(function(){ return db.ref('notifications/'+path+'/'+key).remove(); })
-                .then(function(){ showNotify('🗑️ Deleted!','success'); if(path==='global') adminLoadGlobalMessages(); else adminLoadPrivateMsgs(); })
-                .catch(function(){ showNotify('✅ Message hidden','success'); if(path==='global') adminLoadGlobalMessages(); else adminLoadPrivateMsgs(); });
-        };
-        window.adminEditMsg = function(path, key) {
-            if(!_isRealAdmin()) return;
-            // Fetch current text from Firebase - no inline escaping needed!
-            db.ref('notifications/'+path+'/'+key).once('value').then(function(snap) {
-                var currentText = snap.val() ? (snap.val().message || snap.val().text || '') : '';
-                showInputModal('EDIT MESSAGE', 'New text...', function(newText) {
-                    if (!newText || newText === currentText) return;
-                    var ak = ADMIN_KEY || 'anuragAdmin@123';
-                    db.ref('notifications/'+path+'/'+key).update({message: newText, _k: ak})
-                        .then(function(){ showNotify('✅ Message updated!','success'); if(path==='global') adminLoadGlobalMessages(); else adminLoadPrivateMsgs(); })
-                        .catch(function(e){ showNotify('❌ '+e.message,'error'); });
-                }, currentText);
-            }).catch(function(e){ showNotify('❌ Could not load: '+e.message,'error'); });
+            db.ref('notifications/'+path+'/'+key).remove()
+                .then(function(){ showNotify('Deleted','success'); if(path==='global') adminLoadGlobalMessages(); else adminLoadPrivateMsgs(); })
+                .catch(function(e){ showNotify('❌ '+e.message,'error'); });
         };
 
         // ── PRIVATE DM ───────────────────────────────────────────────────────
         window.adminSendSpecific = function() {
-            if(!_isRealAdmin()) return;
             var target=document.getElementById('adminTargetUser').value.toLowerCase().trim();
             var text=document.getElementById('adminSpecificText').value.trim();
             if(!target||!text) return showNotify('Fill both fields!','error');
-            showConfirm('✉️ Send private message to "'+target+'"?', function(){
-                var key=db.ref('notifications/private/'+target).push().key;
-                db.ref('notifications/private/'+target+'/'+key).set({message:text,time:Date.now(),_k:ADMIN_KEY})
-                    .then(function(){ showNotify('✅ Sent to '+target,'success'); document.getElementById('adminSpecificText').value=''; adminLoadPrivateMsgs(); })
-                    .catch(function(e){ showNotify('❌ '+e.message,'error'); });
-            },'✉️');
+            var key=db.ref('notifications/private/'+target).push().key;
+            db.ref('notifications/private/'+target+'/'+key).set({message:text,time:Date.now(),_k:ADMIN_KEY})
+                .then(function(){ showNotify('✅ Sent to '+target,'success'); document.getElementById('adminSpecificText').value=''; adminLoadPrivateMsgs(); })
+                .catch(function(e){ showNotify('❌ '+e.message,'error'); });
         };
         window.adminLoadPrivateMsgs = function() {
             var target=document.getElementById('adminTargetUser').value.toLowerCase().trim();
-            var list=document.getElementById('adminPrivateMsgList'); if(!list) return;
-            if(!target){list.innerHTML='<div style="color:#888;font-size:.8rem;">Enter a username above.</div>';return;}
+            var list=document.getElementById('adminPrivateMsgList'); if(!list||!target) return;
             db.ref('notifications/private/'+target).orderByChild('time').limitToLast(10).once('value').then(function(snap){
-                var msgs=[]; snap.forEach(function(ch){ msgs.unshift({id:ch.key,text:ch.val().message||ch.val().text||''}); });
-                if(!msgs.length){list.innerHTML='<div style="color:#888;font-size:.8rem;padding:8px;">No messages for '+target+'.</div>';return;}
-                list.innerHTML='';
-                msgs.forEach(function(m){
-                    var row=document.createElement('div');
-                    row.style.cssText='display:flex;justify-content:space-between;gap:6px;align-items:flex-start;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.06);';
-                    var preview=document.createElement('span');
-                    preview.style.cssText='font-size:.83rem;color:white;flex:1;word-break:break-word;';
-                    preview.textContent=m.text.length>120?m.text.slice(0,120)+'...':m.text;
-                    var btns=document.createElement('div');
-                    btns.style.cssText='display:flex;gap:4px;flex-shrink:0;';
-                    var editBtn=document.createElement('button');
-                    editBtn.textContent='EDIT'; editBtn.className='mini-btn';
-                    editBtn.style.cssText='background:#3498db;color:#fff;';
-                    editBtn.onclick=(function(id){ return function(){ adminEditMsg('private/'+target,id); }; })(m.id);
-                    // DEL button removed — use EDIT only
-                    btns.appendChild(editBtn);
-                    row.appendChild(preview); row.appendChild(btns);
-                    list.appendChild(row);
-                });
-            }).catch(function(e){list.innerHTML='<div style="color:#e74c3c;font-size:.8rem;">'+e.message+'</div>';});
+                var msgs=[]; snap.forEach(function(c){ msgs.unshift({id:c.key,text:c.val().message||c.val().text}); });
+                list.innerHTML=msgs.length?msgs.map(function(m){
+                    return '<div class="msg-card" style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start;"><span style="font-size:.83rem;color:white;flex:1;">'+m.text+'</span><button onclick="adminDeleteMsg(\'private/'+target+'\',\''+m.id+'\')" class="mini-btn" style="background:#e74c3c;color:#fff;flex-shrink:0;">DEL</button></div>';
+                }).join(''):'<div style="color:#888;font-size:.8rem;padding:8px;">No messages for this user.</div>';
+            });
         };
 
         // ── USERS ────────────────────────────────────────────────────────────
         function adminLoadUsers() {
-            if (typeof db === 'undefined' || !db) return showNotify('Database not ready','error');
             db.ref('users').once('value').then(function(snap){
                 _adminAllUsers=[];
                 snap.forEach(function(c){ var d=c.val(); if(!d._deleted) _adminAllUsers.push(Object.assign({id:c.key},d)); });
@@ -4179,15 +4264,7 @@
         }
         function adminRenderUserTable(users) {
             var tbody=document.getElementById('adminUserTableBody'); if(!tbody) return;
-            // Viewer (read-only): only show users with the allowed prefix
-            var filteredUsers = window._adminReadOnly
-                ? users.filter(function(u){ return u.id.toLowerCase().startsWith(VIEWER_PREFIX); })
-                : users;
-            if (window._adminReadOnly && filteredUsers.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:14px;color:#888;">No "'+VIEWER_PREFIX+'" users found.</td></tr>';
-                return;
-            }
-            tbody.innerHTML=filteredUsers.map(function(u){
+            tbody.innerHTML=users.map(function(u){
                 var bl=!!u.blocked;
                 var j=u.createdAt?new Date(u.createdAt).toLocaleDateString('en-IN'):'—';
                 return '<tr><td style="color:'+(bl?'#e74c3c':'white')+';">'+u.id+'</td>'+
@@ -4204,7 +4281,6 @@
             adminRenderUserTable(q?_adminAllUsers.filter(function(u){return u.id.includes(q);}):_adminAllUsers);
         };
         window.adminToggleBlock = function(uid,state) {
-            if(!_isRealAdmin()) return;
             state=(state==='true'||state===true);
             showConfirm((state?'🚫 BLOCK':'✅ UNBLOCK')+' user "'+uid+'"?', function(){
                 db.ref('users/'+uid).update({blocked:state,_admin:true,_adminKey:ADMIN_KEY})
@@ -4213,7 +4289,6 @@
             }, state?'🚫':'✅');
         };
         window.adminResetPass = function(uid) {
-            if(!_isRealAdmin()) return;
             showInputModal('RESET PASSWORD — '+uid.toUpperCase(), 'New password (min 3 chars)...', function(newPass){
                 if(!newPass||newPass.length<3){ showNotify('Min 3 chars!','error'); return; }
                 crypto.subtle.digest('SHA-1',new TextEncoder().encode(newPass)).then(function(buf){
@@ -4229,17 +4304,13 @@
         // Full migration: profile → friends → chats → requests → status/invites → quiz
         // Then old user is overwritten with adminKey tombstone, then removed.
         // Requires Firebase rule: !newData.exists() && data.child('_adminKey').val()==='anuragAdmin@123'
-        window.adminRenameUser = function() {
-            if(!_isRealAdmin()) return;
+        window.adminRenameUser = async function() {
             var oldN=document.getElementById('adminOldName').value.toLowerCase().trim();
             var newN=document.getElementById('adminNewName').value.toLowerCase().trim();
+            var st=document.getElementById('adminRenameStatus');
             if(!oldN||!newN) return showNotify('Fill both fields!','error');
             if(oldN===newN) return showNotify('Names are identical!','error');
             if(!/^[a-z0-9]+$/.test(newN)) return showNotify('New name: letters & numbers only!','error');
-            showConfirm('Rename "'+oldN+'" → "'+newN+'"?\nThis migrates ALL data and removes the old username.', function() { _doAdminRename(oldN, newN); }, '✏️');
-        };
-        async function _doAdminRename(oldN, newN) {
-            var st=document.getElementById('adminRenameStatus');
             var S=function(msg,c){ st.style.color=c||'#888'; st.innerHTML=msg; };
             S('🔍 Step 1/8: Validating...');
             try {
@@ -4328,11 +4399,10 @@
                 S('❌ '+err.message,'#ff3366');
                 showNotify('❌ Rename failed: '+err.message,'error');
             }
-        }
+        };
 
         // ── DELETE USER ──────────────────────────────────────────────────────
         window.adminDeleteUser = async function() {
-            if(!_isRealAdmin()) return;
             var uid=document.getElementById('adminDeleteName').value.toLowerCase().trim();
             var st=document.getElementById('adminDeleteStatus');
             if(!uid) return showNotify('Enter a username!','error');
@@ -4374,12 +4444,6 @@
             var game=document.getElementById('adminScoreGame').value;
             var st=document.getElementById('adminScoreStatus');
             if(!uid) return (st.innerText='❌ Enter username');
-            // Viewer: can only view users with allowed prefix
-            if(window._adminReadOnly && !uid.startsWith(VIEWER_PREFIX)){
-                st.style.color='#ff3366';
-                st.innerText='❌ Viewer limited to "'+VIEWER_PREFIX+'..." users only';
-                return;
-            }
             (game?db.ref('users/'+uid+'/'+game):db.ref('users/'+uid)).once('value').then(function(s){
                 if(!s.exists()) return (st.style.color='#ff3366',st.innerText='❌ Not found');
                 if(game){ st.style.color='#00f3ff'; st.innerText=uid+' → '+game+': '+s.val(); }
@@ -4387,52 +4451,28 @@
             }).catch(function(e){ st.style.color='#ff3366'; st.innerText='❌ '+e.message; });
         };
         window.adminResetScore=function(){
-            if(!_isRealAdmin()) return;
             var uid=document.getElementById('adminScoreUser').value.toLowerCase().trim();
             var game=document.getElementById('adminScoreGame').value;
             var st=document.getElementById('adminScoreStatus');
             if(!uid) return (st.innerText='❌ Enter username');
-            db.ref('users/'+uid).once('value').then(function(snap){
-                if(!snap.exists()||snap.val()._deleted){
-                    st.style.color='#ff3366'; st.innerText='❌ User "'+uid+'" not found!';
-                    showNotify('❌ User not found: '+uid,'error'); return;
-                }
-                showConfirm('Reset '+(game||'ALL scores')+' for "'+uid+'"?',function(){
-                    var upd=game?{[game]:0,_admin:true,_adminKey:ADMIN_KEY}:{flappy_highscore:0,dino_highscore:0,snake_highscore:0,pacman_highscore:0,_admin:true,_adminKey:ADMIN_KEY};
-                    db.ref('users/'+uid).update(upd)
-                        .then(function(){ st.style.color='#2ecc71'; st.innerText='✅ Reset: '+uid; showNotify('✅ Scores reset','success'); adminLoadUserInfo(); })
-                        .catch(function(e){ st.style.color='#ff3366'; st.innerText='❌ '+e.message; });
-                },'🗑️');
-            }).catch(function(e){ st.style.color='#ff3366'; st.innerText='❌ '+e.message; });
+            showConfirm('Reset '+(game||'ALL scores')+' for "'+uid+'"?',function(){
+                var upd=game?{[game]:0,_admin:true,_adminKey:ADMIN_KEY}:{flappy_highscore:0,dino_highscore:0,snake_highscore:0,pacman_highscore:0,_admin:true,_adminKey:ADMIN_KEY};
+                db.ref('users/'+uid).update(upd).then(function(){ st.style.color='#2ecc71'; st.innerText='✅ Reset: '+uid; showNotify('✅ Scores reset','success'); adminLoadUserInfo(); }).catch(function(e){ st.style.color='#ff3366'; st.innerText='❌ '+e.message; });
+            },'🗑️');
         };
         window.adminSetScore=function(){
-            if(!_isRealAdmin()) return;
             var uid=document.getElementById('adminScoreUser').value.toLowerCase().trim();
             var game=document.getElementById('adminScoreGame').value;
             var st=document.getElementById('adminScoreStatus');
-            if(!uid||!game) return (st.innerText='❌ Enter username and select a game');
+            if(!uid||!game) return (st.innerText='❌ Select user and game');
             showInputModal('SET SCORE — '+uid+' / '+game,'New score value (number)...',function(val){
                 var score=parseInt(val); if(isNaN(score)||score<0){ showNotify('Invalid number','error'); return; }
-                // Verify user exists first — prevent creating phantom accounts
-                st.style.color='#888'; st.innerText='Checking user...';
-                db.ref('users/'+uid).once('value').then(function(snap){
-                    if(!snap.exists()||snap.val()._deleted){
-                        st.style.color='#ff3366'; st.innerText='❌ User "'+uid+'" does not exist!';
-                        showNotify('❌ User not found: '+uid,'error');
-                        return;
-                    }
-                    showConfirm('Set '+game+' = '+score+' for "'+uid+'"?', function(){
-                        db.ref('users/'+uid).update({[game]:score,_admin:true,_adminKey:ADMIN_KEY})
-                            .then(function(){ st.style.color='#2ecc71'; st.innerText='✅ Set '+uid+' '+game+'='+score; showNotify('✅ Score updated','success'); adminLoadUserInfo(); })
-                            .catch(function(e){ st.style.color='#ff3366'; st.innerText='❌ '+e.message; });
-                    },'✏️');
-                }).catch(function(e){ st.style.color='#ff3366'; st.innerText='❌ '+e.message; });
+                db.ref('users/'+uid).update({[game]:score,_admin:true,_adminKey:ADMIN_KEY}).then(function(){ st.style.color='#2ecc71'; st.innerText='✅ Set '+uid+' '+game+'='+score; showNotify('✅ Score updated','success'); adminLoadUserInfo(); }).catch(function(e){ st.style.color='#ff3366'; st.innerText='❌ '+e.message; });
             });
         };
 
         // ── ROOMS ────────────────────────────────────────────────────────────
         function adminLoadRooms() {
-            if (typeof db === 'undefined' || !db) return;
             var tbody=document.getElementById('adminRoomTableBody');
             var rst=document.getElementById('adminRoomStatus');
             if(!tbody) return;
@@ -4451,13 +4491,11 @@
             }).catch(function(e){ showNotify('❌ '+e.message,'error'); });
         }
         window.adminDeleteRoom=function(roomId){
-            if(!_isRealAdmin()) return;
             showConfirm('Delete room "'+roomId+'"?',function(){
                 db.ref('car_world/'+roomId).remove().then(function(){ showNotify('🗑️ Room deleted','success'); adminLoadRooms(); }).catch(function(e){ showNotify('❌ '+e.message,'error'); });
             },'🗑️');
         };
         window.adminCleanRooms=function(){
-            if(!_isRealAdmin()) return;
             showConfirm('Delete all rooms with 0 players?',function(){
                 db.ref('car_world').once('value').then(function(snap){
                     var ops=[];
@@ -4485,12 +4523,8 @@
                 if(st) st.innerText='Week '+wn+' — '+entries.length+' player(s)';
             });
         };
-        window.adminClearQuizEntry=function(wk,uid){
-            if(!_isRealAdmin()) return;
-            showConfirm('Remove quiz entry for "'+uid+'"?',function(){ db.ref('quiz/'+wk+'/lb/'+uid).remove().then(function(){showNotify('✅ Removed','success');adminLoadQuizLb();}).catch(function(e){showNotify('❌ '+e.message,'error');}); },'🗑️'); };
-        window.adminResetQuizWeek=function(){
-            if(!_isRealAdmin()) return;
-            var wn=Math.floor((Date.now()-new Date(2024,0,1))/(7*864e5)); showConfirm('Reset quiz data for Week '+wn+'? This clears the leaderboard.',function(){ db.ref('quiz/week_'+wn).remove().then(function(){showNotify('✅ Quiz week reset','success');adminLoadQuizLb();}).catch(function(e){showNotify('❌ '+e.message,'error');}); },'⚠️'); };
+        window.adminClearQuizEntry=function(wk,uid){ showConfirm('Remove quiz entry for "'+uid+'"?',function(){ db.ref('quiz/'+wk+'/lb/'+uid).remove().then(function(){showNotify('✅ Removed','success');adminLoadQuizLb();}).catch(function(e){showNotify('❌ '+e.message,'error');}); },'🗑️'); };
+        window.adminResetQuizWeek=function(){ var wn=Math.floor((Date.now()-new Date(2024,0,1))/(7*864e5)); showConfirm('Reset quiz data for Week '+wn+'? This clears the leaderboard.',function(){ db.ref('quiz/week_'+wn).remove().then(function(){showNotify('✅ Quiz week reset','success');adminLoadQuizLb();}).catch(function(e){showNotify('❌ '+e.message,'error');}); },'⚠️'); };
         window.adminSetAiQuestion=function(){
             var s=document.getElementById('aqSubject').value.trim();
             var q=document.getElementById('aqQuestion').value.trim();
@@ -4499,11 +4533,9 @@
             var st=document.getElementById('adminQuizStatus');
             if(!s||!q||opts.some(function(o){return !o;})){st.style.color='#ff3366';st.innerText='❌ Fill all fields!';return;}
             var wn=Math.floor((Date.now()-new Date(2024,0,1))/(7*864e5));
-            showConfirm('Set special question for Week '+wn+'?', function(){
-                db.ref('quiz/week_'+wn+'/ai_question').set({id:'ai_w'+wn,s:s,q:q,o:opts,a:ans,d:2,_k:ADMIN_KEY})
-                    .then(function(){st.style.color='#2ecc71';st.innerText='✅ Special question set for Week '+wn;showNotify('✅ AI question set','success');})
-                    .catch(function(e){st.style.color='#ff3366';st.innerText='❌ '+e.message;});
-            },'🧠');
+            db.ref('quiz/week_'+wn+'/ai_question').set({id:'ai_w'+wn,s:s,q:q,o:opts,a:ans,d:2,_k:ADMIN_KEY})
+                .then(function(){st.style.color='#2ecc71';st.innerText='✅ Special question set for Week '+wn;showNotify('✅ AI question set','success');})
+                .catch(function(e){st.style.color='#ff3366';st.innerText='❌ '+e.message;});
         };
 
         // ── ONLINE USERS ─────────────────────────────────────────────────────
@@ -4540,8 +4572,8 @@
         .admin-section{background:rgba(255,255,255,.02);padding:18px;border-radius:10px;animation:adm-in .18s ease;}
         @keyframes adm-in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
         .adm-h3{color:#2ecc71;margin-bottom:12px;font-family:'Teko',sans-serif;font-size:1.35rem;letter-spacing:2px;border-bottom:1px solid rgba(46,204,113,.2);padding-bottom:7px;}
-        .adm-input{width:100%;padding:10px;margin:6px 0;border-radius:7px;border:1px solid rgba(0,243,255,.28);background:#0d0b22;color:white;font-size:.87rem;box-sizing:border-box;transition:border-color .2s;appearance:none;-webkit-appearance:none;} .adm-input:focus{outline:none;border-color:#00f3ff;box-shadow:0 0 0 2px rgba(0,243,255,.12);} .adm-input option{background:#111;color:white;}
-        .adm-textarea{width:100%;padding:10px;margin:6px 0;border-radius:7px;border:1px solid rgba(0,243,255,.25);background:#0d0b22;color:white;min-height:75px;resize:vertical;font-size:.87rem;box-sizing:border-box;transition:border-color .2s;} .adm-textarea:focus{outline:none;border-color:#00f3ff;}
+        .adm-input{width:100%;padding:10px;margin:6px 0;border-radius:7px;border:none;background:#111;color:white;font-size:.87rem;box-sizing:border-box;}
+        .adm-textarea{width:100%;padding:10px;margin:6px 0;border-radius:7px;border:none;background:#111;color:white;min-height:75px;resize:vertical;font-size:.87rem;box-sizing:border-box;}
         .adm-action-btn{width:100%;padding:13px;border:none;border-radius:50px;cursor:pointer;font-family:'Teko',sans-serif;font-size:1.2rem;letter-spacing:1px;transition:.2s;margin-top:4px;}
         .adm-action-btn:hover{opacity:.88;}
         .adm-status{margin-top:10px;font-size:.83rem;color:#888;min-height:18px;line-height:1.6;}
@@ -4561,8 +4593,7 @@
 
     <!-- ═══════════ QUIZ RULES MODAL ═══════════ -->
     <div id="quiz-rules-modal">
-        <div class="qrm-box" style="position:relative;">
-            <button onclick="quizCloseModal()" style="position:absolute;top:10px;right:12px;background:rgba(255,51,102,.15);border:1px solid rgba(255,51,102,.4);color:#ff3366;border-radius:50%;width:30px;height:30px;cursor:pointer;font-size:1rem;line-height:1;display:flex;align-items:center;justify-content:center;z-index:2;" title="Close">✕</button>
+        <div class="qrm-box">
             <div class="qrm-title">📋 QUIZ RULES</div>
             <div class="qrm-sub">READ CAREFULLY BEFORE STARTING</div>
             <div class="qrm-rule"><span class="qrm-rule-i">⏱️</span><span><b>60 seconds</b> per question — auto-skips on timeout</span></div>
@@ -5159,126 +5190,6 @@
     function _exitFs(cb){if(document.fullscreenElement||document.webkitFullscreenElement){try{if(screen.orientation&&screen.orientation.unlock)screen.orientation.unlock();}catch(e){}var done=false;function go(){if(done)return;done=true;cb();}setTimeout(go,400);document.addEventListener('fullscreenchange',go,{once:true});document.addEventListener('webkitfullscreenchange',go,{once:true});try{document.exitFullscreen();}catch(e){try{document.webkitExitFullscreen();}catch(e2){}}}else{cb();}}
     loadImages();
 </script>
-
-    <!-- ═══════════ DRAGGABLE CHAT BUBBLE ═══════════ -->
-    <div id="chat-bubble-wrap" style="
-        position:fixed; right:18px; bottom:80px; z-index:8888;
-        touch-action:none; user-select:none;">
-
-        <!-- Main circle button -->
-        <div id="chat-bubble" style="
-            width:52px; height:52px; border-radius:50%;
-            background:rgba(0,0,0,0.42); backdrop-filter:blur(10px);
-            border:1.5px solid rgba(255,255,255,0.22);
-            display:flex; align-items:center; justify-content:center;
-            cursor:pointer; font-size:1.3rem;
-            box-shadow:0 4px 20px rgba(0,0,0,0.35);
-            transition:transform .18s, box-shadow .18s;">
-            💬
-        </div>
-
-        <!-- Action bubbles (hidden by default) -->
-        <div id="chat-actions" style="
-            display:none; position:absolute; bottom:0; right:0;
-            align-items:center; gap:10px;">
-            <!-- Hub -->
-            <div class="cb-action" onclick="chatBubbleHub()" title="Go to Hub" style="
-                background:rgba(0,180,255,0.18); border:1.5px solid rgba(0,180,255,0.5);
-                color:#00c8ff;">🏠</div>
-            <!-- Chat -->
-            <div class="cb-action" onclick="chatBubbleChat()" title="Open Chat" style="
-                background:rgba(0,255,140,0.15); border:1.5px solid rgba(0,255,140,0.45);
-                color:#00ff8c;">💬</div>
-            <!-- Close -->
-            <div class="cb-action" onclick="chatBubbleClose()" title="Close" style="
-                background:rgba(255,50,80,0.15); border:1.5px solid rgba(255,50,80,0.4);
-                color:#ff3250;">✕</div>
-        </div>
-    </div>
-
-    <style>
-    .cb-action {
-        width:42px; height:42px; border-radius:50%;
-        display:flex; align-items:center; justify-content:center;
-        cursor:pointer; font-size:1.1rem;
-        backdrop-filter:blur(8px);
-        box-shadow:0 2px 12px rgba(0,0,0,0.3);
-        transition:transform .15s, opacity .15s;
-        animation:cbPop .2s ease both;
-    }
-    .cb-action:active { transform:scale(0.88); }
-    @keyframes cbPop {
-        from { transform:scale(0); opacity:0; }
-        to   { transform:scale(1); opacity:1; }
-    }
-    #chat-bubble:active { transform:scale(0.90); }
-    #chat-bubble.open { background:rgba(0,0,0,0.65); border-color:rgba(255,255,255,0.4); }
-    </style>
-
-    <script>
-    (function(){
-        var wrap = document.getElementById('chat-bubble-wrap');
-        var btn  = document.getElementById('chat-bubble');
-        var acts = document.getElementById('chat-actions');
-        var open = false;
-
-        // ── Toggle actions ──
-        btn.addEventListener('click', function(e) {
-            if (Math.abs(_cbDX||0) > 5 || Math.abs(_cbDY||0) > 5) return; // was dragged
-            open = !open;
-            acts.style.display = open ? 'flex' : 'none';
-            btn.classList.toggle('open', open);
-        });
-
-        // ── Dragging ──
-        var _cbStartX, _cbStartY, _cbOrigR, _cbOrigB, _cbDragging=false, _cbDX=0, _cbDY=0;
-        function pointerDown(e) {
-            var pt = e.touches ? e.touches[0] : e;
-            _cbStartX = pt.clientX; _cbStartY = pt.clientY;
-            var rect = wrap.getBoundingClientRect();
-            _cbOrigR = window.innerWidth  - rect.right;
-            _cbOrigB = window.innerHeight - rect.bottom;
-            _cbDX=0; _cbDY=0; _cbDragging=true;
-            e.preventDefault();
-        }
-        function pointerMove(e) {
-            if (!_cbDragging) return;
-            var pt = e.touches ? e.touches[0] : e;
-            _cbDX = pt.clientX - _cbStartX;
-            _cbDY = pt.clientY - _cbStartY;
-            var newR = Math.max(4, _cbOrigR - _cbDX);
-            var newB = Math.max(4, _cbOrigB - _cbDY);
-            wrap.style.right  = newR + 'px';
-            wrap.style.bottom = newB + 'px';
-            e.preventDefault();
-        }
-        function pointerUp() { _cbDragging=false; }
-
-        btn.addEventListener('mousedown',  pointerDown, {passive:false});
-        btn.addEventListener('touchstart', pointerDown, {passive:false});
-        window.addEventListener('mousemove', pointerMove, {passive:false});
-        window.addEventListener('touchmove', pointerMove, {passive:false});
-        window.addEventListener('mouseup',  pointerUp);
-        window.addEventListener('touchend', pointerUp);
-    })();
-
-    window.chatBubbleHub  = function(){
-        document.getElementById('chat-actions').style.display='none';
-        document.getElementById('chat-bubble').classList.remove('open');
-        MapsTo('section-hub','left');
-    };
-    window.chatBubbleChat = function(){
-        document.getElementById('chat-actions').style.display='none';
-        document.getElementById('chat-bubble').classList.remove('open');
-        MapsTo('section-chat','right');
-    };
-    window.chatBubbleClose = function(){
-        document.getElementById('chat-actions').style.display='none';
-        document.getElementById('chat-bubble').classList.remove('open');
-    };
-    </script>
-    <!-- ═══════════ END CHAT BUBBLE ═══════════ -->
-
 </body>
 </html>
 
@@ -10132,6 +10043,44 @@ window.addEventListener('load', function(){
         </div>
     </div>
 
+    <!-- ARCADECRAFT GAME SECTION -->
+    <div id="section-game-arcadecraft" allow="fullscreen; screen-orientation" class="spa-section hidden-right game-frame">
+        <div class="game-section-wrapper">
+            <iframe id="iframe-arcadecraft" allow="fullscreen; screen-orientation; autoplay"
+                allowfullscreen
+                style="width:100%;height:100%;border:none;"
+                sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-popups allow-modals"
+                src="about:blank"></iframe>
+        </div>
+    </div>
+
+    <!-- ARCADECRAFT FLOATING RADIAL BUTTON -->
+    <div id="mc-float-btn">
+        <div id="mc-radial-menu">
+            <div class="mc-radial-pill" onclick="mcGoHub()">🏠 Hub</div>
+            <div class="mc-radial-pill" onclick="mcOpenChat()">💬</div>
+            <div class="mc-radial-pill" onclick="mcCloseMenu()">✕</div>
+        </div>
+        <div id="mc-float-circle-main" onclick="mcToggleMenu()">⛏️</div>
+    </div>
+
+    <!-- ARCADECRAFT CHAT OVERLAY -->
+    <div id="mc-chat-overlay">
+        <div id="mc-chat-header">
+            <h3>⛏️ ArcadeCraft Chat</h3>
+            <div id="mc-chat-close" onclick="mcCloseChat()">✕</div>
+        </div>
+        <div id="mc-friends-list-mini"></div>
+        <div id="mc-chat-msgs">
+            <div id="mc-no-friend-sel">← Select a friend<br>to start chatting<br><span style="font-size:0.7rem;margin-top:8px;display:block;color:rgba(200,160,107,0.35);">Share your invite code<br>so friends can join your world!</span></div>
+        </div>
+        <div id="mc-invite-hint">💡 Tip: Share your world invite code in chat so friends can join via Direct Connect!</div>
+        <div id="mc-chat-input-row">
+            <input id="mc-chat-input" type="text" placeholder="Message or invite code..." maxlength="200" autocomplete="off" />
+            <button id="mc-chat-send" onclick="mcSendMsg()">Send</button>
+        </div>
+    </div>
+
     <!-- THANK YOU SECTION -->
     <div id="section-thankyou" class="spa-section hidden-right" style="background:#0a0a0c;">
         <div style="height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;">
@@ -10148,21 +10097,6 @@ window.addEventListener('load', function(){
                 <div style="margin-top:20px;font-size:1rem;color:#666;font-family:'Segoe UI',sans-serif;">Automatic
                     redirect in <span id="ty-seconds" style="color:#00f3ff;font-weight:bold;">10</span>s</div>
             </div>
-        </div>
-        <div id="section-game-arcadecraft" class="spa-section hidden-right game-frame">
-        <div class="game-section-wrapper" style="position:relative;">
-            <iframe id="iframe-arcadecraft" allow="fullscreen; screen-orientation; clipboard-read; clipboard-write"
-                style="width:100%;height:100%;border:none;display:block;" src="eaglercraft.html">
-            </iframe>
-            <!-- Floating back button -->
-            <button onclick="spaGoBack()" style="
-                position:absolute;top:12px;left:12px;z-index:9999;
-                background:rgba(0,0,0,0.55);backdrop-filter:blur(6px);
-                border:1px solid rgba(255,255,255,0.25);color:#fff;
-                border-radius:20px;padding:6px 14px;font-size:.8rem;
-                cursor:pointer;letter-spacing:1px;font-family:inherit;
-"                title="Back to Hub">&#8592; Hub</button>
-        </div>
         </div>
     </div>
     <style>
@@ -10306,29 +10240,23 @@ window.addEventListener('load', function(){
         });
         function _mountGame(iid) {
             const fr = document.getElementById(iid);
-            if (!fr || !_gameSrc[iid]) return;
-            // Always force-clear first to prevent black/blank screen after long sessions
-            fr.removeAttribute('srcdoc');
-            fr.src = 'about:blank';
-            delete fr.dataset.mounted;
-            // Double rAF: wait for blank to paint, then inject content
-            requestAnimationFrame(function() {
-                requestAnimationFrame(function() {
-                    fr.srcdoc = _gameSrc[iid];
-                    fr.dataset.mounted = '1';
-                });
-            });
+            if (!fr) return;
+            if (iid === 'iframe-arcadecraft') {
+                if (!fr.dataset.mounted) { fr.src = 'eaglercraft.html'; fr.dataset.mounted = '1'; }
+                return;
+            }
+            if (fr && _gameSrc[iid] && !fr.dataset.mounted) { fr.srcdoc = _gameSrc[iid]; fr.dataset.mounted = '1'; }
         }
         function _unmountGame(iid) {
             const fr = document.getElementById(iid);
             if (!fr) return;
-            delete fr.dataset.mounted;
-            // WASM game — never reset src (expensive to reload)
-            if (iid !== 'iframe-arcadecraft') {
-                fr.removeAttribute('srcdoc');
-                fr.src = 'about:blank';
+            // Hide ArcadeCraft floating button & chat when leaving
+            if (iid === 'iframe-arcadecraft') {
+                mcFloatHide();
             }
-            try { if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock(); } catch(_) {}
+            delete fr.dataset.mounted;
+            fr.removeAttribute('srcdoc');
+            fr.src = 'about:blank';
         }
         const _gameIframe = {
             'section-game-dino': 'iframe-dino', 'section-game-flappy': 'iframe-flappy',
@@ -10427,22 +10355,6 @@ function disableGlobalZoom() {
             history.pushState({ spa: targetId }, '', '#' + targetId);
 
             if (targetId === 'section-chat') LC.timer('section-chat', setTimeout(initChat, 300));
-            if (targetId === 'section-leaderboard') {
-                LC.timer('section-leaderboard', setTimeout(function() {
-                    var active = document.querySelector('.lb-game-tab.active');
-                    if (active) {
-                        // Already selected — just refresh
-                        loadLeaderboard();
-                    } else {
-                        // First visit — auto-select first tab
-                        var first = document.querySelector('.lb-game-tab');
-                        if (first) {
-                            var m = first.getAttribute('onclick').match(/'([^']+)'/);
-                            if (m) lbSelectGame(m[1], first);
-                        }
-                    }
-                }, 320));
-            }
             var _lbar = document.getElementById('lb-my-rank-bar');
             if (_lbar && targetId !== 'section-leaderboard') _lbar.classList.remove('show');
             if (targetId === 'section-hub') { LC.timer('section-hub', setTimeout(initHub, 300)); if (currentSection && currentSection.startsWith('section-game')) _setUserStatus('online'); setTimeout(_checkInviteQueue, 800); }
@@ -10574,15 +10486,6 @@ function disableGlobalZoom() {
             localStorage.setItem('isLoggedIn', 'true');
             localStorage.setItem('playerName', u);
             try { db.ref('users/' + u).update({ lastLogin: firebase.database.ServerValue.TIMESTAMP }); } catch (e) { }
-            // Clear login inputs 3s after success so values don't linger
-            setTimeout(function() {
-                var un = document.getElementById('login-username');
-                var pw = document.getElementById('login-password');
-                var st = document.getElementById('login-status');
-                if (un) un.value = '';
-                if (pw) pw.value = '';
-                if (st) st.innerText = '';
-            }, 3000);
             setTimeout(() => { initHub(); MapsTo('section-hub', 'right'); }, 800);
         }
         document.getElementById('login-password').addEventListener('keypress', e => { if (e.key === 'Enter') processAuth(); });
@@ -10832,11 +10735,6 @@ function disableGlobalZoom() {
             }
         }, 1000); 
        /* function logout() {
-            // Reset admin state on logout
-            window._adminReadOnly = false;
-            window._adminIsHimanshu = false;
-            var _roBadge = document.getElementById('adm-ro-badge');
-            if (_roBadge) _roBadge.remove();
             var _logoutUser = localStorage.getItem('playerName');
             if (_logoutUser && typeof db !== 'undefined') {
                 try {
@@ -10964,8 +10862,8 @@ function disableGlobalZoom() {
             'ttt': '❌⭕ Playing Tic-Tac-Toe',
             'multittt': '🎮 Playing TTT Online',
             'multicar': '🏎️ Playing Car Multiplayer',
-            'arcadecraft': '⛏️ Playing ArcadeCraft',
-            'quiz': '🧠 Taking Weekly Quiz'
+            'quiz': '🧠 Taking Weekly Quiz',
+            'arcadecraft': '⛏️ Playing ArcadeCraft'
         };
         function _setUserStatus(statusVal) {
             var pn = localStorage.getItem('playerName');
@@ -10978,11 +10876,6 @@ function disableGlobalZoom() {
         function openGame(k) {
     const s = gameMap[k];
     if (!s) return;
-    if (k === 'arcadecraft') {
-        _setUserStatus('⛏️ Playing ArcadeCraft');
-        setTimeout(function() { MapsTo(s, 'right'); }, 30);
-        return;
-    }
     if (k === 'quiz') { if (typeof quizOpenRulesModal === 'function') quizOpenRulesModal(); else MapsTo(s, 'right'); return; }
     const iid = 'iframe-' + k;
 
@@ -11009,6 +10902,7 @@ function disableGlobalZoom() {
     _mountGame(iid);
     _setUserStatus(_gameStatusNames[k] || '🎮 In Game');
     setTimeout(function() { MapsTo(s, 'right'); }, 30);
+    if (k === 'arcadecraft') setTimeout(mcFloatShow, 400);
 }
 
         // ─── CONTACT FORM AJAX ───
@@ -11303,7 +11197,7 @@ function disableGlobalZoom() {
             document.getElementById('pc-username').innerHTML = '<span class="skeleton" style="display:inline-block;width:130px;height:26px;border-radius:6px;">&nbsp;</span>';
             document.getElementById('pc-scores').innerHTML = [0,1,2,3].map(function(){return '<div class="pc-score-item skeleton" style="height:52px;">&nbsp;</div>';}).join('');
             document.getElementById('pc-last-login').innerText = '';
-            ['pc-stats-row','pc-quiz-medals','pc-medals-row','pc-online-status','pc-extra-row'].forEach(function(id){ var el=document.getElementById(id); if(el) el.remove(); });
+            ['pc-stats-row','pc-quiz-medals','pc-medals-row'].forEach(function(id){ var el=document.getElementById(id); if(el) el.remove(); });
             // Pre-insert skeleton stats-row so friends/badge never flash old data
             var _skSR = document.createElement('div');
             _skSR.id = 'pc-stats-row';
@@ -11446,97 +11340,6 @@ function disableGlobalZoom() {
                 } else {
                     llEl.innerText = '';
                 }
-                // Online status dot
-                var statusDot = document.createElement('div');
-                statusDot.id = 'pc-online-status';
-                statusDot.style.cssText = 'display:flex;align-items:center;justify-content:center;gap:6px;margin-top:6px;margin-bottom:2px;';
-                db.ref('status/' + uid).once('value').then(function(ss) {
-                    var sv = ss.val() || {};
-                    var isOnline = sv.online || (sv.last_changed && Date.now()-sv.last_changed < 300000);
-                    var activity = sv.activity || '';
-                    statusDot.innerHTML = '<span style="width:8px;height:8px;border-radius:50%;background:' + (isOnline?'#2ecc71':'#555') + ';display:inline-block;"></span>' +
-                        '<span style="font-size:.72rem;color:' + (isOnline?'#2ecc71':'rgba(255,255,255,.35)') + ';">' +
-                        (isOnline ? (activity || 'Online') : (sv.last_changed ? 'Last seen ' + _fmtAgo(sv.last_changed) : 'Offline')) + '</span>';
-                });
-                function _fmtAgo(ts) {
-                    var m = Math.floor((Date.now()-ts)/60000);
-                    if (m < 1) return 'just now';
-                    if (m < 60) return m + 'm ago';
-                    var h = Math.floor(m/60); if (h < 24) return h + 'h ago';
-                    return Math.floor(h/24) + 'd ago';
-                }
-                var existingStatus = document.getElementById('pc-online-status'); if (existingStatus) existingStatus.remove();
-                var _pcCard2 = document.getElementById('profile-card');
-                if (_pcCard2 && document.getElementById('pc-username')) {
-                    document.getElementById('pc-username').parentNode.insertBefore(statusDot, document.getElementById('pc-username').nextSibling);
-                }
-
-                // Total score + join date row
-                var totalScore = flappyScore + dinoScore + snakeScore + pacmanScore;
-                var joinDate = d.createdAt ? new Date(d.createdAt).toLocaleDateString('en-IN', {year:'numeric',month:'short',day:'numeric'}) : '—';
-                var extraRow = document.getElementById('pc-extra-row');
-                if (extraRow) extraRow.remove();
-                var _er = document.createElement('div');
-                _er.id = 'pc-extra-row';
-                _er.style.cssText = 'display:flex;justify-content:space-between;gap:10px;margin:6px 0;';
-                _er.innerHTML =
-                    '<div style="flex:1;background:rgba(255,255,255,.04);border-radius:10px;padding:5px 8px;text-align:center;">' +
-                    '<div style="font-size:.6rem;color:#888;">TOTAL SCORE</div>' +
-                    '<div style="font-size:1rem;color:#f1c40f;font-family:Teko,sans-serif;">'+totalScore.toLocaleString()+'</div></div>' +
-                    '<div style="flex:1;background:rgba(255,255,255,.04);border-radius:10px;padding:5px 8px;text-align:center;">' +
-                    '<div style="font-size:.6rem;color:#888;">JOINED</div>' +
-                    '<div style="font-size:.78rem;color:rgba(255,255,255,.6);">'+joinDate+'</div></div>';
-                var _scoresEl = document.getElementById('pc-scores');
-                if (_scoresEl && _scoresEl.parentNode) _scoresEl.parentNode.insertBefore(_er, _scoresEl.nextSibling);
-
-                // ── Online status dot ──────────────────────────
-                var _existingStatus = document.getElementById('pc-online-status');
-                if (_existingStatus) _existingStatus.remove();
-                var statusDot = document.createElement('div');
-                statusDot.id = 'pc-online-status';
-                statusDot.style.cssText = 'display:flex;align-items:center;justify-content:center;gap:6px;margin:4px 0 6px;';
-                function _fmtAgo(ts) {
-                    var m = Math.floor((Date.now()-ts)/60000);
-                    if (m < 1) return 'just now';
-                    if (m < 60) return m + 'm ago';
-                    var h = Math.floor(m/60); if (h < 24) return h + 'h ago';
-                    return Math.floor(h/24) + 'd ago';
-                }
-                db.ref('status/' + uid).once('value').then(function(ss) {
-                    var sv = ss.val() || {};
-                    var isOnline = sv.online || (sv.last_changed && Date.now()-sv.last_changed < 300000);
-                    var activity = sv.activity || '';
-                    statusDot.innerHTML =
-                        '<span style="width:8px;height:8px;border-radius:50%;background:' + (isOnline?'#2ecc71':'#555') + ';display:inline-block;flex-shrink:0;"></span>' +
-                        '<span style="font-size:.72rem;color:' + (isOnline?'#2ecc71':'rgba(255,255,255,.35)') + ';">' +
-                        (isOnline ? (activity || 'Online') : (sv.last_changed ? 'Last seen ' + _fmtAgo(sv.last_changed) : 'Offline')) +
-                        '</span>';
-                });
-                var _usernameEl2 = document.getElementById('pc-username');
-                if (_usernameEl2 && _usernameEl2.parentNode) {
-                    _usernameEl2.parentNode.insertBefore(statusDot, _usernameEl2.nextSibling);
-                }
-
-                // ── Total score + join date row ─────────────────────
-                var totalScore = flappyScore + dinoScore + snakeScore + pacmanScore;
-                var joinDate = d.createdAt ? new Date(d.createdAt).toLocaleDateString('en-IN',{year:'numeric',month:'short',day:'numeric'}) : '—';
-                var _existingER = document.getElementById('pc-extra-row');
-                if (_existingER) _existingER.remove();
-                var _er = document.createElement('div');
-                _er.id = 'pc-extra-row';
-                _er.style.cssText = 'display:flex;justify-content:space-between;gap:8px;margin:6px 0;';
-                _er.innerHTML =
-                    '<div style="flex:1;background:rgba(255,255,255,.04);border-radius:10px;padding:6px 8px;text-align:center;">' +
-                    '<div style="font-size:.6rem;color:#888;letter-spacing:.5px;">TOTAL SCORE</div>' +
-                    '<div style="font-size:1rem;color:#f1c40f;font-family:Teko,sans-serif;">' + totalScore.toLocaleString() + '</div></div>' +
-                    '<div style="flex:1;background:rgba(255,255,255,.04);border-radius:10px;padding:6px 8px;text-align:center;">' +
-                    '<div style="font-size:.6rem;color:#888;letter-spacing:.5px;">JOINED</div>' +
-                    '<div style="font-size:.78rem;color:rgba(255,255,255,.6);margin-top:1px;">' + joinDate + '</div></div>';
-                var _scoresEl = document.getElementById('pc-scores');
-                if (_scoresEl && _scoresEl.parentNode) {
-                    _scoresEl.parentNode.insertBefore(_er, _scoresEl.nextSibling);
-                }
-
                 // Update medals box with real data
                 var _medBox = document.getElementById('pc-quiz-medals');
                 if (_medBox) {
@@ -12148,7 +11951,7 @@ function disableGlobalZoom() {
 
         // ─── GAME SECTIONS ───
         // Only Dino and Multiplayer Car use requestFullscreen + landscape lock in your zip
-        var _GAME_SECTIONS = new Set(['section-game-dino', 'section-game-multicar', 'section-game-car']);
+        var _GAME_SECTIONS = new Set(['section-game-dino', 'section-game-multicar', 'section-game-car', 'section-game-arcadecraft']);
         var _fsActive = false;
 
         // ─── MOBILE ROTATE OVERLAY ───
@@ -12156,14 +11959,12 @@ function disableGlobalZoom() {
             return window.innerWidth < window.innerHeight && Math.min(window.screen.width, window.screen.height) <= 900;
         }
         function _updateRotateOverlay() {
-            var fv = document.getElementById('fair-viewer');
-            if (fv && fv.classList.contains('open')) return;
             var el = document.getElementById('rotate-overlay');
             if (!el) return;
             if (_GAME_SECTIONS.has(currentSection) && !_fsActive && _isMobilePortrait()) { el.classList.add('rotate-show'); }
             else { el.classList.remove('rotate-show'); }
         }
-        window.addEventListener('resize', function () { _updateRotateOverlay(); }, { passive: true });
+        window.addEventListener('resize', function () { _updateRotateOverlay(); });
         (screen.orientation
             ? screen.orientation.addEventListener('change', _updateRotateOverlay)
             : window.addEventListener('orientationchange', _updateRotateOverlay));
@@ -12281,45 +12082,27 @@ function disableGlobalZoom() {
                 document.getElementById('al-pass-input').value = '';
             };
 
-            // Admin access levels:
-            // 'anuragAdmin@123' → full control, only player 'anurag' can use
-            // 'himanshuAdmin@mishra' → read-only view, players 'anurag' OR 'himanshu' can use
-            var VIEWER_HASH = null; // computed on first use
-            async function _getViewerHash() {
-                if (!VIEWER_HASH) VIEWER_HASH = await sha256('himanshuAdmin@mishra');
-                return VIEWER_HASH;
-            }
-            window._adminReadOnly = false;
             window.alVerify = async function () {
                 var pass = document.getElementById('al-pass-input').value;
                 if (!pass) return;
                 var eEl = document.getElementById('al-error');
+                // Username check: only 'anurag' can be admin
                 var loggedUser = (localStorage.getItem('playerName') || '').toLowerCase().trim();
+                if (loggedUser !== 'anurag') {
+                    eEl.innerText = '⛔ ACCESS DENIED — You are not the Admin!';
+                    document.getElementById('al-pass-input').value = '';
+                    return;
+                }
                 var h = await sha256(pass);
-                var vh = await _getViewerHash();
-                // Full admin: only 'anurag' with full key
                 if (h === ADMIN_HASH) {
-                    if (loggedUser !== 'anurag') {
-                        eEl.innerText = '⛔ Access denied — wrong account.';
-                        return;
-                    }
-                    window._adminReadOnly = false;
-                    window._adminIsHimanshu = false;
-                    document.getElementById('al-modal').style.display = 'none';
-                    document.getElementById('al-pass-input').value = '';
+                    alClose();
                     _injectAdminIframe();
-                    return;
-                }
-                // Himanshu: viewer key — show same UI but all writes blocked by fn-level check
-                if (h === vh) {
-                    window._adminReadOnly = false;     // same UI shown
-                    window._adminIsHimanshu = true;    // but writes will show "not real admin"
-                    document.getElementById('al-modal').style.display = 'none';
+                    MapsTo('section-admin', 'right');
+                } else {
+                    eEl.innerText = '⛔ ACCESS DENIED — Invalid credentials';
                     document.getElementById('al-pass-input').value = '';
-                    _injectAdminIframe();
-                    return;
+                    document.getElementById('al-pass-input').focus();
                 }
-                eEl.innerText = '❌ Wrong key. Try again.';
             };
 
             window.launchAdminEntry = function () {
@@ -13383,45 +13166,18 @@ async function fairLoadFile(fileId, fileName, mimeType) {
             var numPages = pdfDoc.numPages;
             for (var pg = 1; pg <= numPages; pg++) {
                 var page = await pdfDoc.getPage(pg);
-                var vp = page.getViewport({ scale: 2.0 });
+                var vp = page.getViewport({ scale: 1.5 });
                 var canvas = document.createElement('canvas');
                 canvas.width = vp.width;
                 canvas.height = vp.height;
-                canvas.style.cssText = 'display:block;margin:0 auto 8px;max-width:100%;will-change:transform;transform:translateZ(0);';
+                canvas.style.marginBottom = '6px';
+                canvas.style.maxWidth = '100%';
                 content.appendChild(canvas);
                 await page.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise;
                 _setViewerProgress(80 + (pg / numPages) * 18, 'Rendering page ' + pg + '/' + numPages);
             }
             _setViewerProgress(100, 'Done!');
             _viewerShowContent();
-            // Debounced resize: only re-render after resize stops (not on every pixel)
-            (function() {
-                var _pdfDocRef = pdfDoc;
-                var _resizeTimer = null;
-                function _reRender() {
-                    if (_resizeTimer) clearTimeout(_resizeTimer);
-                    _resizeTimer = setTimeout(function() {
-                        var cont = document.getElementById('fair-viewer-content');
-                        if (!_pdfDocRef || !cont || cont.style.display==='none') return;
-                        cont.innerHTML = '';
-                        var nP = _pdfDocRef.numPages;
-                        (function rp(pg) {
-                            if (pg > nP) return;
-                            _pdfDocRef.getPage(pg).then(function(page) {
-                                var cw = cont.clientWidth - 16;
-                                var scale = Math.min(1.5, cw > 0 ? cw / page.getViewport({scale:1}).width : 1.5);
-                                var vp = page.getViewport({scale: Math.max(0.8, scale)});
-                                var cv = document.createElement('canvas');
-                                cv.width=vp.width; cv.height=vp.height; cv.style.marginBottom='6px'; cv.style.maxWidth='100%';
-                                cont.appendChild(cv);
-                                page.render({canvasContext:cv.getContext('2d'),viewport:vp}).promise.then(function(){ rp(pg+1); });
-                            });
-                        })(1);
-                    }, 400);
-                }
-                window.addEventListener('resize', _reRender);
-                // touchend removed — browser zoom handles pinch natively
-            })();
 
         } else if (type === 'image') {
             dlUrl = 'https://drive.google.com/uc?export=download&id=' + fileId;
@@ -13464,10 +13220,10 @@ async function fairLoadFile(fileId, fileName, mimeType) {
             var numPages = pdfDoc.numPages;
             for (var pg = 1; pg <= numPages; pg++) {
                 var page = await pdfDoc.getPage(pg);
-                var vp = page.getViewport({ scale: 2.0 });
+                var vp = page.getViewport({ scale: 1.5 });
                 var canvas = document.createElement('canvas');
                 canvas.width = vp.width; canvas.height = vp.height;
-                canvas.style.cssText = 'display:block;margin:0 auto 8px;max-width:100%;will-change:transform;transform:translateZ(0);';
+                canvas.style.marginBottom = '6px'; canvas.style.maxWidth = '100%';
                 content.appendChild(canvas);
                 await page.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise;
                 _setViewerProgress(80 + (pg / numPages) * 18, 'Rendering page ' + pg + '/' + numPages);
@@ -13931,11 +13687,7 @@ window.loadFairCopies = function() {
                 };
                 _pha = function () {
                     if (!_qRunning) return;
-                    // pagehide can be accidental — apply grace period like visibilitychange
-                    _qAbsentSince = Date.now();
-                    _qAbsentTimer = setTimeout(function() {
-                        if (_qRunning) _triggerCheat();
-                    }, ABSENT_GRACE);
+                    _triggerCheat();
                 };
                 document.addEventListener('visibilitychange', _vis);
                 window.addEventListener('blur', _blr);
@@ -13998,33 +13750,30 @@ window.loadFairCopies = function() {
             };
 
             // ── RULES MODAL ───────────────────────────────────────────────────
-            window.quizCloseModal = function() {
-                var modal = document.getElementById('quiz-rules-modal');
-                if (modal) modal.classList.remove('show');
-                if (_rulesCountdown) { clearInterval(_rulesCountdown); _rulesCountdown = null; }
-            };
             window.quizOpenRulesModal = function () {
+                // Check ban first
                 _checkBan(function (banned) {
                     if (banned) {
+                        // Open quiz section and show ban UI
                         MapsTo('section-quiz', 'right');
-                        setTimeout(function () { window.initQuizSection && window.initQuizSection(); }, 380);
+                        setTimeout(function () {
+                            window.initQuizSection && window.initQuizSection();
+                        }, 380);
                         return;
                     }
                     var modal = document.getElementById('quiz-rules-modal');
                     var btn   = document.getElementById('qrm-ok-btn');
+                    var cntEl = document.getElementById('qrm-sec');
                     var cdEl  = document.getElementById('qrm-countdown');
                     if (!modal) return;
-                    // FULL RESET every time modal opens
-                    if (_rulesCountdown) { clearInterval(_rulesCountdown); _rulesCountdown = null; }
-                    if (btn) btn.disabled = true;
-                    // Reset countdown HTML completely so old "✅ You may now proceed" is gone
-                    if (cdEl) cdEl.innerHTML = 'Please read the rules... <span id="qrm-sec">5</span>s';
                     modal.classList.add('show');
+                    if (btn) btn.disabled = true;
                     var sec = 5;
+                    if (cntEl) cntEl.innerText = sec;
+                    if (_rulesCountdown) clearInterval(_rulesCountdown);
                     _rulesCountdown = setInterval(function () {
                         sec--;
-                        var s = document.getElementById('qrm-sec');
-                        if (s) s.innerText = sec;
+                        if (cntEl) cntEl.innerText = sec;
                         if (sec <= 0) {
                             clearInterval(_rulesCountdown); _rulesCountdown = null;
                             if (btn) btn.disabled = false;
@@ -14250,32 +13999,18 @@ window.loadFairCopies = function() {
                 });
             };
 
-            var _awardingInProgress = false;  // prevent double-award on same device
             function _awardPrevWeek() {
-                if (_awardingInProgress) return;
                 var prevKey = 'week_' + (_weekNum - 1);
-                // Use a transaction on the 'awarded' flag so only ONE client awards medals
-                db.ref('quiz/' + prevKey + '/awarded').transaction(function(current) {
-                    // If already awarded, abort (return undefined)
-                    if (current === true) return; // abort
-                    return true; // mark as awarded atomically
-                }, function(err, committed, snap) {
-                    if (err || !committed) return; // another client already won the race
-                    _awardingInProgress = true;
-                    db.ref('quiz/' + prevKey + '/lb').once('value').then(function(snap) {
+                db.ref('quiz/' + prevKey + '/awarded').once('value').then(function (s) {
+                    if (s.val()) return;
+                    db.ref('quiz/' + prevKey + '/lb').once('value').then(function (snap) {
                         var entries = _sortEntries(snap);
-                        if (!entries.length) { _awardingInProgress = false; return; }
+                        if (!entries.length) return;
                         var meds = ['gold', 'silver', 'bronze'];
-                        // Award top 3 unique users only
-                        var awarded = new Set();
-                        var rank = 0;
-                        entries.forEach(function(e) {
-                            if (rank >= 3 || awarded.has(e.id)) return;
-                            awarded.add(e.id);
-                            db.ref('users/' + e.id + '/quiz_medals/' + meds[rank]).transaction(function(v) { return (v || 0) + 1; });
-                            rank++;
+                        entries.slice(0, 3).forEach(function (e, i) {
+                            db.ref('users/' + e.id + '/quiz_medals/' + meds[i]).transaction(function (v) { return (v || 0) + 1; });
                         });
-                        _awardingInProgress = false;
+                        db.ref('quiz/' + prevKey + '/awarded').set(true);
                     });
                 });
             }
@@ -14464,6 +14199,205 @@ window.loadFairCopies = function() {
 
         })(); // end quiz IIFE
         // For clarity, I'll provide the modified MapsTo section for you to copy/paste (only the part that changes).
+
+        // ═══════════════════════════════════════════════════════
+        //  ARCADECRAFT — Floating Button + In-Game Chat
+        // ═══════════════════════════════════════════════════════
+        (function() {
+            var _mcMenuOpen = false;
+            var _mcChatOpen = false;
+            var _mcSelFriend = null;
+            var _mcListeners = {};
+
+            // ── Draggable float btn ──
+            var _floatBtn = null;
+            var _dragging = false, _dragOX = 0, _dragOY = 0, _hasMoved = false;
+
+            function _initDrag() {
+                _floatBtn = document.getElementById('mc-float-btn');
+                if (!_floatBtn) return;
+                _floatBtn.style.left = (window.innerWidth - 70) + 'px';
+                _floatBtn.style.top  = (window.innerHeight - 70) + 'px';
+                _floatBtn.style.bottom = 'auto';
+
+                function startDrag(ex, ey) {
+                    var r = _floatBtn.getBoundingClientRect();
+                    _dragOX = ex - r.left; _dragOY = ey - r.top;
+                    _dragging = true; _hasMoved = false;
+                    _floatBtn.style.cursor = 'grabbing';
+                }
+                function moveDrag(ex, ey) {
+                    if (!_dragging) return;
+                    var nx = ex - _dragOX, ny = ey - _dragOY;
+                    nx = Math.max(0, Math.min(window.innerWidth - 56, nx));
+                    ny = Math.max(0, Math.min(window.innerHeight - 56, ny));
+                    _floatBtn.style.left = nx + 'px'; _floatBtn.style.top = ny + 'px';
+                    _hasMoved = true;
+                }
+                function endDrag() {
+                    _dragging = false;
+                    _floatBtn.style.cursor = 'grab';
+                }
+                _floatBtn.addEventListener('mousedown', function(e) { startDrag(e.clientX, e.clientY); e.preventDefault(); });
+                document.addEventListener('mousemove', function(e) { moveDrag(e.clientX, e.clientY); });
+                document.addEventListener('mouseup', endDrag);
+                _floatBtn.addEventListener('touchstart', function(e) { var t = e.touches[0]; startDrag(t.clientX, t.clientY); }, { passive: true });
+                document.addEventListener('touchmove', function(e) { if (!_dragging) return; var t = e.touches[0]; moveDrag(t.clientX, t.clientY); e.preventDefault(); }, { passive: false });
+                document.addEventListener('touchend', endDrag);
+            }
+
+            // ── Show / Hide float btn ──
+            window.mcFloatShow = function() {
+                _floatBtn = document.getElementById('mc-float-btn');
+                if (!_floatBtn) return;
+                _initDrag();
+                _floatBtn.classList.add('mc-visible');
+                _mcLoadFriends();
+            };
+            window.mcFloatHide = function() {
+                _floatBtn = document.getElementById('mc-float-btn');
+                if (_floatBtn) _floatBtn.classList.remove('mc-visible');
+                mcCloseMenu(); mcCloseChat();
+            };
+
+            // ── Radial menu toggle ──
+            window.mcToggleMenu = function() {
+                if (_hasMoved) { _hasMoved = false; return; }
+                _mcMenuOpen = !_mcMenuOpen;
+                var menu = document.getElementById('mc-radial-menu');
+                if (menu) { menu.classList.toggle('mc-open', _mcMenuOpen); }
+            };
+            window.mcCloseMenu = function() {
+                _mcMenuOpen = false;
+                var menu = document.getElementById('mc-radial-menu');
+                if (menu) menu.classList.remove('mc-open');
+            };
+
+            // ── Hub pill ──
+            window.mcGoHub = function() {
+                mcCloseMenu(); mcCloseChat(); mcFloatHide();
+                // Navigate back
+                window.parent && window.parent.MapsTo ? window.parent.MapsTo('section-hub', 'left') : (typeof MapsTo === 'function' && MapsTo('section-hub', 'left'));
+            };
+
+            // ── Chat overlay ──
+            window.mcOpenChat = function() {
+                mcCloseMenu();
+                _mcChatOpen = true;
+                var ov = document.getElementById('mc-chat-overlay');
+                if (ov) ov.classList.add('mc-chat-open');
+                _mcLoadFriends();
+            };
+            window.mcCloseChat = function() {
+                _mcChatOpen = false;
+                var ov = document.getElementById('mc-chat-overlay');
+                if (ov) ov.classList.remove('mc-chat-open');
+                // Detach any live listener
+                if (_mcSelFriend && _mcListeners[_mcSelFriend]) {
+                    try { _mcListeners[_mcSelFriend].off(); } catch(e) {}
+                    delete _mcListeners[_mcSelFriend];
+                }
+            };
+
+            // ── Load friends ──
+            function _mcLoadFriends() {
+                var myName = localStorage.getItem('playerName');
+                if (!myName || typeof db === 'undefined') return;
+                db.ref('friends/' + myName).once('value').then(function(snap) {
+                    var friends = snap.val() || {};
+                    var listEl = document.getElementById('mc-friends-list-mini');
+                    if (!listEl) return;
+                    listEl.innerHTML = '';
+                    var fnames = Object.keys(friends);
+                    if (fnames.length === 0) {
+                        listEl.innerHTML = '<div style="padding:6px 10px;font-size:0.72rem;color:rgba(200,160,107,0.4);">No friends yet. Add from Hub!</div>';
+                        return;
+                    }
+                    // Load statuses
+                    var promises = fnames.map(function(fn) {
+                        return db.ref('status/' + fn).once('value').then(function(s) { return { name: fn, status: s.val() }; });
+                    });
+                    Promise.all(promises).then(function(results) {
+                        results.forEach(function(r) {
+                            var isOnline = r.status && (Date.now() - (r.status.last_changed || 0) < 5 * 60 * 1000);
+                            var chip = document.createElement('div');
+                            chip.className = 'mc-friend-chip' + (r.name === _mcSelFriend ? ' mc-chip-active' : '');
+                            chip.innerHTML = '<span class="mc-dot ' + (isOnline ? 'online' : '') + '"></span>' + r.name;
+                            chip.onclick = function() { _mcSelectFriend(r.name); };
+                            listEl.appendChild(chip);
+                        });
+                    });
+                });
+            }
+
+            // ── Select friend ──
+            function _mcSelectFriend(fname) {
+                var myName = localStorage.getItem('playerName');
+                if (!myName) return;
+                _mcSelFriend = fname;
+                // Update chip styles
+                document.querySelectorAll('.mc-friend-chip').forEach(function(c) {
+                    c.classList.toggle('mc-chip-active', c.textContent.trim() === fname);
+                });
+                // Clear messages
+                var msgsEl = document.getElementById('mc-chat-msgs');
+                var noSel = document.getElementById('mc-no-friend-sel');
+                if (noSel) noSel.style.display = 'none';
+                if (msgsEl) msgsEl.innerHTML = '<div id="mc-no-friend-sel" style="display:none"></div>';
+                // Detach old listener
+                if (_mcListeners[fname]) { try { _mcListeners[fname].off(); } catch(e) {} }
+                // Build chat key (sorted)
+                var chatKey = [myName.toLowerCase(), fname.toLowerCase()].sort().join('_');
+                var ref = db.ref('private/' + chatKey);
+                _mcListeners[fname] = ref;
+                ref.limitToLast(40).on('child_added', function(snap) {
+                    var msg = snap.val();
+                    if (!msg) return;
+                    _mcRenderMsg(msg, myName);
+                });
+            }
+
+            // ── Render message ──
+            function _mcRenderMsg(msg, myName) {
+                var msgsEl = document.getElementById('mc-chat-msgs');
+                if (!msgsEl) return;
+                var isMine = msg.sender === myName;
+                var div = document.createElement('div');
+                div.className = 'mc-msg' + (isMine ? ' mine' : '');
+                var time = msg.ts ? new Date(msg.ts).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) : '';
+                div.innerHTML = '<div class="mc-sender">' + (msg.sender || '?') + ' <span style="font-size:0.68rem;opacity:0.5;font-weight:normal;">' + time + '</span></div>' + _escMsg(msg.text || '');
+                msgsEl.appendChild(div);
+                msgsEl.scrollTop = msgsEl.scrollHeight;
+            }
+
+            function _escMsg(t) {
+                return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+            }
+
+            // ── Send message ──
+            window.mcSendMsg = function() {
+                var myName = localStorage.getItem('playerName');
+                if (!myName || !_mcSelFriend) { showNotify('Select a friend first!', 'error'); return; }
+                var inp = document.getElementById('mc-chat-input');
+                var text = inp ? inp.value.trim() : '';
+                if (!text) return;
+                inp.value = '';
+                var chatKey = [myName.toLowerCase(), _mcSelFriend.toLowerCase()].sort().join('_');
+                db.ref('private/' + chatKey).push({
+                    sender: myName,
+                    text: text,
+                    ts: firebase.database.ServerValue.TIMESTAMP
+                });
+            };
+
+            // Enter key to send
+            document.addEventListener('DOMContentLoaded', function() {});
+            setTimeout(function() {
+                var inp = document.getElementById('mc-chat-input');
+                if (inp) inp.addEventListener('keydown', function(e) { if (e.key === 'Enter') mcSendMsg(); });
+            }, 2000);
+
+        })(); // end ArcadeCraft IIFE
     </script>
 </body>
 
