@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arcade Hub | Verification</title>
+    <style>
+        :root {
+            --primary: #00f3ff;
+            --bg: #0d0b22;
+            --card-bg: #16142e;
+            --text: #ffffff;
+            --error: #ff4d4d;
+            --success: #00ff88;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .container {
+            background: var(--card-bg);
+            padding: 2.5rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 243, 255, 0.1);
+            width: 100%;
+            max-width: 400px;
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            text-align: center;
+        }
+
+        h1 {
+            color: var(--primary);
+            letter-spacing: 3px;
+            margin-bottom: 0.5rem;
+            font-size: 1.8rem;
+            text-transform: uppercase;
+        }
+
+        p {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+            margin-bottom: 2rem;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.8rem;
+            color: var(--primary);
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: white;
+            font-size: 1rem;
+            outline: none;
+            box-sizing: border-box;
+            transition: 0.3s;
+        }
+
+        input:focus {
+            border-color: var(--primary);
+            background: rgba(0, 243, 255, 0.05);
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: var(--primary);
+            color: var(--bg);
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 243, 255, 0.4);
+        }
+
+        button:disabled {
+            background: #444;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        #verify-section {
+            display: none;
+        }
+
+        .status-msg {
+            margin-top: 1rem;
+            font-size: 0.85rem;
+            min-height: 1.2rem;
+        }
+
+        .error { color: var(--error); }
+        .success { color: var(--success); }
+
+        .loader {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s ease-in-out infinite;
+            margin: 10px auto;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Arcade Hub</h1>
+        <p id="sub-text">Create your player profile</p>
+
+        <div id="register-section">
+            <div class="input-group">
+                <label>Gamer ID</label>
+                <input type="text" id="username" placeholder="e.g. BittuGamer7">
+            </div>
+            <div class="input-group">
+                <label>Email Address</label>
+                <input type="email" id="email" placeholder="you@gmail.com">
+            </div>
+            <button id="btn-send" onclick="handleSendCode()">Send Verification Code</button>
+        </div>
+
+        <div id="verify-section">
+            <div class="input-group">
+                <label>Enter 6-Digit Code</label>
+                <input type="text" id="verify-code" maxlength="6" placeholder="000000" style="text-align: center; font-size: 1.5rem; letter-spacing: 5px;">
+            </div>
+            <button id="btn-verify" onclick="handleVerifyCode()">Verify & Join</button>
+            <p style="margin-top: 15px; cursor: pointer; color: var(--primary);" onclick="location.reload()">← Use different email</p>
+        </div>
+
+        <div class="loader" id="loader"></div>
+        <div id="status" class="status-msg"></div>
+    </div>
+
+    <script>
+        // 1. PASTE YOUR RENDER URL HERE
+        const API_URL = 'https://arcade-hub-email.onrender.com'; 
+
+        const statusBox = document.getElementById('status');
+        const loader = document.getElementById('loader');
+
+        function setStatus(msg, isError = false) {
+            statusBox.innerText = msg;
+            statusBox.className = isError ? 'status-msg error' : 'status-msg success';
+        }
+
+        function toggleLoading(isLoading) {
+            loader.style.display = isLoading ? 'block' : 'none';
+            document.querySelectorAll('button').forEach(b => b.disabled = isLoading);
+        }
+
+        async function handleSendCode() {
+            const email = document.getElementById('email').value.trim();
+            const username = document.getElementById('username').value.trim();
+
+            if (!email || !username) return setStatus("Please fill all fields", true);
+
+            toggleLoading(true);
+            setStatus("");
+
+            try {
+                const response = await fetch(`${API_URL}/send-code`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, username })
+                });
+
+                const data = await response.json();
+
+                if (data.ok) {
+                    document.getElementById('register-section').style.display = 'none';
+                    document.getElementById('verify-section').style.display = 'block';
+                    document.getElementById('sub-text').innerText = `Code sent to ${email}`;
+                    setStatus("Check your inbox!");
+                } else {
+                    setStatus(data.error || "Failed to send code", true);
+                }
+            } catch (err) {
+                setStatus("Server connection failed. Is the URL correct?", true);
+                console.error(err);
+            } finally {
+                toggleLoading(false);
+            }
+        }
+
+        async function handleVerifyCode() {
+            const email = document.getElementById('email').value.trim();
+            const code = document.getElementById('verify-code').value.trim();
+
+            if (code.length !== 6) return setStatus("Enter a 6-digit code", true);
+
+            toggleLoading(true);
+            setStatus("");
+
+            try {
+                const response = await fetch(`${API_URL}/verify-code`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, code })
+                });
+
+                const data = await response.json();
+
+                if (data.ok) {
+                    document.querySelector('.container').innerHTML = `
+                        <h1 style="color: var(--success)">Verified!</h1>
+                        <p>Welcome to the Arcade Hub, ${document.getElementById('username').value}!</p>
+                        <button onclick="location.reload()">Start Playing</button>
+                    `;
+                } else {
+                    setStatus(data.error || "Invalid code", true);
+                }
+            } catch (err) {
+                setStatus("Verification failed. Check server.", true);
+            } finally {
+                toggleLoading(false);
+            }
+        }
+    </script>
+</body>
+</html>
