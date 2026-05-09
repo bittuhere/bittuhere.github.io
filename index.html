@@ -62,6 +62,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Teko:wght@400;600&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <style>
         *,
         *::before,
@@ -391,6 +392,112 @@
             cursor: pointer;
             text-decoration: underline;
         }
+
+        /* ── Auth divider ── */
+        .auth-divider {
+            display: flex; align-items: center; gap: 10px;
+            margin: 12px 0; color: rgba(255,255,255,.3); font-size: .78rem;
+        }
+        .auth-divider::before, .auth-divider::after {
+            content: ''; flex: 1; height: 1px; background: rgba(255,255,255,.12);
+        }
+
+        /* ── Google sign-in button ── */
+        .google-btn {
+            width: 100%; padding: 12px; border-radius: 10px;
+            background: #fff; color: #333; font-weight: 700;
+            font-size: .92rem; letter-spacing: .5px;
+            border: none; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            transition: background .2s, transform .15s;
+        }
+        .google-btn:hover { background: #f0f0f0; transform: translateY(-1px); }
+        .google-btn:active { transform: translateY(0); }
+        .google-btn svg { width: 20px; height: 20px; flex-shrink: 0; }
+
+        /* ── Forgot password link ── */
+        .forgot-link {
+            font-size: .78rem; color: rgba(0,243,255,.7); cursor: pointer;
+            text-align: right; margin-top: -6px; margin-bottom: 4px;
+            text-decoration: underline; display: block;
+        }
+        .forgot-link:hover { color: #00f3ff; }
+
+        /* ── Email verification modal ── */
+        #email-verify-modal {
+            display: none; position: fixed; inset: 0; z-index: 50000;
+            background: rgba(0,0,0,.82); backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            align-items: center; justify-content: center;
+        }
+        #email-verify-modal.open { display: flex; }
+        .ev-box {
+            background: linear-gradient(160deg,#0d1b2a,#0a0a1a);
+            border: 1px solid rgba(0,243,255,.25); border-radius: 20px;
+            padding: 32px 28px; width: min(420px, 92vw); text-align: center;
+            box-shadow: 0 24px 60px rgba(0,0,0,.7);
+            animation: evSlideIn .3s cubic-bezier(.34,1.56,.64,1);
+        }
+        @keyframes evSlideIn { from { opacity:0; transform:translateY(20px) scale(.95); } to { opacity:1; transform:none; } }
+        .ev-icon { font-size: 2.8rem; margin-bottom: 10px; }
+        .ev-title { font-family:'Teko',sans-serif; font-size:1.9rem; letter-spacing:3px; color:#00f3ff; margin:0 0 8px; }
+        .ev-sub { color:rgba(255,255,255,.6); font-size:.88rem; line-height:1.5; margin-bottom:20px; }
+        .ev-email-display { background:rgba(0,243,255,.07); border:1px solid rgba(0,243,255,.2);
+            border-radius:10px; padding:10px 16px; margin-bottom:16px;
+            color:#00f3ff; font-size:.9rem; word-break:break-all; }
+        .ev-code-wrap { display:flex; gap:8px; margin-bottom:14px; }
+        .ev-code-input {
+            flex: 1; padding: 14px 10px; text-align: center; letter-spacing: 8px;
+            font-size: 1.4rem; font-weight: 700;
+            background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.2);
+            border-radius: 10px; color: white; outline: none;
+        }
+        .ev-code-input:focus { border-color: #00f3ff; }
+        .ev-btn {
+            width: 100%; padding: 13px; border-radius: 10px; border: none;
+            font-family:'Teko',sans-serif; font-size:1.1rem; letter-spacing:2px;
+            cursor: pointer; margin-bottom: 8px; transition: all .2s;
+        }
+        .ev-btn-primary { background: linear-gradient(90deg,#00f3ff,#0066ff); color: #000; font-weight: 900; }
+        .ev-btn-primary:hover { opacity: .9; transform: translateY(-1px); }
+        .ev-btn-secondary { background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.15); color: rgba(255,255,255,.6); }
+        .ev-btn-secondary:hover { background: rgba(255,255,255,.1); color: white; }
+        .ev-status { min-height:18px; font-size:.82rem; margin-bottom:6px; }
+
+        /* ── Forgot password modal ── */
+        #forgot-modal {
+            display: none; position: fixed; inset: 0; z-index: 50001;
+            background: rgba(0,0,0,.85); backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            align-items: center; justify-content: center;
+        }
+        #forgot-modal.open { display: flex; }
+        .fp-box {
+            background: linear-gradient(160deg,#0d1b2a,#0a0a1a);
+            border: 1px solid rgba(255,165,0,.25); border-radius: 20px;
+            padding: 28px; width: min(400px, 92vw);
+            box-shadow: 0 24px 60px rgba(0,0,0,.7);
+            animation: evSlideIn .3s cubic-bezier(.34,1.56,.64,1);
+        }
+        .fp-title { font-family:'Teko',sans-serif; font-size:1.7rem; letter-spacing:3px; color:#ffcc00; margin:0 0 6px; }
+        .fp-sub { color:rgba(255,255,255,.5); font-size:.83rem; margin-bottom:18px; }
+        .fp-input {
+            width: 100%; padding: 12px 14px; margin-bottom: 10px;
+            background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.15);
+            border-radius: 10px; color: white; font-size: .92rem; outline: none;
+            box-sizing: border-box;
+        }
+        .fp-input:focus { border-color: #ffcc00; }
+        .fp-btn {
+            width: 100%; padding: 12px; border-radius: 10px; border: none;
+            font-family:'Teko',sans-serif; font-size:1.1rem; letter-spacing:2px;
+            cursor: pointer; margin-bottom: 8px; transition: all .2s;
+        }
+        .fp-btn-primary { background: linear-gradient(90deg,#ffcc00,#ff8800); color:#000; font-weight:900; }
+        .fp-btn-primary:hover { opacity:.9; transform:translateY(-1px); }
+        .fp-btn-cancel { background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); color:rgba(255,255,255,.5); }
+        .fp-btn-cancel:hover { background:rgba(255,255,255,.1); color:white; }
+        .fp-status { min-height:18px; font-size:.82rem; margin-bottom:8px; }
 
         .l-error {
             color: #ff3366;
@@ -2023,6 +2130,11 @@
         .notify-toast.nt-invite {
             border-color: #ff00ff;
             box-shadow: 0 0 20px rgba(255, 0, 255, 0.25), 0 8px 32px rgba(0, 0, 0, 0.5);
+        }
+
+        .notify-toast.nt-warn {
+            border-color: #ffcc00;
+            box-shadow: 0 0 20px rgba(255, 204, 0, 0.25), 0 8px 32px rgba(0, 0, 0, 0.5);
         }
 
         .notify-icon {
@@ -3931,7 +4043,11 @@
             <h1 id="login-header">LOGIN</h1>
             <p id="login-sub">Enter the Arcade World</p>
             <form id="login-form" autocomplete="on" onsubmit="processAuth();return false;" style="display:contents;">
-                <input type="text" id="login-username" name="username" placeholder="Username" autocomplete="username">
+                <input type="text" id="login-username" name="username" placeholder="Username / Email" autocomplete="username">
+                <!-- Email field — shown only during sign-up -->
+                <div id="reg-email-wrap" style="display:none;">
+                    <input type="email" id="reg-email" name="email" placeholder="Email address (for verification)" autocomplete="email">
+                </div>
                 <div style="position:relative;">
                     <input type="password" id="login-password" name="password" placeholder="Password"
                         autocomplete="current-password">
@@ -3942,13 +4058,104 @@
                             style="width:25px;height:auto;filter:drop-shadow(0 0 5px var(--neon-blue));">
                     </span>
                 </div>
+                <!-- Forgot password — login mode only -->
+                <span id="forgot-link" class="forgot-link" onclick="openForgotModal()">Forgot password?</span>
                 <div class="spin-loader" id="login-loader"></div>
                 <div class="status-msg" id="login-status"></div>
                 <div id="trouble-link" class="trouble-link" onclick="goToTroubleshoot()">Trouble signing in? Click here
                 </div>
                 <button class="l-btn btn-go" type="submit" id="submit-btn">ENTER</button>
             </form>
+            <div class="auth-divider">OR</div>
+            <button class="google-btn" onclick="signInWithGoogle()">
+                <svg viewBox="0 0 48 48"><path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z"/><path fill="#FF3D00" d="M6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 16.318 4 9.656 8.337 6.306 14.691z"/><path fill="#4CAF50" d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238A11.91 11.91 0 0 1 24 36c-5.202 0-9.619-3.317-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z"/><path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303a12.04 12.04 0 0 1-4.087 5.571l.003-.002 6.19 5.238C36.971 39.205 44 34 44 24c0-1.341-.138-2.65-.389-3.917z"/></svg>
+                <span id="google-btn-text">Continue with Google</span>
+            </button>
             <span class="switch-link" onclick="toggleMode()" id="switch-btn">New here? Create ID</span>
+        </div>
+    </div>
+
+    <!-- ── EMAIL VERIFICATION MODAL ─────────────────────────────── -->
+    <div id="email-verify-modal">
+        <div class="ev-box">
+            <div class="ev-icon">📧</div>
+            <h2 class="ev-title">VERIFY EMAIL</h2>
+            <p class="ev-sub">Verify your email to unlock all features and secure your account.</p>
+            <div class="ev-email-display" id="ev-email-display"></div>
+            <div id="ev-step1">
+                <button class="ev-btn ev-btn-primary" onclick="evSendCode()">📨 Send Verification Code</button>
+                <button class="ev-btn ev-btn-secondary" onclick="evNotNow()">Not Now</button>
+            </div>
+            <div id="ev-step2" style="display:none;">
+                <p style="color:rgba(255,255,255,.5);font-size:.8rem;margin-bottom:10px;">Enter the 6-digit code sent to your email:</p>
+                <input type="tel" class="ev-code-input" id="ev-code-input" maxlength="6" placeholder="000000"
+                    oninput="this.value=this.value.replace(/\D/g,'')">
+                <div class="ev-status" id="ev-status"></div>
+                <button class="ev-btn ev-btn-primary" onclick="evVerifyCode()" style="margin-top:8px;">✅ VERIFY CODE</button>
+                <button class="ev-btn ev-btn-secondary" onclick="evResendCode()" style="margin-top:4px;">🔄 Resend Code</button>
+                <button class="ev-btn ev-btn-secondary" onclick="evNotNow()">Not Now</button>
+            </div>
+            <div id="ev-step3" style="display:none;text-align:center;">
+                <div style="font-size:3rem;margin-bottom:12px;">🎉</div>
+                <p style="color:#2ecc71;font-size:1rem;margin-bottom:16px;">Email verified successfully!</p>
+                <button class="ev-btn ev-btn-primary" onclick="evClose()">CONTINUE →</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── FORGOT PASSWORD MODAL ────────────────────────────────── -->
+    <div id="forgot-modal">
+        <div class="fp-box">
+            <h2 class="fp-title">🔑 FORGOT PASSWORD</h2>
+            <div id="fp-step1">
+                <p class="fp-sub">Enter your username and registered email. We'll send a 6-digit reset code.</p>
+                <input type="text"  class="fp-input" id="fp-username" placeholder="Your username">
+                <input type="email" class="fp-input" id="fp-email"    placeholder="Your registered email">
+                <div class="fp-status" id="fp-status"></div>
+                <button class="fp-btn fp-btn-primary" onclick="fpSendCode()">📨 SEND RESET CODE</button>
+                <button class="fp-btn fp-btn-cancel"  onclick="closeForgotModal()">Cancel</button>
+            </div>
+            <div id="fp-step2" style="display:none;">
+                <p class="fp-sub">Enter the 6-digit code from your email, then set a new password.</p>
+                <input type="tel"      class="fp-input" id="fp-code"     placeholder="6-digit code" maxlength="6">
+                <input type="password" class="fp-input" id="fp-newpass"  placeholder="New password (min 3 chars)">
+                <input type="password" class="fp-input" id="fp-newpass2" placeholder="Confirm new password">
+                <div class="fp-status" id="fp-status2"></div>
+                <button class="fp-btn fp-btn-primary" onclick="fpVerifyAndReset()">🔑 RESET PASSWORD</button>
+                <button class="fp-btn fp-btn-cancel"  onclick="closeForgotModal()">Cancel</button>
+            </div>
+            <div id="fp-step3" style="display:none;text-align:center;">
+                <div style="font-size:2.5rem;margin-bottom:10px;">✅</div>
+                <p style="color:#2ecc71;margin-bottom:16px;">Password reset! You can now log in.</p>
+                <button class="fp-btn fp-btn-primary" onclick="closeForgotModal()">OK, CLOSE</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── GOOGLE USERNAME PICKER (new Google users only) ───────── -->
+    <div id="google-pick-modal" style="display:none;position:fixed;inset:0;z-index:50002;
+         background:rgba(0,0,0,.85);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+         align-items:center;justify-content:center;">
+        <div style="background:linear-gradient(160deg,#0d1b2a,#0a0a1a);border:1px solid rgba(0,243,255,.25);
+             border-radius:20px;padding:28px;width:min(400px,92vw);text-align:center;">
+            <div style="font-size:2rem;margin-bottom:8px;">👤</div>
+            <h2 style="font-family:Teko,sans-serif;font-size:1.7rem;color:#00f3ff;letter-spacing:3px;margin:0 0 8px;">CHOOSE USERNAME</h2>
+            <p style="color:rgba(255,255,255,.5);font-size:.85rem;margin-bottom:16px;">Pick a unique username for your Arcade Hub account linked to Google.</p>
+            <input type="text" id="google-pick-username" class="fp-input"
+                placeholder="Username (letters & numbers only)"
+                oninput="this.value=this.value.toLowerCase().replace(/[^a-z0-9]/g,'')">
+            <p style="color:rgba(255,255,255,.3);font-size:.75rem;margin-bottom:12px;">
+                Connected as: <span id="google-pick-email" style="color:#00f3ff;"></span>
+            </p>
+            <div id="google-pick-status" style="min-height:18px;font-size:.82rem;margin-bottom:8px;"></div>
+            <button onclick="googlePickConfirm()"
+                style="width:100%;padding:12px;background:linear-gradient(90deg,#00f3ff,#0066ff);color:#000;
+                       border:none;border-radius:10px;font-family:Teko,sans-serif;font-size:1.1rem;
+                       letter-spacing:2px;font-weight:900;cursor:pointer;margin-bottom:8px;">CREATE ACCOUNT</button>
+            <button onclick="googlePickCancel()"
+                style="width:100%;padding:11px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);
+                       color:rgba(255,255,255,.5);border-radius:10px;font-family:Teko,sans-serif;
+                       font-size:1rem;cursor:pointer;">Cancel</button>
         </div>
     </div>
 
@@ -4485,14 +4692,22 @@
                 return;
             }
             tbody.innerHTML=filteredUsers.map(function(u){
-                var bl=!!u.blocked;
-                var j=u.createdAt?new Date(u.createdAt).toLocaleDateString('en-IN'):'—';
-                return '<tr><td style="color:'+(bl?'#e74c3c':'white')+';">'+u.id+'</td>'+
-                    '<td style="text-align:center;"><span style="font-size:.7rem;padding:2px 7px;border-radius:10px;background:'+(bl?'rgba(231,76,60,.2)':'rgba(46,204,113,.2)')+';color:'+(bl?'#e74c3c':'#2ecc71')+'">'+(bl?'BLOCKED':'ACTIVE')+'</span></td>'+
+                var bl  = !!u.blocked;
+                var ev  = u.emailVerified === true;
+                var evReq = u.email_verification !== false; // default true
+                var j   = u.createdAt ? new Date(u.createdAt).toLocaleDateString('en-IN') : '—';
+                var emailStr = u.email ? ('<span style="font-size:.65rem;color:#00f3ff;">'+u.email+'</span>') : '<span style="color:#555;font-size:.65rem;">—</span>';
+                return '<tr><td style="color:'+(bl?'#e74c3c':'white')+';">'+u.id+'<br>'+emailStr+'</td>'+
+                    '<td style="text-align:center;">'+
+                        '<span style="font-size:.7rem;padding:2px 7px;border-radius:10px;display:block;margin-bottom:3px;background:'+(bl?'rgba(231,76,60,.2)':'rgba(46,204,113,.2)')+';color:'+(bl?'#e74c3c':'#2ecc71')+'">'+(bl?'BLOCKED':'ACTIVE')+'</span>'+
+                        '<span style="font-size:.65rem;padding:1px 5px;border-radius:10px;background:'+(ev?'rgba(46,204,113,.15)':'rgba(255,165,0,.15)')+';color:'+(ev?'#2ecc71':'#ffaa00')+'">'+(ev?'✅ Verified':'⚠ Unverified')+'</span>'+
+                    '</td>'+
                     '<td style="font-size:.74rem;color:#888;">'+j+'</td>'+
                     '<td style="white-space:nowrap;">'+
                     '<button onclick="adminToggleBlock(\''+u.id+'\','+(bl?'false':'true')+')" style="background:'+(bl?'#2ecc71':'#e74c3c')+';border:none;color:'+(bl?'#000':'#fff')+';padding:4px 8px;border-radius:4px;cursor:pointer;font-size:.74rem;margin:2px;">'+(bl?'UNBLOCK':'BLOCK')+'</button>'+
                     '<button onclick="adminResetPass(\''+u.id+'\')" style="background:#3498db;border:none;color:#fff;padding:4px 8px;border-radius:4px;cursor:pointer;font-size:.74rem;margin:2px;">RESET PW</button>'+
+                    '<button onclick="adminToggleEmailVerify(\''+u.id+'\','+evReq+')" style="background:'+(evReq?'#9b59b6':'#27ae60')+';border:none;color:#fff;padding:4px 8px;border-radius:4px;cursor:pointer;font-size:.74rem;margin:2px;" title="Toggle whether email verification is required for this user">'+(evReq?'📧 Req':'📧 Skip')+'</button>'+
+                    '<button onclick="adminMarkVerified(\''+u.id+'\','+ev+')" style="background:'+(ev?'#e67e22':'#2ecc71')+';border:none;color:'+(ev?'#fff':'#000')+';padding:4px 8px;border-radius:4px;cursor:pointer;font-size:.74rem;margin:2px;">'+(ev?'Unverify':'✅ Verify')+'</button>'+
                     '</td></tr>';
             }).join('')||'<tr><td colspan="4" style="text-align:center;padding:14px;color:#888;">No users.</td></tr>';
         }
@@ -4520,6 +4735,30 @@
                         .catch(function(e){ showNotify('❌ '+e.message,'error'); });
                 });
             });
+        };
+
+        // Toggle whether email verification is REQUIRED for this user
+        // email_verification: false → skip the verification prompt (admin bypass)
+        window.adminToggleEmailVerify = function(uid, currentlyRequired) {
+            if(!_isRealAdmin()) return;
+            var newVal = !currentlyRequired;
+            var label  = newVal ? 'REQUIRE email verification' : 'SKIP email verification';
+            showConfirm(label + ' for "' + uid + '"?', function() {
+                db.ref('users/'+uid).update({ email_verification: newVal, _admin:true, _adminKey:ADMIN_KEY })
+                    .then(function(){ showNotify('✅ Email verify ' + (newVal?'required':'skipped') + ': '+uid, 'success'); adminLoadUsers(); })
+                    .catch(function(e){ showNotify('❌ '+e.message,'error'); });
+            }, '📧');
+        };
+
+        // Manually mark a user as email-verified or unverified
+        window.adminMarkVerified = function(uid, currentlyVerified) {
+            if(!_isRealAdmin()) return;
+            var newVal = !currentlyVerified;
+            showConfirm((newVal?'✅ Mark VERIFIED':'⚠ Mark UNVERIFIED')+' for "'+uid+'"?', function() {
+                db.ref('users/'+uid).update({ emailVerified: newVal, _admin:true, _adminKey:ADMIN_KEY })
+                    .then(function(){ showNotify((newVal?'✅ Verified: ':'⚠ Unverified: ')+uid, newVal?'success':'warn'); adminLoadUsers(); })
+                    .catch(function(e){ showNotify('❌ '+e.message,'error'); });
+            }, newVal?'✅':'⚠');
         };
 
         // ── RENAME ───────────────────────────────────────────────────────────
@@ -10559,7 +10798,12 @@ window.addEventListener('load', function(){
             measurementId: "G-JD1YFCG7G3"
         };
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
+        const db   = firebase.database();
+        const auth = firebase.auth();
+        const googleProvider = new firebase.auth.GoogleAuthProvider();
+
+        // ── Your Render backend URL — replace with your actual URL ───────────
+        const VERIFY_SERVER = 'https://arcade-hub-email.onrender.com';
 
         // ═══════════════════════════════════════════════════════
         //  LIFECYCLE MANAGER  — all cleanup lives here.
@@ -10893,68 +11137,392 @@ function disableGlobalZoom() {
 
         function toggleMode() {
             isSignup = !isSignup;
-            document.getElementById('login-header').innerText = isSignup ? 'SIGN UP' : 'LOGIN';
-            document.getElementById('login-sub').innerText = isSignup ? 'Claim your Unique ID' : 'Enter the Arcade World';
-            document.getElementById('submit-btn').innerText = isSignup ? 'CREATE ACCOUNT' : 'ENTER';
-            document.getElementById('switch-btn').innerText = isSignup ? 'Have an account? Login' : 'New here? Create ID';
-            document.getElementById('login-status').innerText = '';
+            document.getElementById('login-header').innerText    = isSignup ? 'SIGN UP'          : 'LOGIN';
+            document.getElementById('login-sub').innerText       = isSignup ? 'Claim your ID'    : 'Enter the Arcade World';
+            document.getElementById('submit-btn').innerText      = isSignup ? 'CREATE ACCOUNT'   : 'ENTER';
+            document.getElementById('switch-btn').innerText      = isSignup ? 'Have an account? Login' : 'New here? Create ID';
+            document.getElementById('login-status').innerText    = '';
             document.getElementById('trouble-link').style.display = 'none';
+            // Show email field only in signup, hide forgot-password only in signup
+            document.getElementById('reg-email-wrap').style.display = isSignup ? 'block' : 'none';
+            document.getElementById('forgot-link').style.display    = isSignup ? 'none'  : 'block';
+            document.getElementById('google-btn-text').textContent  = isSignup ? 'Sign up with Google' : 'Continue with Google';
         }
-        function togglePass() {
-            const p = document.getElementById('login-password'), icon = document.getElementById('eye-icon');
-            const val = p.value;  // save value before type change (Chrome clears autofill on type change)
-            if (p.type === 'password') { p.type = 'text'; icon.src = EYECLOSED; }
-            else { p.type = 'password'; icon.src = EYEOPEN; }
-            p.value = val;  // restore value
+
+        // ── Robust backend caller: auto-retry when Render free tier is waking up ──
+        async function callBackend(endpoint, body, opts) {
+            opts = opts || {};
+            const maxTries = opts.retries || 2;
+            const retryDelay = opts.retryDelay || 6000; // 6s — Render cold start
+            const statusEl = opts.statusEl || null;
+            let lastErr;
+            for (let t = 0; t < maxTries; t++) {
+                if (t > 0) {
+                    if (statusEl) statusEl.textContent = '⏳ Server waking up… retrying (' + t + '/' + (maxTries-1) + ')';
+                    await new Promise(r => setTimeout(r, retryDelay));
+                }
+                try {
+                    const ctrl = new AbortController();
+                    const timer = setTimeout(() => ctrl.abort(), 20000); // 20s timeout
+                    const res = await fetch(VERIFY_SERVER + endpoint, {
+                        method : 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body   : JSON.stringify(body),
+                        signal : ctrl.signal
+                    });
+                    clearTimeout(timer);
+                    const data = await res.json();
+                    return data; // always return — caller checks .ok
+                } catch (err) {
+                    lastErr = err;
+                }
+            }
+            throw lastErr || new Error('Network error');
         }
+
         async function processAuth() {
-            const user = document.getElementById('login-username').value.trim().toLowerCase();
-            const rawPass = document.getElementById('login-password').value;
-            const pass = await hashPw(rawPass);
-            const status = document.getElementById('login-status');
-            const loader = document.getElementById('login-loader');
-            const showT = () => document.getElementById('trouble-link').style.display = 'block';
-            if (user.length < 3 || rawPass.length < 3) { status.innerText = 'Username/Password too short.'; status.className = 'status-msg l-error'; showT(); return; }
-            if (!/^[a-z0-9]+$/.test(user)) { status.innerText = 'Username: Letters & Numbers only.'; status.className = 'status-msg l-error'; showT(); return; }
-            loader.style.display = 'block'; status.innerText = ''; document.getElementById('trouble-link').style.display = 'none';
+            const rawUser  = document.getElementById('login-username').value.trim();
+            const rawPass  = document.getElementById('login-password').value;
+            const regEmail = document.getElementById('reg-email') ? document.getElementById('reg-email').value.trim().toLowerCase() : '';
+            const status   = document.getElementById('login-status');
+            const loader   = document.getElementById('login-loader');
+            const showT    = () => document.getElementById('trouble-link').style.display = 'block';
+
+            const setErr = msg => { status.innerText = msg; status.className = 'status-msg l-error'; loader.style.display = 'none'; showT(); };
+            const setOk  = msg => { status.innerText = msg; status.className = 'status-msg l-success'; };
+
+            if (!rawUser || rawPass.length < 3) { setErr('Username/Email and Password required (min 3 chars).'); return; }
+
+            // Detect email login (contains @)
+            const isEmailLogin = rawUser.includes('@');
+            let user = rawUser.toLowerCase();
+
             if (isSignup) {
-                db.ref('users/' + user).once('value').then(snap => {
-                    if (snap.exists()) { loader.style.display = 'none'; status.innerText = 'Username taken! Choose another.'; status.className = 'status-msg l-error'; showT(); }
-                    else {
-                        db.ref('users/' + user).set({ password: pass, score: 0, dino_highscore: 0, flappy_highscore: 0, snake_highscore: 0, pacman_highscore: 0, createdAt: Date.now() }).then(() => {
-                            loader.style.display = 'none'; status.innerText = 'Account Created! Logging in...'; status.className = 'status-msg l-success'; loginSuccess(user);
-                        }).catch(() => { loader.style.display = 'none'; status.innerText = 'Error creating account.'; status.className = 'status-msg l-error'; showT(); });
-                    }
-                }).catch(() => { loader.style.display = 'none'; status.innerText = 'Database Connection Error.'; status.className = 'status-msg l-error'; showT(); });
-            } else {
-                db.ref('users/' + user).once('value').then(snap => {
+                // ── REGISTER ──────────────────────────────────────────────────
+                if (!/^[a-z0-9]+$/.test(user)) { setErr('Username: letters & numbers only (no spaces/symbols).'); return; }
+                if (user.length < 3)            { setErr('Username too short (min 3 chars).'); return; }
+                if (!regEmail)                  { setErr('Email address is required for registration.'); return; }
+                if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(regEmail)) { setErr('Enter a valid email address.'); return; }
+
+                loader.style.display = 'block'; status.innerText = '';
+                document.getElementById('trouble-link').style.display = 'none';
+                const pass = await hashPw(rawPass);
+
+                try {
+                    const snap = await db.ref('users/' + user).once('value');
+                    if (snap.exists()) { setErr('Username taken! Choose another.'); return; }
+
+                    // Check email not already used
+                    const emailSnap = await db.ref('users').orderByChild('email').equalTo(regEmail).once('value');
+                    if (emailSnap.exists()) { setErr('Email already registered. Use a different email.'); return; }
+
+                    await db.ref('users/' + user).set({
+                        password: pass, email: regEmail, emailVerified: false,
+                        score: 0, dino_highscore: 0, flappy_highscore: 0,
+                        snake_highscore: 0, pacman_highscore: 0, createdAt: Date.now()
+                    });
+
                     loader.style.display = 'none';
-                    if (snap.exists()) {
-                        const d = snap.val();
-                        if (d.password === pass) {
-                            if (d.blocked === true) { status.innerText = 'Access Denied: This account is BLOCKED!'; status.className = 'status-msg l-error'; showT(); return; }
-                            status.innerText = 'Success!'; status.className = 'status-msg l-success'; loginSuccess(user);
-                        } else { status.innerText = 'Wrong Password.'; status.className = 'status-msg l-error'; showT(); }
-                    } else { status.innerText = 'User not found.'; status.className = 'status-msg l-error'; showT(); }
-                }).catch(() => { loader.style.display = 'none'; status.innerText = 'Connection Error.'; showT(); });
+                    setOk('🎉 Account created! Sending welcome email…');
+
+                    // Send welcome + auto verification code in background — don't block login
+                    callBackend('/send-welcome', { email: regEmail, username: user }, { statusEl: status, retries: 2 })
+                        .then(r => { if (!r.ok) console.warn('Welcome email failed:', r.error); })
+                        .catch(() => console.warn('Welcome email: server unreachable'));
+
+                    loginSuccess(user, regEmail, false /* not yet verified */);
+
+                } catch (err) { setErr('Error: ' + (err.message || 'Database error.')); }
+
+            } else {
+                // ── LOGIN ─────────────────────────────────────────────────────
+                loader.style.display = 'block'; status.innerText = '';
+                document.getElementById('trouble-link').style.display = 'none';
+                const pass = await hashPw(rawPass);
+
+                try {
+                    let snap, resolvedUser = user;
+
+                    if (isEmailLogin) {
+                        // Look up by email field
+                        snap = await db.ref('users').orderByChild('email').equalTo(user).once('value');
+                        if (!snap.exists()) { setErr('No account found with this email.'); return; }
+                        // Get first matching username
+                        resolvedUser = Object.keys(snap.val())[0];
+                        snap = await db.ref('users/' + resolvedUser).once('value');
+                    } else {
+                        snap = await db.ref('users/' + user).once('value');
+                    }
+
+                    loader.style.display = 'none';
+                    if (!snap.exists()) { setErr('User not found.'); return; }
+
+                    const d = snap.val();
+                    if (d.blocked === true) { setErr('Access Denied: This account is BLOCKED!'); return; }
+                    if (d.password !== pass) { setErr('Wrong Password.'); showT(); return; }
+
+                    setOk('Success!');
+                    loginSuccess(resolvedUser, d.email || null, d.emailVerified === true, d.email_verification !== false);
+
+                } catch (err) { setErr('Connection Error. Check your internet.'); }
             }
         }
-        function loginSuccess(u) {
+
+        // ── After successful login/register: check email verification ─────────
+        function loginSuccess(u, email, alreadyVerified, requiresVerification) {
             localStorage.setItem('isLoggedIn', 'true');
             localStorage.setItem('playerName', u);
-            try { db.ref('users/' + u).update({ lastLogin: firebase.database.ServerValue.TIMESTAMP }); } catch (e) { }
-            // Clear login inputs 3s after success so values don't linger
+            if (email) localStorage.setItem('playerEmail', email);
+            try { db.ref('users/' + u).update({ lastLogin: firebase.database.ServerValue.TIMESTAMP }); } catch (_) {}
+
+            // Clear inputs after delay
             setTimeout(function() {
                 var un = document.getElementById('login-username');
                 var pw = document.getElementById('login-password');
                 var st = document.getElementById('login-status');
+                var em = document.getElementById('reg-email');
                 if (un) un.value = '';
                 if (pw) pw.value = '';
                 if (st) st.innerText = '';
+                if (em) em.value = '';
+                document.getElementById('reg-email-wrap').style.display = 'none';
+                document.getElementById('forgot-link').style.display = 'block';
+                if (isSignup) toggleMode();
             }, 3000);
-            setTimeout(() => { initHub(); MapsTo('section-hub', 'right'); }, 800);
+
+            setTimeout(() => {
+                initHub();
+                MapsTo('section-hub', 'right');
+                // After navigating to hub, show verification modal if needed
+                // requiresVerification: undefined means check DB fresh
+                if (requiresVerification === undefined) requiresVerification = true;
+                if (requiresVerification && email && !alreadyVerified) {
+                    setTimeout(() => { _evCurrentUser = u; _evCurrentEmail = email; openEmailVerifyModal(); }, 1200);
+                }
+            }, 800);
+        }
+        function togglePass() {
+            const p = document.getElementById('login-password'), icon = document.getElementById('eye-icon');
+            const val = p.value;
+            if (p.type === 'password') { p.type = 'text'; icon.src = EYECLOSED; }
+            else { p.type = 'password'; icon.src = EYEOPEN; }
+            p.value = val;
         }
         document.getElementById('login-password').addEventListener('keypress', e => { if (e.key === 'Enter') processAuth(); });
+
+        // ─────────────────────────────────────────────────────────────────────
+        //  GOOGLE SIGN-IN
+        // ─────────────────────────────────────────────────────────────────────
+        var _googleUser = null;
+
+        async function signInWithGoogle() {
+            const btn = document.querySelector('.google-btn');
+            const status = document.getElementById('login-status');
+            if (btn) { btn.disabled = true; btn.style.opacity = '.7'; }
+            status.innerText = ''; status.className = 'status-msg';
+            try {
+                const result = await auth.signInWithPopup(googleProvider);
+                const gUser  = result.user;
+                const gUID   = gUser.uid;
+                const gEmail = (gUser.email || '').toLowerCase();
+                const snap   = await db.ref('users').orderByChild('googleUID').equalTo(gUID).once('value');
+                if (snap.exists()) {
+                    const username = Object.keys(snap.val())[0];
+                    const d = snap.val()[username];
+                    if (d.blocked) { status.innerText = 'Account BLOCKED.'; status.className = 'status-msg l-error'; return; }
+                    status.innerText = '✅ Welcome back, ' + username + '!'; status.className = 'status-msg l-success';
+                    loginSuccess(username, gEmail, d.emailVerified === true, d.email_verification !== false);
+                } else {
+                    _googleUser = gUser;
+                    document.getElementById('google-pick-email').textContent = gEmail;
+                    const suggested = (gUser.displayName || '').toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 20);
+                    document.getElementById('google-pick-username').value = suggested;
+                    document.getElementById('google-pick-status').textContent = '';
+                    const m = document.getElementById('google-pick-modal');
+                    m.style.display = 'flex';
+                    setTimeout(() => document.getElementById('google-pick-username').focus(), 200);
+                }
+            } catch (err) {
+                if (err.code !== 'auth/popup-closed-by-user' && err.code !== 'auth/cancelled-popup-request') {
+                    status.innerText = '❌ Google sign-in failed: ' + (err.message || 'Unknown error');
+                    status.className = 'status-msg l-error';
+                }
+            } finally {
+                if (btn) { btn.disabled = false; btn.style.opacity = ''; }
+            }
+        }
+
+        async function googlePickConfirm() {
+            if (!_googleUser) return;
+            const username = document.getElementById('google-pick-username').value.trim().toLowerCase();
+            const statusEl = document.getElementById('google-pick-status');
+            if (!username || username.length < 3) { statusEl.style.color = '#ff3366'; statusEl.textContent = 'Min 3 characters.'; return; }
+            if (!/^[a-z0-9]+$/.test(username))    { statusEl.style.color = '#ff3366'; statusEl.textContent = 'Letters & numbers only.'; return; }
+            statusEl.style.color = '#00f3ff'; statusEl.textContent = 'Checking availability…';
+            try {
+                const snap = await db.ref('users/' + username).once('value');
+                if (snap.exists()) { statusEl.style.color = '#ff3366'; statusEl.textContent = 'Username taken. Try another.'; return; }
+                const gEmail = (_googleUser.email || '').toLowerCase();
+                await db.ref('users/' + username).set({
+                    password: 'google_' + _googleUser.uid, email: gEmail, emailVerified: true,
+                    googleUID: _googleUser.uid, score: 0, dino_highscore: 0, flappy_highscore: 0,
+                    snake_highscore: 0, pacman_highscore: 0, createdAt: Date.now()
+                });
+                callBackend('/send-welcome', { email: gEmail, username }, { retries: 2 }).catch(() => {});
+                document.getElementById('google-pick-modal').style.display = 'none';
+                _googleUser = null;
+                document.getElementById('login-status').innerText = '🎉 Account created!';
+                document.getElementById('login-status').className = 'status-msg l-success';
+                loginSuccess(username, gEmail, true, false);
+            } catch (err) {
+                statusEl.style.color = '#ff3366';
+                statusEl.textContent = 'Error: ' + (err.message || 'Try again.');
+            }
+        }
+
+        function googlePickCancel() {
+            _googleUser = null;
+            document.getElementById('google-pick-modal').style.display = 'none';
+            try { auth.signOut(); } catch (_) {}
+        }
+
+        // ─────────────────────────────────────────────────────────────────────
+        //  EMAIL VERIFICATION MODAL
+        // ─────────────────────────────────────────────────────────────────────
+        var _evCurrentUser  = null;
+        var _evCurrentEmail = null;
+
+        function openEmailVerifyModal() {
+            if (!_evCurrentEmail) return;
+            document.getElementById('ev-email-display').textContent = _evCurrentEmail;
+            document.getElementById('ev-step1').style.display = 'block';
+            document.getElementById('ev-step2').style.display = 'none';
+            document.getElementById('ev-step3').style.display = 'none';
+            document.getElementById('ev-status').textContent  = '';
+            document.getElementById('ev-code-input').value    = '';
+            document.getElementById('email-verify-modal').classList.add('open');
+        }
+
+        async function evSendCode() {
+            const statusEl = document.getElementById('ev-status');
+            document.getElementById('ev-step1').style.display = 'none';
+            document.getElementById('ev-step2').style.display = 'block';
+            statusEl.style.color = '#00f3ff'; statusEl.textContent = 'Sending code…';
+            try {
+                const r = await callBackend('/send-code',
+                    { email: _evCurrentEmail, username: _evCurrentUser, purpose: 'verify' },
+                    { statusEl, retries: 3, retryDelay: 7000 });
+                if (r.ok) { statusEl.style.color = '#2ecc71'; statusEl.textContent = '✅ Code sent! Check your inbox.'; }
+                else      { statusEl.style.color = '#ff3366'; statusEl.textContent = '❌ ' + (r.error || 'Failed to send.'); }
+            } catch (_) {
+                statusEl.style.color = '#ff3366';
+                statusEl.textContent = '❌ Server unreachable. Try again later.';
+            }
+        }
+
+        async function evVerifyCode() {
+            const code     = document.getElementById('ev-code-input').value.trim();
+            const statusEl = document.getElementById('ev-status');
+            if (!code || code.length !== 6) { statusEl.style.color = '#ff3366'; statusEl.textContent = 'Enter the 6-digit code.'; return; }
+            statusEl.style.color = '#00f3ff'; statusEl.textContent = 'Verifying…';
+            try {
+                const r = await callBackend('/verify-code', { email: _evCurrentEmail, code },
+                    { statusEl, retries: 2, retryDelay: 5000 });
+                if (r.ok) {
+                    if (_evCurrentUser) {
+                        await db.ref('users/' + _evCurrentUser).update({ emailVerified: true });
+                        localStorage.setItem('emailVerified', 'true');
+                    }
+                    document.getElementById('ev-step2').style.display = 'none';
+                    document.getElementById('ev-step3').style.display = 'block';
+                    showNotify('✅ Email verified!', 'success');
+                } else {
+                    statusEl.style.color = '#ff3366';
+                    statusEl.textContent = '❌ ' + (r.error || 'Wrong code.');
+                }
+            } catch (_) {
+                statusEl.style.color = '#ff3366';
+                statusEl.textContent = '❌ Server unreachable. Try again later.';
+            }
+        }
+
+        function evResendCode() { document.getElementById('ev-code-input').value = ''; evSendCode(); }
+        function evNotNow()     { document.getElementById('email-verify-modal').classList.remove('open'); showNotify('⚠️ You can verify later from your Profile.', 'warn'); }
+        function evClose()      { document.getElementById('email-verify-modal').classList.remove('open'); }
+
+        // ─────────────────────────────────────────────────────────────────────
+        //  FORGOT PASSWORD MODAL
+        // ─────────────────────────────────────────────────────────────────────
+        var _fpTargetUser  = null;
+        var _fpTargetEmail = null;
+
+        function openForgotModal() {
+            document.getElementById('fp-step1').style.display = 'block';
+            document.getElementById('fp-step2').style.display = 'none';
+            document.getElementById('fp-step3').style.display = 'none';
+            document.getElementById('fp-status').textContent  = '';
+            const uVal = document.getElementById('login-username').value.trim();
+            document.getElementById('fp-username').value = uVal.includes('@') ? '' : uVal;
+            document.getElementById('fp-email').value    = uVal.includes('@') ? uVal : '';
+            _fpTargetUser = null; _fpTargetEmail = null;
+            document.getElementById('forgot-modal').classList.add('open');
+        }
+
+        function closeForgotModal() { document.getElementById('forgot-modal').classList.remove('open'); }
+
+        async function fpSendCode() {
+            const username = document.getElementById('fp-username').value.trim().toLowerCase();
+            const email    = document.getElementById('fp-email').value.trim().toLowerCase();
+            const st       = document.getElementById('fp-status');
+            if (!username || username.length < 3)                        { st.style.color = '#ff3366'; st.textContent = 'Enter your username.'; return; }
+            if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))   { st.style.color = '#ff3366'; st.textContent = 'Enter a valid email address.'; return; }
+            st.style.color = '#ffcc00'; st.textContent = 'Checking account…';
+            try {
+                const snap = await db.ref('users/' + username).once('value');
+                if (!snap.exists()) { st.style.color = '#ff3366'; st.textContent = 'Username not found.'; return; }
+                const d = snap.val();
+                if (!d.email || d.email.toLowerCase() !== email) {
+                    st.style.color = '#ff3366'; st.textContent = 'Email does not match our records.'; return;
+                }
+                _fpTargetUser = username; _fpTargetEmail = email;
+                st.style.color = '#ffcc00'; st.textContent = 'Sending reset code…';
+                const r = await callBackend('/send-code',
+                    { email, username, purpose: 'reset' },
+                    { statusEl: st, retries: 3, retryDelay: 7000 });
+                if (r.ok) {
+                    st.style.color = '#2ecc71'; st.textContent = '✅ Code sent to ' + email;
+                    document.getElementById('fp-step1').style.display = 'none';
+                    document.getElementById('fp-step2').style.display = 'block';
+                    document.getElementById('fp-status2').textContent = '';
+                    setTimeout(() => document.getElementById('fp-code').focus(), 150);
+                } else { st.style.color = '#ff3366'; st.textContent = '❌ ' + (r.error || 'Failed. Try again.'); }
+            } catch (_) { st.style.color = '#ff3366'; st.textContent = '❌ Server unreachable. Try again later.'; }
+        }
+
+        async function fpVerifyAndReset() {
+            const code = document.getElementById('fp-code').value.trim();
+            const np   = document.getElementById('fp-newpass').value;
+            const np2  = document.getElementById('fp-newpass2').value;
+            const st   = document.getElementById('fp-status2');
+            if (!code || code.length !== 6) { st.style.color = '#ff3366'; st.textContent = 'Enter the 6-digit code.'; return; }
+            if (!np || np.length < 3)       { st.style.color = '#ff3366'; st.textContent = 'Password: min 3 characters.'; return; }
+            if (np !== np2)                 { st.style.color = '#ff3366'; st.textContent = 'Passwords do not match.'; return; }
+            st.style.color = '#ffcc00'; st.textContent = 'Verifying code…';
+            try {
+                const r = await callBackend('/verify-code', { email: _fpTargetEmail, code },
+                    { statusEl: st, retries: 2, retryDelay: 5000 });
+                if (!r.ok) { st.style.color = '#ff3366'; st.textContent = '❌ ' + (r.error || 'Wrong code.'); return; }
+                st.style.color = '#ffcc00'; st.textContent = 'Updating password…';
+                const hash = await hashPw(np);
+                await db.ref('users/' + _fpTargetUser).update({ password: hash });
+                document.getElementById('fp-step2').style.display = 'none';
+                document.getElementById('fp-step3').style.display = 'block';
+                _fpTargetUser = null; _fpTargetEmail = null;
+            } catch (err) {
+                st.style.color = '#ff3366';
+                st.textContent = '❌ ' + (err.message || 'Server error. Try again.');
+            }
+        }
 
         // ─── TROUBLESHOOT ───
         function goToTroubleshoot() {
@@ -11403,42 +11971,54 @@ function disableGlobalZoom() {
             const fileInput = document.getElementById('contact-file-input');
             const file      = fileInput && fileInput.files[0] ? fileInput.files[0] : null;
 
-            // ── Size checks ─────────────────────────────────────────────
-            // FormSubmit JSON mode: text limit ~100 KB
-            // FormSubmit multipart mode (with file): file limit 5 MB
-            const MAX_TEXT_BYTES = 80 * 1024;   // 80 KB text limit (safe)
-            const MAX_FILE_BYTES = 5 * 1024 * 1024;  // 5 MB file limit
-
+            const MAX_TEXT_BYTES = 80 * 1024;
+            const MAX_FILE_BYTES = 5 * 1024 * 1024;
             const textBytes = new TextEncoder().encode(rawMsg + subject + email).length;
             if (textBytes > MAX_TEXT_BYTES) {
                 statusEl.style.color = '#ff3366';
-                statusEl.innerText = '❌ Message too long! Reduce text to under ~80 KB. Currently: ' +
-                    (textBytes / 1024).toFixed(1) + ' KB';
+                statusEl.innerText = '❌ Message too long! Reduce to under ~80 KB. Currently: ' + (textBytes/1024).toFixed(1) + ' KB';
                 return;
             }
             if (file && file.size > MAX_FILE_BYTES) {
                 statusEl.style.color = '#ff3366';
-                statusEl.innerText = '❌ File too large! Max 5 MB allowed. Your file: ' +
-                    (file.size / 1024 / 1024).toFixed(2) + ' MB. Please remove it.';
-                // Clear the file input immediately — no upload, no data waste
-                contactFileRemove();
-                return;
+                statusEl.innerText = '❌ File too large! Max 5 MB. Yours: ' + (file.size/1024/1024).toFixed(2) + ' MB';
+                contactFileRemove(); return;
             }
 
-            btn.disabled = true; btn.innerText = 'Sending...';
-            statusEl.style.color = '#00f3ff'; statusEl.innerText = 'Connecting to mail server...';
-
-            // IST Timestamp
-            const istTime = new Date().toLocaleString('en-IN', {
-                timeZone: 'Asia/Kolkata',
-                weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
-                hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true
-            });
-
+            btn.disabled = true; btn.innerText = 'Sending…';
             const userMatch = rawMsg.match(/Username:\s*([^\n]+)/);
             const username  = userMatch ? userMatch[1].trim() : (localStorage.getItem('playerName') || 'Unknown');
             const cleanMsg  = rawMsg.replace(/Username:[^\n]*\n[-]+\n?/, '').replace('My Question is:', '').trim();
 
+            // ── Try backend first (no file limitation, better formatting) ────
+            if (!file) {
+                try {
+                    statusEl.style.color = '#00f3ff'; statusEl.innerText = 'Connecting to mail server…';
+                    const r = await callBackend('/send-contact',
+                        { fromEmail: email, username, subject, message: cleanMsg },
+                        { statusEl, retries: 2, retryDelay: 7000 });
+                    if (r.ok) {
+                        statusEl.style.color = '#00ff88'; statusEl.innerText = '✅ Message sent!';
+                        document.getElementById('contact-form').reset();
+                        contactFileRemove(); contactCheckSize();
+                        setTimeout(() => { startTyCountdown(); MapsTo('section-thankyou', 'right'); }, 600);
+                        return; // ← success, stop here
+                    }
+                    // Backend returned error — fall through to formsubmit
+                    console.warn('Backend contact failed:', r.error, '— falling back to formsubmit');
+                } catch (_) {
+                    // Backend unreachable — fall through to formsubmit
+                    console.warn('Backend unreachable — falling back to formsubmit');
+                }
+                statusEl.style.color = '#00f3ff'; statusEl.innerText = 'Trying fallback method…';
+            }
+
+            // ── Fallback: formsubmit.co ───────────────────────────────────────
+            const istTime = new Date().toLocaleString('en-IN', {
+                timeZone: 'Asia/Kolkata', weekday: 'long', year: 'numeric',
+                month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit',
+                second: '2-digit', hour12: true
+            });
             const formattedMsg =
                 '════════════════════════════════\n' +
                 '  🎮  ARCADE HUB — Contact Form  \n' +
@@ -11448,59 +12028,39 @@ function disableGlobalZoom() {
                 '📋 Subject   : ' + (subject || 'General Inquiry') + '\n' +
                 '📎 File      : ' + (file ? file.name + ' (' + (file.size/1024).toFixed(1) + ' KB)' : 'None') + '\n' +
                 '🕐 Time (IST): ' + istTime + '\n\n' +
-                '──────────────────────────────────\n' +
-                '💬 MESSAGE:\n' +
-                '──────────────────────────────────\n' +
-                cleanMsg + '\n\n' +
-                '──────────────────────────────────\n' +
-                '🌐 bittuhere.github.io';
-
-            const prettySubject = '🎮 [Arcade Hub] ' + (subject || 'New Message') +
-                ' — from ' + username + ' | IST: ' + istTime;
+                '──────────────────────────────────\n💬 MESSAGE:\n──────────────────────────────────\n' +
+                cleanMsg + '\n\n──────────────────────────────────\n🌐 bittuhere.github.io';
+            const prettySubject = '🎮 [Arcade Hub] ' + (subject || 'New Message') + ' — from ' + username;
 
             try {
                 let res;
                 if (file) {
-                    // ── Multipart send (supports file attachment) ─────────
-                    statusEl.innerText = 'Uploading file...';
+                    statusEl.innerText = 'Uploading file…';
                     const fd = new FormData();
-                    fd.append('email', email);
-                    fd.append('_subject', prettySubject);
-                    fd.append('message', formattedMsg);
-                    fd.append('_captcha', 'false');
-                    fd.append('_template', 'table');
-                    fd.append('attachment', file, file.name);
+                    fd.append('email', email); fd.append('_subject', prettySubject);
+                    fd.append('message', formattedMsg); fd.append('_captcha', 'false');
+                    fd.append('_template', 'table'); fd.append('attachment', file, file.name);
                     res = await fetch('https://formsubmit.co/anurag670singh@gmail.com', {
-                        method: 'POST',
-                        headers: { 'Accept': 'application/json' },
-                        body: fd
+                        method: 'POST', headers: { 'Accept': 'application/json' }, body: fd
                     });
                 } else {
-                    // ── JSON send (text only, faster) ─────────────────────
                     res = await fetch('https://formsubmit.co/ajax/anurag670singh@gmail.com', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                        body: JSON.stringify({
-                            email,
-                            _subject: prettySubject,
-                            message: formattedMsg,
-                            _captcha: 'false'
-                        })
+                        body: JSON.stringify({ email, _subject: prettySubject, message: formattedMsg, _captcha: 'false' })
                     });
                 }
-
-                const data = await res.json().catch(function() { return { success: res.ok ? 'true' : 'false' }; });
+                const data = await res.json().catch(() => ({ success: res.ok ? 'true' : 'false' }));
                 if (data.success === 'true' || data.success === true) {
                     statusEl.style.color = '#00ff88';
                     statusEl.innerText = '✅ Message sent!' + (file ? ' (with attachment)' : '');
                     document.getElementById('contact-form').reset();
-                    contactFileRemove();
-                    contactCheckSize();
-                    setTimeout(function() { startTyCountdown(); MapsTo('section-thankyou', 'right'); }, 600);
+                    contactFileRemove(); contactCheckSize();
+                    setTimeout(() => { startTyCountdown(); MapsTo('section-thankyou', 'right'); }, 600);
                 } else { throw new Error('Send failed'); }
-            } catch (err) {
+            } catch (_) {
                 statusEl.style.color = '#ff3366';
-                statusEl.innerText = '❌ Send failed. Please try again.';
+                statusEl.innerText = '❌ Both send methods failed. Check your connection.';
                 btn.disabled = false; btn.innerText = 'SEND MESSAGE';
             }
         }
@@ -12564,7 +13124,7 @@ function disableGlobalZoom() {
         var _ntQueue = [];
         function showNotify(msg, type) {
             type = type || 'info';
-            var icons = { success: '✅', error: '❌', info: 'ℹ️', invite: '🎮' };
+            var icons = { success: '✅', error: '❌', info: 'ℹ️', invite: '🎮', warn: '⚠️' };
             var cont = document.getElementById('notify-container');
             if (!cont) return;
             var t = document.createElement('div');
@@ -13008,16 +13568,44 @@ function renderUserTable(users) {
   var tbody = document.getElementById('userTableBody');
   tbody.innerHTML = '';
   users.forEach(function(u) {
-    var isBlocked = u.data.blocked === true;
+    var d         = u.data;
+    var isBlocked = d.blocked === true;
+    var ev        = d.emailVerified === true;
+    var evReq     = d.email_verification !== false;
+    var emailStr  = d.email ? ('<br><span style="font-size:.7rem;color:#00f3ff;">'+d.email+'</span>') : '';
     var tr = document.createElement('tr');
-    tr.innerHTML = '<td>' + u.id + '</td>' +
-      '<td><span class="status-tag" style="background:' + (isBlocked ? 'rgba(231,76,60,.2);color:#e74c3c' : 'rgba(46,204,113,.2);color:#2ecc71') + '">' + (isBlocked ? 'BLOCKED' : 'ACTIVE') + '</span></td>' +
-      '<td style="display:flex;gap:6px;flex-wrap:wrap;">' +
-      '<button onclick="toggleBlock(\'' + u.id + '\',' + (!isBlocked) + ')" style="background:' + (isBlocked ? '#2ecc71' : '#e74c3c') + ';border:none;color:' + (isBlocked ? 'black' : 'white') + ';padding:5px 10px;border-radius:4px;cursor:pointer;font-family:Teko;font-size:1rem;">' + (isBlocked ? 'UNBLOCK' : 'BLOCK') + '</button>' +
-      '<button onclick="adminResetPass(\'' + u.id + '\')" style="background:#3498db;border:none;color:white;padding:5px 10px;border-radius:4px;cursor:pointer;font-family:Teko;font-size:1rem;">RESET PASS</button>' +
+    tr.innerHTML =
+      '<td>' + u.id + emailStr + '</td>' +
+      '<td>' +
+        '<span class="status-tag" style="display:block;background:' + (isBlocked?'rgba(231,76,60,.2);color:#e74c3c':'rgba(46,204,113,.2);color:#2ecc71') + '">' + (isBlocked?'BLOCKED':'ACTIVE') + '</span>' +
+        '<span style="font-size:.68rem;padding:1px 5px;border-radius:10px;background:' + (ev?'rgba(46,204,113,.15)':'rgba(255,165,0,.15)') + ';color:' + (ev?'#2ecc71':'#ffaa00') + '">' + (ev?'✅ Verified':'⚠ Unverified') + '</span>' +
+      '</td>' +
+      '<td style="display:flex;gap:4px;flex-wrap:wrap;">' +
+        '<button onclick="toggleBlock(\'' + u.id + '\',' + (!isBlocked) + ')" style="background:' + (isBlocked?'#2ecc71':'#e74c3c') + ';border:none;color:' + (isBlocked?'black':'white') + ';padding:5px 8px;border-radius:4px;cursor:pointer;font-family:Teko;font-size:.9rem;">' + (isBlocked?'UNBLOCK':'BLOCK') + '</button>' +
+        '<button onclick="adminResetPass(\'' + u.id + '\')" style="background:#3498db;border:none;color:white;padding:5px 8px;border-radius:4px;cursor:pointer;font-family:Teko;font-size:.9rem;">RESET PASS</button>' +
+        '<button onclick="adminToggleEmailVerify2(\'' + u.id + '\',' + evReq + ')" style="background:' + (evReq?'#9b59b6':'#27ae60') + ';border:none;color:white;padding:5px 8px;border-radius:4px;cursor:pointer;font-family:Teko;font-size:.9rem;" title="Toggle whether email verification is required">' + (evReq?'📧 Req':'📧 Skip') + '</button>' +
+        '<button onclick="adminMarkVerified2(\'' + u.id + '\',' + ev + ')" style="background:' + (ev?'#e67e22':'#2ecc71') + ';border:none;color:' + (ev?'white':'black') + ';padding:5px 8px;border-radius:4px;cursor:pointer;font-family:Teko;font-size:.9rem;">' + (ev?'Unverify':'✅ Verify') + '</button>' +
       '</td>';
     tbody.appendChild(tr);
   });
+}
+
+function adminToggleEmailVerify2(uid, currentlyRequired) {
+  var newVal = !currentlyRequired;
+  showConfirm((newVal?'REQUIRE':'SKIP') + ' email verification for "' + uid + '"?', function() {
+    db.ref('users/'+uid).update({ email_verification: newVal, _admin: true, _adminKey: ADMIN_KEY })
+      .then(function(){ notify('✅ Email verify ' + (newVal?'required':'skipped') + ': ' + uid); loadUsers(); })
+      .catch(function(e){ notify('❌ ' + e.message, true); });
+  }, '📧');
+}
+
+function adminMarkVerified2(uid, currentlyVerified) {
+  var newVal = !currentlyVerified;
+  showConfirm((newVal?'Mark VERIFIED':'Mark UNVERIFIED') + ' for "' + uid + '"?', function() {
+    db.ref('users/'+uid).update({ emailVerified: newVal, _admin: true, _adminKey: ADMIN_KEY })
+      .then(function(){ notify((newVal?'✅ Verified: ':'⚠ Unverified: ') + uid); loadUsers(); })
+      .catch(function(e){ notify('❌ ' + e.message, true); });
+  }, newVal?'✅':'⚠');
 }
 
 function toggleBlock(uid, state) {
