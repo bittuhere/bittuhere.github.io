@@ -7242,10 +7242,10 @@ function saveFlappyScoreToCloud(finalScore) {
     </div>
     <div id="section-game-car" allow="fullscreen; screen-orientation" class="spa-section hidden-right game-frame">
         <div class="game-section-wrapper">
-            <iframe id="iframe-car" srcdoc="<!DOCTYPE html>
-<html lang=&quot;en&quot;>
-<head>
-    <script>
+            <iframe id="iframe-car" srcdoc="&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+&lt;head&gt;
+    &lt;script&gt;
         // SECURITY CHECK &amp; FIREBASE VERIFICATION
         const storedName = localStorage.getItem('playerName');
         
@@ -7255,8 +7255,8 @@ function saveFlappyScoreToCloud(finalScore) {
         } else {
             // Extra Protection: Check if user actually exists in Firebase
             const checkId = storedName.toLowerCase().trim();
-            if (typeof db !== 'undefined' && db) {
-                db.ref('users/' + checkId).once('value', snap => {
+            if (typeof db !== 'undefined' &amp;&amp; db) {
+                db.ref('users/' + checkId).once('value', snap =&gt; {
                     if (!snap.exists()) {
                         window.parent.postMessage({type:'notify',msg:'⛔ Access denied! Please re-login.',nt:'error'},'*');
                         localStorage.clear();
@@ -7265,12 +7265,12 @@ function saveFlappyScoreToCloud(finalScore) {
                 });
             }
         }
-    </script>
-<meta charset=&quot;UTF-8&quot;>
-<meta name=&quot;viewport&quot; content=&quot;width=device-width,initial-scale=1,user-scalable=no&quot;>
-<title>Real City Drift – Balanced Edition</title>
+    &lt;/script&gt;
+&lt;meta charset=&quot;UTF-8&quot;&gt;
+&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width,initial-scale=1,user-scalable=no&quot;&gt;
+&lt;title&gt;Real City Drift – Balanced Edition&lt;/title&gt;
 
-<style>
+&lt;style&gt;
 body{margin:0;overflow:hidden;background:#87ceeb;font-family:sans-serif}
 #game{position:fixed;inset:0}
 #ui{position:fixed;inset:0;pointer-events:none}
@@ -7301,35 +7301,35 @@ margin-right:10px;font-size:1.5rem
 width:55px;height:95px;border-radius:10px;
 margin-left:10px
 }
-</style>
+&lt;/style&gt;
 
-<script src=&quot;https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js&quot;></script>
-</head>
-<body><style>#spabk{position:fixed;top:10px;left:10px;z-index:99999;background:rgba(0,0,0,0.8);color:#00f3ff;border:1px solid #00f3ff;padding:8px 18px;border-radius:20px;cursor:pointer;font-family:Segoe UI,sans-serif;font-size:.9rem;backdrop-filter:blur(5px);}#spabk:hover{background:#00f3ff;color:#000;}</style><button id=&quot;spabk&quot; onclick=&quot;_exitFs(function(){window.parent.postMessage('spa-back','*')}); exitLandscapeAndRelease();&quot;>← Hub</button>
+&lt;script src=&quot;https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js&quot;&gt;&lt;/script&gt;
+&lt;/head&gt;
+&lt;body&gt;&lt;style&gt;#spabk{position:fixed;top:10px;left:10px;z-index:99999;background:rgba(0,0,0,0.8);color:#00f3ff;border:1px solid #00f3ff;padding:8px 18px;border-radius:20px;cursor:pointer;font-family:Segoe UI,sans-serif;font-size:.9rem;backdrop-filter:blur(5px);}#spabk:hover{background:#00f3ff;color:#000;}&lt;/style&gt;&lt;button id=&quot;spabk&quot; onclick=&quot;_exitFs(function(){window.parent.postMessage('spa-back','*')}); exitLandscapeAndRelease();&quot;&gt;← Hub&lt;/button&gt;
 
-<div id=&quot;game&quot;></div>
+&lt;div id=&quot;game&quot;&gt;&lt;/div&gt;
 
-<div id=&quot;ui&quot;>
-<div class=&quot;speed&quot; id=&quot;speed&quot;>0</div>
+&lt;div id=&quot;ui&quot;&gt;
+&lt;div class=&quot;speed&quot; id=&quot;speed&quot;&gt;0&lt;/div&gt;
 
-<div class=&quot;controls&quot;>
-<div style=&quot;display:flex&quot;>
-<div class=&quot;btn&quot; id=&quot;left&quot;>◀</div>
-<div class=&quot;btn&quot; id=&quot;right&quot;>▶</div>
-</div>
+&lt;div class=&quot;controls&quot;&gt;
+&lt;div style=&quot;display:flex&quot;&gt;
+&lt;div class=&quot;btn&quot; id=&quot;left&quot;&gt;◀&lt;/div&gt;
+&lt;div class=&quot;btn&quot; id=&quot;right&quot;&gt;▶&lt;/div&gt;
+&lt;/div&gt;
 
-<div style=&quot;display:flex&quot;>
-<div class=&quot;pedal&quot; id=&quot;brake&quot;>BRK</div>
-<div class=&quot;pedal&quot; id=&quot;gas&quot;>GAS</div>
-</div>
-</div>
-</div>
+&lt;div style=&quot;display:flex&quot;&gt;
+&lt;div class=&quot;pedal&quot; id=&quot;brake&quot;&gt;BRK&lt;/div&gt;
+&lt;div class=&quot;pedal&quot; id=&quot;gas&quot;&gt;GAS&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
 
-<script>
+&lt;script&gt;
  async function exitLandscapeAndRelease() {
  try {
  
- if (screen.orientation && screen.orientation.unlock) {
+ if (screen.orientation &amp;&amp; screen.orientation.unlock) {
  screen.orientation.unlock();
  console.log(&quot;Orientation unlocked. Phone will now follow the sensor.&quot;);
  }
@@ -7382,7 +7382,7 @@ async function handleMobileRotation() {
     }
 
     // 3. Lock Orientation to Landscape
-    if (screen.orientation && screen.orientation.lock) {
+    if (screen.orientation &amp;&amp; screen.orientation.lock) {
       // 'landscape' locks to both primary or secondary
       await screen.orientation.lock('landscape');
       console.log(&quot;Locked to landscape&quot;);
@@ -7432,7 +7432,7 @@ function createRoads(){
         polygonOffsetUnits: -4
     });
 
-    for(let i=-2000;i<=2000;i+=80){
+    for(let i=-2000;i&lt;=2000;i+=80){
         const r1 = new THREE.Mesh(
             new THREE.PlaneGeometry(4000,24),
             roadMat
@@ -7453,8 +7453,8 @@ function createRoads(){
 
 
 function createBuildings(){
-for(let x=-14;x<=14;x++){
-for(let z=-14;z<=14;z++){
+for(let x=-14;x&lt;=14;x++){
+for(let z=-14;z&lt;=14;z++){
 if(Math.abs(x)%2===0||Math.abs(z)%2===0) continue
 let h=25+Math.random()*60
 let b=new THREE.Mesh(
@@ -7469,7 +7469,7 @@ buildings.push(new THREE.Box3().setFromObject(b))
 }
 
 function createTrafficLights(){
-for(let i=-3;i<=3;i++){
+for(let i=-3;i&lt;=3;i++){
 let pole=new THREE.Mesh(
 new THREE.CylinderGeometry(1,1,22),
 new THREE.MeshStandardMaterial({color:0x333})
@@ -7480,10 +7480,10 @@ scene.add(pole)
 lights.push({state:2,timer:0}) // start green
 }
 
-setInterval(()=>{
-lights.forEach(l=>{
+setInterval(()=&gt;{
+lights.forEach(l=&gt;{
 l.timer++
-if(l.timer>300){
+if(l.timer&gt;300){
 l.state=(l.state+1)%3 // 0 red 1 yellow 2 green
 l.timer=0
 }
@@ -7494,7 +7494,7 @@ l.timer=0
 function createTrafficCars(){
     const types = [&quot;sedan&quot;,&quot;suv&quot;,&quot;truck&quot;];
 
-    for(let i=0;i<8;i++){
+    for(let i=0;i&lt;8;i++){
         const type = types[Math.floor(Math.random()*types.length)];
         const color = new THREE.Color().setHSL(Math.random(),0.6,0.5);
 
@@ -7576,7 +7576,7 @@ function createVehicle(type, color) {
     const wheelGeo = new THREE.CylinderGeometry(0.5, 0.5, 0.45, 16);
     wheelGeo.rotateZ(Math.PI / 2);
 
-    [[1.3,1.8],[-1.3,1.8],[1.3,-1.8],[-1.3,-1.8]].forEach(p=>{
+    [[1.3,1.8],[-1.3,1.8],[1.3,-1.8],[-1.3,-1.8]].forEach(p=&gt;{
         const w = new THREE.Mesh(
             wheelGeo,
             new THREE.MeshStandardMaterial({color:0x111})
@@ -7588,7 +7588,7 @@ function createVehicle(type, color) {
 
     // BRAKE LIGHTS
     vehicle.userData.brakes = [];
-    [-0.8,0.8].forEach(x=>{
+    [-0.8,0.8].forEach(x=&gt;{
         const b = new THREE.Mesh(
             new THREE.BoxGeometry(0.4,0.2,0.1),
             new THREE.MeshBasicMaterial({color:0x330000})
@@ -7611,8 +7611,11 @@ function createCar(){
 
 
 
-function animate(){
-requestAnimationFrame(animate)
+let _lastFrameTime = 0;
+function animate(ts){
+requestAnimationFrame(animate);
+if (ts - _lastFrameTime &lt; 15.5) return; // 60fps lock (~16.67ms)
+_lastFrameTime = ts;
 
 // 🚗 PLAYER PHYSICS (FIXED)
 let accel=0
@@ -7636,8 +7639,8 @@ new THREE.Vector3(nx+1.2,2,nz+2.5)
 )
 
 let hit=false
-buildings.forEach(b=>{if(carBox.intersectsBox(b)) hit=true})
-traffic.forEach(t=>{
+buildings.forEach(b=&gt;{if(carBox.intersectsBox(b)) hit=true})
+traffic.forEach(t=&gt;{
 let tb=new THREE.Box3().setFromObject(t)
 if(carBox.intersectsBox(tb)) hit=true
 })
@@ -7652,18 +7655,18 @@ car.position.set(nx,0.6,nz)
 car.rotation.y=dir
 
 // 🚦 TRAFFIC AI
-traffic.forEach(t=>{
+traffic.forEach(t=&gt;{
     let stop=false;
-    lights.forEach(l=>{
-        if(l.state===0 &amp;&amp; Math.abs(t.position.z)<15) stop=true;
+    lights.forEach(l=&gt;{
+        if(l.state===0 &amp;&amp; Math.abs(t.position.z)&lt;15) stop=true;
     });
 
-    t.userData.brakes.forEach(b=>{
+    t.userData.brakes.forEach(b=&gt;{
         b.material.color.set(stop ? 0xff0000 : 0x330000);
     });
 
     if(!stop) t.position.x += t.userData.speed;
-    if(t.position.x>650) t.position.x=-650;
+    if(t.position.x&gt;650) t.position.x=-650;
 });
 
 // 📸 CAMERA
@@ -7674,7 +7677,7 @@ car.position.z-Math.cos(dir)*12
 )
 camera.position.lerp(camTarget,0.1)
 
-if(crashShake>0){
+if(crashShake&gt;0){
 camera.position.x+=(Math.random()-0.5)*0.6
 camera.position.y+=(Math.random()-0.5)*0.4
 crashShake--
@@ -7687,38 +7690,38 @@ renderer.render(scene,camera)
 }
 
 function setupControls(){
-const bind=(id,key)=>{
+const bind=(id,key)=&gt;{
 let e=document.getElementById(id)
-e.ontouchstart=e.onmousedown=ev=>{
+e.ontouchstart=e.onmousedown=ev=&gt;{
 ev.preventDefault();keys[key]=1}
-e.ontouchend=e.onmouseup=()=>keys[key]=0
+e.ontouchend=e.onmouseup=()=&gt;keys[key]=0
 }
 bind(&quot;gas&quot;,&quot;up&quot;)
 bind(&quot;brake&quot;,&quot;down&quot;)
 bind(&quot;left&quot;,&quot;left&quot;)
 bind(&quot;right&quot;,&quot;right&quot;)
 
-addEventListener(&quot;keydown&quot;,e=>{
+addEventListener(&quot;keydown&quot;,e=&gt;{
 if(e.key===&quot;w&quot;)keys.up=1
 if(e.key===&quot;s&quot;)keys.down=1
 if(e.key===&quot;a&quot;)keys.left=1
 if(e.key===&quot;d&quot;)keys.right=1
 })
-addEventListener(&quot;keyup&quot;,()=>keys={up:0,down:0,left:0,right:0})
+addEventListener(&quot;keyup&quot;,()=&gt;keys={up:0,down:0,left:0,right:0})
 }
 
-addEventListener(&quot;resize&quot;,()=>{
+addEventListener(&quot;resize&quot;,()=&gt;{
 camera.aspect=innerWidth/innerHeight
 camera.updateProjectionMatrix()
 renderer.setSize(innerWidth,innerHeight)
 })
-function _exitFs(cb){if(document.fullscreenElement||document.webkitFullscreenElement){try{if(screen.orientation&&screen.orientation.unlock)screen.orientation.unlock();}catch(e){}var done=false;function go(){if(done)return;done=true;cb();}setTimeout(go,400);document.addEventListener('fullscreenchange',go,{once:true});document.addEventListener('webkitfullscreenchange',go,{once:true});try{document.exitFullscreen();}catch(e){try{document.webkitExitFullscreen();}catch(e2){}}}else{cb();}}
-</script>
-</body>
-</html>
+function _exitFs(cb){if(document.fullscreenElement||document.webkitFullscreenElement){try{if(screen.orientation&amp;&amp;screen.orientation.unlock)screen.orientation.unlock();}catch(e){}var done=false;function go(){if(done)return;done=true;cb();}setTimeout(go,400);document.addEventListener('fullscreenchange',go,{once:true});document.addEventListener('webkitfullscreenchange',go,{once:true});try{document.exitFullscreen();}catch(e){try{document.webkitExitFullscreen();}catch(e2){}}}else{cb();}}
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
 
 
-" sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock" allowfullscreen></iframe>
+&quot; sandbox=&quot;allow-scripts allow-same-origin allow-forms allow-pointer-lock&quot; allowfullscreen&gt;</iframe>
         </div>
     </div>
     <div id="section-game-snake" class="spa-section hidden-right game-frame">
@@ -9418,6 +9421,7 @@ function _exitFs(cb){if(document.fullscreenElement||document.webkitFullscreenEle
 
     <script src=&quot;https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js&quot;></script>
     <script src=&quot;https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js&quot;></script>
+    <script src=&quot;https://cdn.socket.io/4.7.2/socket.io.min.js&quot;></script>
 
     <script>
         // --- CONFIG ---
@@ -9434,6 +9438,7 @@ function _exitFs(cb){if(document.fullscreenElement||document.webkitFullscreenEle
 
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
+        const socket = io('https://arcade-hub-email.onrender.com');
 
         // Game Vars
         let mySymbol = '';
@@ -9488,35 +9493,60 @@ function _exitFs(cb){if(document.fullscreenElement||document.webkitFullscreenEle
             toggleSidebar();
         }
 
+        // --- SOCKET LISTENERS ---
+        socket.on('ttt:created', ({ roomId: rid }) => {
+            roomId = rid; mySymbol = 'X';
+            enterGameUI();
+            statusMsg.innerText = &quot;Waiting for opponent...&quot;;
+            setTimeout(() => { if (!sidebar.classList.contains('active')) toggleSidebar(); }, 600);
+        });
+        socket.on('ttt:state', ({ board, turn, status, winner }) => {
+            updateBoardUI(board);
+            restartBtn.style.display = 'none';
+            cells.forEach(c =&gt; c.classList.remove('win-highlight'));
+            if (status === 'playing') {
+                gameActive = true;
+                if (turn === mySymbol) {
+                    statusMsg.innerText = &quot;YOUR TURN (&quot; + mySymbol + &quot;)&quot;;
+                    statusMsg.style.color = &quot;#00f3ff&quot;; isMyTurn = true;
+                } else {
+                    statusMsg.innerText = &quot;Opponent's Turn&quot;;
+                    statusMsg.style.color = &quot;#aaa&quot;; isMyTurn = false;
+                }
+            } else if (status === 'finished') {
+                restartBtn.style.display = 'block'; isMyTurn = false; gameActive = false;
+                if (winner === mySymbol) {
+                    statusMsg.innerText = &quot;YOU WON! 🎉&quot;; statusMsg.style.color = &quot;#00ff00&quot;;
+                } else {
+                    statusMsg.innerText = &quot;YOU LOST 💀&quot;; statusMsg.style.color = &quot;#ff0000&quot;;
+                }
+                if (winner) {
+                    const winLine = checkWin(board, winner);
+                    if (winLine) winLine.forEach(i =&gt; cells[i].classList.add('win-highlight'));
+                }
+                restartBtn.innerText = &quot;Request Rematch&quot;; restartBtn.disabled = false;
+            } else if (status === 'draw') {
+                restartBtn.style.display = 'block'; isMyTurn = false; gameActive = false;
+                statusMsg.innerText = &quot;DRAW GAME&quot;; statusMsg.style.color = &quot;yellow&quot;;
+                restartBtn.innerText = &quot;Request Rematch&quot;; restartBtn.disabled = false;
+            }
+        });
+        socket.on('ttt:chat', ({ n, msg }) => {
+            const div = document.createElement('div');
+            div.className = 'chat-msg ' + (n === myName ? 'msg-me' : 'msg-opp');
+            div.innerText = msg;
+            chatMsgs.appendChild(div);
+            chatMsgs.scrollTop = chatMsgs.scrollHeight;
+        });
+        socket.on('ttt:error', msg =&gt; window.parent.postMessage({type:'notify',msg,nt:'error'},'*'));
+        socket.on('ttt:opponent-left', () =&gt; {
+            statusMsg.innerText = &quot;Opponent Disconnected!&quot;;
+            statusMsg.style.color = &quot;red&quot;; gameActive = false;
+        });
+
         // --- GAME LOGIC ---
         function createRoom() {
-            roomId = Math.floor(1000 + Math.random() * 9000).toString();
-            mySymbol = 'X';
-
-            db.ref('games/' + roomId).set({
-                board: [&quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;],
-                turn: 'X', status: 'waiting', rematch: null, lastActivity: Date.now(),
-                players: { X: true }
-            });
-
-            // Auto-delete if inactive for 10 min
-            if (window._tttActivityInterval) clearInterval(window._tttActivityInterval);
-            window._tttActivityInterval = setInterval(function() {
-                if (!roomId) { clearInterval(window._tttActivityInterval); return; }
-                db.ref('games/' + roomId + '/lastActivity').once('value', function(snap) {
-                    if (snap.exists() && Date.now() - snap.val() > 600000) {
-                        db.ref('games/' + roomId).remove();
-                        clearInterval(window._tttActivityInterval);
-                        window.parent.postMessage({type:'notify',msg:'Room deleted: 10min inactivity.',nt:'error'},'*');
-                    }
-                });
-            }, 60000);
-
-            db.ref('games/' + roomId + '/players/X').onDisconnect().remove();
-
-            enterGameUI();
-            listenToGame();
-            setTimeout(() => { if (!sidebar.classList.contains('active')) toggleSidebar(); }, 600);
+            socket.emit('ttt:create', { playerName: myName });
         }
 
         // Listen for auto-join from parent (invite accept)
@@ -9527,119 +9557,30 @@ function _exitFs(cb){if(document.fullscreenElement||document.webkitFullscreenEle
             }
         });
         function joinRoom() {
-            roomId = document.getElementById('roomInput').value.trim();
-            if (roomId.length !== 4) return window.parent.postMessage({type:'notify',msg:'Enter a valid 4-digit code!',nt:'error'},'*');
-
-            db.ref('games/' + roomId).once('value').then(snapshot => {
-                if (snapshot.exists()) {
-                    mySymbol = 'O';
-                    // Update Game Status
-                    db.ref('games/' + roomId).update({ status: 'playing' });
-                    // Mark Player O as present
-                    db.ref('games/' + roomId + '/players/O').set(true);
-                    db.ref('games/' + roomId + '/players/O').onDisconnect().remove();
-
-                    enterGameUI();
-                    listenToGame();
-                } else window.parent.postMessage({type:'notify',msg:'Room not found!',nt:'error'},'*');
-            });
+            const code = document.getElementById('roomInput').value.trim();
+            if (code.length !== 4) return window.parent.postMessage({type:'notify',msg:'Enter a valid 4-digit code!',nt:'error'},'*');
+            mySymbol = 'O'; roomId = code;
+            socket.emit('ttt:join', { code, playerName: myName });
+            enterGameUI();
+            statusMsg.innerText = &quot;Connecting...&quot;;
         }
 
         function enterGameUI() {
             lobby.style.display = 'none';
             gameArea.style.display = 'flex';
             displayCode.innerText = roomId;
-            statusMsg.innerText = mySymbol === 'X' ? &quot;Waiting...&quot; : &quot;Connected!&quot;;
-            chatMsgs.innerHTML = '<div style=&quot;text-align:center; color:#555; font-size:0.8rem;&quot;>Game Chat Started</div>';
-        }
-
-        function listenToGame() {
-            // Game State Listener
-            db.ref('games/' + roomId).on('value', (snapshot) => {
-                const game = snapshot.val();
-                if (!game) {
-                    // Room deleted
-                    window.parent.postMessage({type:'notify',msg:'Room was closed by host.',nt:'error'},'*');
-                    return;
-                }
-
-                // Check Presence (Auto Delete Logic)
-                const players = game.players || {};
-                if (game.status === 'playing' &amp;&amp; (!players.X || !players.O)) {
-                    // Someone left during game
-                    statusMsg.innerText = &quot;Opponent Left!&quot;;
-                    statusMsg.style.color = &quot;red&quot;;
-                    gameActive = false;
-                    return;
-                }
-
-                updateBoardUI(game.board);
-                restartBtn.style.display = 'none';
-
-                if (game.status === 'playing') {
-                    gameActive = true;
-                    cells.forEach(c => c.classList.remove('win-highlight'));
-                    if (game.turn === mySymbol) {
-                        statusMsg.innerText = &quot;YOUR TURN (&quot; + mySymbol + &quot;)&quot;;
-                        statusMsg.style.color = &quot;#00f3ff&quot;;
-                        isMyTurn = true;
-                    } else {
-                        statusMsg.innerText = &quot;Opponent's Turn&quot;;
-                        statusMsg.style.color = &quot;#aaa&quot;;
-                        isMyTurn = false;
-                    }
-                } else if (game.status === 'win') {
-                    restartBtn.style.display = 'block';
-                    if (game.winner) {
-                        const winLine = checkWin(game.board, game.winner);
-                        if (winLine) winLine.forEach(i => cells[i].classList.add('win-highlight'));
-                    }
-                    if (game.winner === mySymbol) {
-                        statusMsg.innerText = &quot;YOU WON! 🎉&quot;; statusMsg.style.color = &quot;#00ff00&quot;;
-                    } else {
-                        statusMsg.innerText = &quot;YOU LOST 💀&quot;; statusMsg.style.color = &quot;#ff0000&quot;;
-                    }
-                    isMyTurn = false;
-                    checkRematch(game.rematch);
-                } else if (game.status === 'draw') {
-                    restartBtn.style.display = 'block';
-                    statusMsg.innerText = &quot;DRAW GAME&quot;; statusMsg.style.color = &quot;yellow&quot;;
-                    isMyTurn = false;
-                    checkRematch(game.rematch);
-                }
-            });
-
-            // Chat Listener
-            db.ref('games/' + roomId + '/chat').on('child_added', (snap) => {
-                const msg = snap.val();
-                const div = document.createElement('div');
-                div.className = 'chat-msg ' + (msg.sender === myName ? 'msg-me' : 'msg-opp');
-                div.innerText = msg.text;
-                chatMsgs.appendChild(div);
-                chatMsgs.scrollTop = chatMsgs.scrollHeight;
-            });
+            chatMsgs.innerHTML = '&lt;div style=&quot;text-align:center; color:#555; font-size:0.8rem;&quot;&gt;Game Chat Started&lt;/div&gt;';
         }
 
         // --- LEAVE &amp; CLEANUP ---
         function tttBackBtn() {
-            if (gameActive &amp;&amp; roomId &amp;&amp; mySymbol) {
-                // Match is running — leave properly first
-                leaveGame(true);
-            } else {
-                window.parent.postMessage('spa-back','*');
-            }
+            socket.disconnect();
+            window.parent.postMessage('spa-back','*');
         }
         function leaveGame(goBack) {
-            if (window._tttActivityInterval) { clearInterval(window._tttActivityInterval); window._tttActivityInterval = null; }
-            if (roomId) {
-                db.ref('games/' + roomId + '/players/' + mySymbol).remove().then(() => {
-                    db.ref('games/' + roomId + '/players').once('value').then(snap => {
-                        if (!snap.exists()) db.ref('games/' + roomId).remove();
-                    });
-                });
-            }
-            if (goBack) { window.parent.postMessage('spa-back','*'); }
-            else { location.reload(); }
+            socket.disconnect();
+            if (goBack) window.parent.postMessage('spa-back','*');
+            else location.reload();
         }
 
         // --- CHAT LOGIC ---
@@ -9647,61 +9588,27 @@ function _exitFs(cb){if(document.fullscreenElement||document.webkitFullscreenEle
             const input = document.getElementById('gameChatInput');
             const txt = input.value.trim();
             if (!txt || !roomId) return;
-
-            db.ref('games/' + roomId + '/chat').push({
-                sender: myName, text: txt
-            });
+            socket.emit('ttt:chat', { msg: txt });
             input.value = &quot;&quot;;
         }
         function handleChatKey(e) { if (e.key === 'Enter') sendGameMessage(); }
 
         // --- CORE GAME ---
-        function checkRematch(req) {
-            if (req) {
-                if (req !== mySymbol) {
-                    statusMsg.innerText = &quot;Opponent wants Rematch!&quot;;
-                    restartBtn.innerText = &quot;Accept Rematch&quot;;
-                } else {
-                    statusMsg.innerText = &quot;Waiting for opponent...&quot;;
-                    restartBtn.innerText = &quot;Request Sent...&quot;;
-                    restartBtn.disabled = true;
-                }
-            } else {
-                restartBtn.innerText = &quot;Request Rematch&quot;; restartBtn.disabled = false;
-            }
-        }
         function requestRematch() {
-            db.ref('games/' + roomId).once('value').then(snap => {
-                const g = snap.val();
-                if (g.rematch &amp;&amp; g.rematch !== mySymbol) {
-                    db.ref('games/' + roomId).update({
-                        board: [&quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;], turn: 'X', status: 'playing', winner: null, rematch: null
-                    });
-                } else db.ref('games/' + roomId).update({ rematch: mySymbol });
-            });
+            socket.emit('ttt:rematch');
+            restartBtn.innerText = &quot;Request Sent...&quot;;
+            restartBtn.disabled = true;
         }
 
         function updateBoardUI(b) {
             cells.forEach((c, i) => {
                 c.innerText = b[i]; c.className = 'cell ' + b[i];
-                if (c.classList.contains('win-highlight')) { }
             });
         }
         function makeMove(i) {
             if (!isMyTurn || !gameActive) return;
             if (document.getElementById('c' + i).innerText !== &quot;&quot;) return;
-
-            db.ref('games/' + roomId).once('value').then(snap => {
-                const g = snap.val();
-                let nb = g.board; nb[i] = mySymbol;
-                let next = mySymbol === 'X' ? 'O' : 'X';
-                let stat = 'playing'; let win = null;
-
-                if (checkWin(nb, mySymbol)) { stat = 'win'; win = mySymbol; }
-                else if (!nb.includes(&quot;&quot;)) stat = 'draw';
-
-                db.ref('games/' + roomId).update({ board: nb, turn: next, status: stat, winner: win, lastActivity: Date.now() });
-            });
+            socket.emit('ttt:move', { index: i });
         }
         function checkWin(b, p) {
             const wins = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]];
@@ -9719,31 +9626,31 @@ function _exitFs(cb){if(document.fullscreenElement||document.webkitFullscreenEle
     <div id="section-game-multicar" class="spa-section hidden-right game-frame">
         <div class="game-section-wrapper">
             <iframe id="iframe-multicar" allow="fullscreen; screen-orientation"
-                style="width:100%;height:100%;border:none;" srcdoc="id=&quot;iframe-multicar&quot; style=&quot;width:100%;height:100%;border:none;&quot; srcdoc=&quot;id=&quot;iframe-multicar&quot; style=&quot;width:100%;height:100%;border:none;&quot; srcdoc=&quot;id=&quot;iframe-multicar&quot; style=&quot;width:100%;height:100%;border:none;&quot; srcdoc=&quot;<!DOCTYPE html>
-<html lang=&quot;en&quot;>
-<head>
-    <script>
+                style="width:100%;height:100%;border:none;" srcdoc="&quot;&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+&lt;head&gt;
+    &lt;script&gt;
        // SECURITY CHECK &amp; FIREBASE VERIFICATION
         const storedName = localStorage.getItem('playerName');
         const isLoggedIn  = localStorage.getItem('isLoggedIn');
         if (!storedName || isLoggedIn !== 'true') {
-            document.write('<div style=&quot;display:flex;align-items:center;justify-content:center;height:100vh;background:#0d0b22;color:#ff3366;font-family:Teko,sans-serif;font-size:2rem;text-align:center;&quot;>🔒 NOT LOGGED IN<br><span style=&quot;font-size:1rem;color:#888;&quot;>Return to Arcade Hub</span></div>');
+            document.write('&lt;div style=&quot;display:flex;align-items:center;justify-content:center;height:100vh;background:#0d0b22;color:#ff3366;font-family:Teko,sans-serif;font-size:2rem;text-align:center;&quot;&gt;🔒 NOT LOGGED IN&lt;br&gt;&lt;span style=&quot;font-size:1rem;color:#888;&quot;&gt;Return to Arcade Hub&lt;/span&gt;&lt;/div&gt;');
             throw new Error('Not authenticated');
         }
         // Periodic check
-        setInterval(() => {
+        setInterval(() =&gt; {
             if (localStorage.getItem('isLoggedIn') !== 'true') {
                 window.parent.postMessage('spa-back','*');
             }
         }, 5000);
-    </script>
-    <meta charset=&quot;UTF-8&quot;>
-    <meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no&quot;>
-    <title>City Drift Online</title>
-    <script src=&quot;https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js&quot;></script>
-    <script src=&quot;https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js&quot;></script>
-    <script src=&quot;https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js&quot;></script>
-    <style>
+    &lt;/script&gt;
+    &lt;meta charset=&quot;UTF-8&quot;&gt;
+    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no&quot;&gt;
+    &lt;title&gt;City Drift Online&lt;/title&gt;
+    &lt;script src=&quot;https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js&quot;&gt;&lt;/script&gt;
+    &lt;script src=&quot;https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js&quot;&gt;&lt;/script&gt;
+    &lt;script src=&quot;https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js&quot;&gt;&lt;/script&gt;
+    &lt;style&gt;
 
         *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;touch-action:none;}
         body{background:#1a1a2e;overflow:hidden;font-family:'Segoe UI',sans-serif;user-select:none;}
@@ -9805,73 +9712,74 @@ function _exitFs(cb){if(document.fullscreenElement||document.webkitFullscreenEle
         #chat-input-row{display:flex;gap:6px;padding:8px 10px;border-top:1px solid rgba(255,255,255,.08);flex-shrink:0;}
         #chat-input{flex:1;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);border-radius:8px;color:white;padding:7px 10px;font-size:.82rem;outline:none;}
         #chat-send{background:#00f3ff;color:#000;border:none;border-radius:8px;padding:7px 12px;cursor:pointer;font-weight:bold;}
-    </style>
+    &lt;/style&gt;
+    &lt;script src=&quot;https://cdn.socket.io/4.7.2/socket.io.min.js&quot;&gt;&lt;/script&gt;
 
-</head>
-<body>
+&lt;/head&gt;
+&lt;body&gt;
 
-<!-- LOADING -->
-<div id=&quot;loading-screen&quot;>
-    <div class=&quot;load-ring&quot;></div>
-    <div class=&quot;load-text&quot;>LOADING CITY...</div>
-</div>
+&lt;!-- LOADING --&gt;
+&lt;div id=&quot;loading-screen&quot;&gt;
+    &lt;div class=&quot;load-ring&quot;&gt;&lt;/div&gt;
+    &lt;div class=&quot;load-text&quot;&gt;LOADING CITY...&lt;/div&gt;
+&lt;/div&gt;
 
-<!-- LOBBY -->
-<div id=&quot;lobby&quot; style=&quot;display:none;&quot;>
-    <div class=&quot;lobby-card&quot;>
-        <div class=&quot;lobby-title&quot;>🏎️ CITY DRIFT</div>
-        <div class=&quot;lobby-sub&quot;>MULTIPLAYER RACING ONLINE</div>
-        <button class=&quot;lobby-btn btn-create&quot; onclick=&quot;createRoom(); handleMobileRotation();&quot;>🚀 CREATE ROOM</button>
-        <input class=&quot;lobby-input&quot; id=&quot;roomInput&quot; placeholder=&quot;ROOM CODE&quot; maxlength=&quot;4&quot;>
-        <button class=&quot;lobby-btn btn-join&quot; onclick=&quot;joinRoom(); handleMobileRotation()&quot;>🔑 JOIN ROOM</button>
-        <button class=&quot;lobby-btn btn-back&quot; onclick=&quot;window.parent.postMessage('spa-back','*')&quot;>← BACK TO HUB</button>
-        <div class=&quot;lobby-status&quot; id=&quot;lobby-status&quot;></div>
-    </div>
-</div>
+&lt;!-- LOBBY --&gt;
+&lt;div id=&quot;lobby&quot; style=&quot;display:none;&quot;&gt;
+    &lt;div class=&quot;lobby-card&quot;&gt;
+        &lt;div class=&quot;lobby-title&quot;&gt;🏎️ CITY DRIFT&lt;/div&gt;
+        &lt;div class=&quot;lobby-sub&quot;&gt;MULTIPLAYER RACING ONLINE&lt;/div&gt;
+        &lt;button class=&quot;lobby-btn btn-create&quot; onclick=&quot;createRoom(); handleMobileRotation();&quot;&gt;🚀 CREATE ROOM&lt;/button&gt;
+        &lt;input class=&quot;lobby-input&quot; id=&quot;roomInput&quot; placeholder=&quot;ROOM CODE&quot; maxlength=&quot;4&quot;&gt;
+        &lt;button class=&quot;lobby-btn btn-join&quot; onclick=&quot;joinRoom(); handleMobileRotation()&quot;&gt;🔑 JOIN ROOM&lt;/button&gt;
+        &lt;button class=&quot;lobby-btn btn-back&quot; onclick=&quot;window.parent.postMessage('spa-back','*')&quot;&gt;← BACK TO HUB&lt;/button&gt;
+        &lt;div class=&quot;lobby-status&quot; id=&quot;lobby-status&quot;&gt;&lt;/div&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
 
-<!-- GAME CONTAINER -->
-<div id=&quot;game-container&quot;></div>
+&lt;!-- GAME CONTAINER --&gt;
+&lt;div id=&quot;game-container&quot;&gt;&lt;/div&gt;
 
-<!-- HUD -->
-<div id=&quot;hud&quot; style=&quot;display:none;&quot;>
-    <button id=&quot;back-btn&quot; onclick=&quot;window.parent.postMessage('spa-back','*'); exitLandscapeAndRelease();&quot;>← Hub</button>
-    <div id=&quot;ping-wrap&quot;>
-        <span class=&quot;ping-badge ping-good&quot; id=&quot;car-ping-badge&quot;><span class=&quot;ping-dot&quot;></span><span id=&quot;car-ping-ms&quot;>--</span>ms</span>
-    </div>
-    <div id=&quot;room-info&quot;>
-        <div id=&quot;room-code-display&quot;>----</div>
-        <div id=&quot;player-count&quot;>Waiting...</div>
-    </div>
-    <div id=&quot;speedo&quot;>
-        <div id=&quot;speed-val&quot;>0</div>
-        <div id=&quot;speed-unit&quot;>KM/H</div>
-        <div id=&quot;gear-display&quot;>N</div>
-    </div>
-    <div id=&quot;minimap-wrap&quot;>
-        <canvas id=&quot;minimap&quot; width=&quot;130&quot; height=&quot;130&quot;></canvas>
-    </div>
-</div>
-    <div id=&quot;chat-toggle&quot; onclick=&quot;toggleChat()&quot;>💬 <div id=&quot;chat-unread&quot;></div></div>
-    <div id=&quot;chat-panel&quot;>
-        <div id=&quot;chat-header&quot;><span>💬 CHAT</span><span onclick=&quot;toggleChat()&quot; style=&quot;cursor:pointer;color:rgba(255,255,255,.4);&quot;>✕</span></div>
-        <div id=&quot;chat-messages&quot;></div>
-        <div id=&quot;chat-input-row&quot;><input id=&quot;chat-input&quot; placeholder=&quot;Message...&quot; maxlength=&quot;80&quot;><button id=&quot;chat-send&quot; onclick=&quot;sendChat()&quot;>➤</button></div>
-    </div>
+&lt;!-- HUD --&gt;
+&lt;div id=&quot;hud&quot; style=&quot;display:none;&quot;&gt;
+    &lt;button id=&quot;back-btn&quot; onclick=&quot;window.parent.postMessage('spa-back','*'); exitLandscapeAndRelease();&quot;&gt;← Hub&lt;/button&gt;
+    &lt;div id=&quot;ping-wrap&quot;&gt;
+        &lt;span class=&quot;ping-badge ping-good&quot; id=&quot;car-ping-badge&quot;&gt;&lt;span class=&quot;ping-dot&quot;&gt;&lt;/span&gt;&lt;span id=&quot;car-ping-ms&quot;&gt;--&lt;/span&gt;ms&lt;/span&gt;
+    &lt;/div&gt;
+    &lt;div id=&quot;room-info&quot;&gt;
+        &lt;div id=&quot;room-code-display&quot;&gt;----&lt;/div&gt;
+        &lt;div id=&quot;player-count&quot;&gt;Waiting...&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div id=&quot;speedo&quot;&gt;
+        &lt;div id=&quot;speed-val&quot;&gt;0&lt;/div&gt;
+        &lt;div id=&quot;speed-unit&quot;&gt;KM/H&lt;/div&gt;
+        &lt;div id=&quot;gear-display&quot;&gt;N&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div id=&quot;minimap-wrap&quot;&gt;
+        &lt;canvas id=&quot;minimap&quot; width=&quot;130&quot; height=&quot;130&quot;&gt;&lt;/canvas&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+    &lt;div id=&quot;chat-toggle&quot; onclick=&quot;toggleChat()&quot;&gt;💬 &lt;div id=&quot;chat-unread&quot;&gt;&lt;/div&gt;&lt;/div&gt;
+    &lt;div id=&quot;chat-panel&quot;&gt;
+        &lt;div id=&quot;chat-header&quot;&gt;&lt;span&gt;💬 CHAT&lt;/span&gt;&lt;span onclick=&quot;toggleChat()&quot; style=&quot;cursor:pointer;color:rgba(255,255,255,.4);&quot;&gt;✕&lt;/span&gt;&lt;/div&gt;
+        &lt;div id=&quot;chat-messages&quot;&gt;&lt;/div&gt;
+        &lt;div id=&quot;chat-input-row&quot;&gt;&lt;input id=&quot;chat-input&quot; placeholder=&quot;Message...&quot; maxlength=&quot;80&quot;&gt;&lt;button id=&quot;chat-send&quot; onclick=&quot;sendChat()&quot;&gt;➤&lt;/button&gt;&lt;/div&gt;
+    &lt;/div&gt;
 
-<!-- TOUCH CONTROLS -->
-<div id=&quot;touch-controls&quot; style=&quot;display:none;&quot;>
-    <div class=&quot;touch-side&quot;>
-        <div class=&quot;touch-btn&quot; id=&quot;t-left&quot;>◀</div>
-        <div class=&quot;touch-btn&quot; id=&quot;t-right&quot;>▶</div>
-    </div>
-    <div class=&quot;touch-side&quot;>
-        <div class=&quot;touch-btn touch-btn-brake&quot; id=&quot;t-brake&quot;>🔴</div>
-        <div class=&quot;touch-btn touch-btn-gas&quot; id=&quot;t-gas&quot;>🟢</div>
-    </div>
-</div>
+&lt;!-- TOUCH CONTROLS --&gt;
+&lt;div id=&quot;touch-controls&quot; style=&quot;display:none;&quot;&gt;
+    &lt;div class=&quot;touch-side&quot;&gt;
+        &lt;div class=&quot;touch-btn&quot; id=&quot;t-left&quot;&gt;◀&lt;/div&gt;
+        &lt;div class=&quot;touch-btn&quot; id=&quot;t-right&quot;&gt;▶&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;touch-side&quot;&gt;
+        &lt;div class=&quot;touch-btn touch-btn-brake&quot; id=&quot;t-brake&quot;&gt;🔴&lt;/div&gt;
+        &lt;div class=&quot;touch-btn touch-btn-gas&quot; id=&quot;t-gas&quot;&gt;🟢&lt;/div&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
 
 
-<script>
+&lt;script&gt;
  async function handleMobileRotation() {
   // 1. Check if it's a mobile device
   if (!/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
@@ -9892,7 +9800,7 @@ function _exitFs(cb){if(document.fullscreenElement||document.webkitFullscreenEle
     }
 
     // 3. Lock Orientation to Landscape
-    if (screen.orientation && screen.orientation.lock) {
+    if (screen.orientation &amp;&amp; screen.orientation.lock) {
       // 'landscape' locks to both primary or secondary
       await screen.orientation.lock('landscape');
       console.log(&quot;Locked to landscape&quot;);
@@ -9907,7 +9815,7 @@ function _exitFs(cb){if(document.fullscreenElement||document.webkitFullscreenEle
  async function exitLandscapeAndRelease() {
   try {
 
-    if (screen.orientation && screen.orientation.unlock) {
+    if (screen.orientation &amp;&amp; screen.orientation.unlock) {
       screen.orientation.unlock();
       console.log(&quot;Orientation unlocked. Phone will now follow the sensor.&quot;);
     }
@@ -9941,6 +9849,7 @@ const firebaseConfig = {
 };
 if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
+const socket = io('https://arcade-hub-email.onrender.com');
 const playerName = localStorage.getItem('playerName') || 'Driver';
 
 // ═════════
@@ -9954,7 +9863,7 @@ const MAP_H  = BLOCK*(GRID-1); // 280 units total
 const HALF   = MAP_H/2;     // 140
 
 // Road center positions (-140,-70,0,70,140)
-const ROADS  = Array.from({length:GRID},(_,i)=> -HALF + i*BLOCK);
+const ROADS  = Array.from({length:GRID},(_,i)=&gt; -HALF + i*BLOCK);
 
 // Physics constants
 const MAX_SPD   = 0.7;
@@ -10016,7 +9925,7 @@ function initThree() {
     // Hemisphere light for nice sky/ground gradient
     scene.add(new THREE.HemisphereLight(0x87CEEB, 0x4a7a2a, 0.5));
 
-    window.addEventListener('resize', ()=>{
+    window.addEventListener('resize', ()=&gt;{
         camera.aspect = innerWidth/innerHeight;
         camera.updateProjectionMatrix();
         renderer.setSize(innerWidth, innerHeight);
@@ -10041,11 +9950,11 @@ function makeRoadTexture() {
     // draw road lines
     const roadPx = Math.round(size * ROAD_W / (GRID*BLOCK));
     const step = Math.round(size / (GRID-1));
-    ROADS.forEach((_, i) => {
+    ROADS.forEach((_, i) =&gt; {
         const pos = Math.round((i/(GRID-1)) * size);
         // Road stripes
         ctx.fillStyle = '#fff';
-        for (let d=0; d<size; d+=40) {
+        for (let d=0; d&lt;size; d+=40) {
             ctx.fillRect(pos - roadPx/2 + roadPx*0.45, d, 4, 20);
             ctx.fillRect(d, pos - roadPx/2 + roadPx*0.45, 20, 4);
         }
@@ -10061,7 +9970,7 @@ function makeRoadTexture() {
 
 function buildWorld() {
     const S=MAP_H+ROAD_W*2+60;
-    const bMats=[0xc0392b,0x2980b9,0x27ae60,0xd35400,0x8e44ad,0x2c3e50,0x7f8c8d,0x16a085].map(col=>new THREE.MeshLambertMaterial({color:col}));
+    const bMats=[0xc0392b,0x2980b9,0x27ae60,0xd35400,0x8e44ad,0x2c3e50,0x7f8c8d,0x16a085].map(col=&gt;new THREE.MeshLambertMaterial({color:col}));
     const hutMat=new THREE.MeshLambertMaterial({color:0xd4a76a});
     const roofMat=new THREE.MeshLambertMaterial({color:0x6B3A2A});
     const treeMat=new THREE.MeshLambertMaterial({color:0x228822});
@@ -10072,13 +9981,13 @@ function buildWorld() {
     const rMesh=new THREE.Mesh(new THREE.PlaneGeometry(S,S),new THREE.MeshLambertMaterial({map:roadTex,transparent:true,opacity:1,color:0x444444}));
     rMesh.rotation.x=-Math.PI/2;rMesh.position.y=0.01;rMesh.receiveShadow=true;scene.add(rMesh);
     let bIdx=0;
-    for(let ri=0;ri<GRID-1;ri++){
-        for(let ci=0;ci<GRID-1;ci++){
+    for(let ri=0;ri&lt;GRID-1;ri++){
+        for(let ci=0;ci&lt;GRID-1;ci++){
             const cx=(ROADS[ci]+ROADS[ci+1])/2,cz=(ROADS[ri]+ROADS[ri+1])/2;
             const maxW=BLOCK-ROAD_W-4,seed=ri*7+ci*13;
             if((ri+ci)%3===0){
                 const nH=2+Math.floor(Math.abs(Math.sin(seed)*2));
-                for(let h=0;h<nH;h++){
+                for(let h=0;h&lt;nH;h++){
                     const hw=5+Math.abs(Math.sin(h*7+seed)*4),hd=5+Math.abs(Math.cos(h*5+seed)*4),ht=3+Math.abs(Math.sin(h*11)*2);
                     const ox=Math.sin(h*5+ri)*(maxW*0.3),oz=Math.cos(h*7+ci)*(maxW*0.3);
                     const hut=new THREE.Mesh(new THREE.BoxGeometry(hw,ht,hd),hutMat);
@@ -10087,10 +9996,10 @@ function buildWorld() {
                     const rf=new THREE.Mesh(new THREE.ConeGeometry(Math.max(hw,hd)*0.7,ht*0.7,6),roofMat);
                     rf.position.set(cx+ox,ht+ht*0.35,cz+oz);rf.castShadow=true;scene.add(rf);
                 }
-                for(let t=0;t<2;t++) addTree(cx+Math.sin(t*3.1+seed)*maxW*0.35,cz+Math.cos(t*2.9+seed)*maxW*0.35,treeMat,trunkMat);
+                for(let t=0;t&lt;2;t++) addTree(cx+Math.sin(t*3.1+seed)*maxW*0.35,cz+Math.cos(t*2.9+seed)*maxW*0.35,treeMat,trunkMat);
             }else{
                 const nB=2+Math.floor(Math.abs(Math.sin(seed)*2));
-                for(let b=0;b<nB;b++){
+                for(let b=0;b&lt;nB;b++){
                     const bw=7+Math.abs(Math.sin(b*11+seed)*9),bd=7+Math.abs(Math.cos(b*7+seed)*9),bh=8+Math.abs(Math.sin(b*13+seed)*20);
                     const ox=Math.sin(b*5+ri)*(maxW*0.33),oz=Math.cos(b*7+ci)*(maxW*0.33);
                     const m=new THREE.Mesh(new THREE.BoxGeometry(bw,bh,bd),bMats[bIdx%bMats.length]);bIdx++;
@@ -10100,10 +10009,10 @@ function buildWorld() {
             }
         }
     }
-    ROADS.forEach(rx=>{for(let z=-HALF;z<=HALF;z+=30){if(ROADS.some(rz=>Math.abs(z-rz)<ROAD_W/2+2))continue;addTree(rx+ROAD_W/2+3,z,treeMat,trunkMat);if(Math.abs(rx)<HALF)addTree(rx-ROAD_W/2-3,z,treeMat,trunkMat);}});
-    ROADS.forEach(rz=>{for(let x=-HALF;x<=HALF;x+=30){if(ROADS.some(rx=>Math.abs(x-rx)<ROAD_W/2+2))continue;addTree(x,rz+ROAD_W/2+3,treeMat,trunkMat);if(Math.abs(rz)<HALF)addTree(x,rz-ROAD_W/2-3,treeMat,trunkMat);}});
-    [-HALF-ROAD_W,HALF+ROAD_W].forEach(x=>{buildings.push(new THREE.Box3(new THREE.Vector3(x-5,-1,-HALF-40),new THREE.Vector3(x+5,5,HALF+40)));});
-    [-HALF-ROAD_W,HALF+ROAD_W].forEach(z=>{buildings.push(new THREE.Box3(new THREE.Vector3(-HALF-40,-1,z-5),new THREE.Vector3(HALF+40,5,z+5)));});
+    ROADS.forEach(rx=&gt;{for(let z=-HALF;z&lt;=HALF;z+=30){if(ROADS.some(rz=&gt;Math.abs(z-rz)&lt;ROAD_W/2+2))continue;addTree(rx+ROAD_W/2+3,z,treeMat,trunkMat);if(Math.abs(rx)&lt;HALF)addTree(rx-ROAD_W/2-3,z,treeMat,trunkMat);}});
+    ROADS.forEach(rz=&gt;{for(let x=-HALF;x&lt;=HALF;x+=30){if(ROADS.some(rx=&gt;Math.abs(x-rx)&lt;ROAD_W/2+2))continue;addTree(x,rz+ROAD_W/2+3,treeMat,trunkMat);if(Math.abs(rz)&lt;HALF)addTree(x,rz-ROAD_W/2-3,treeMat,trunkMat);}});
+    [-HALF-ROAD_W,HALF+ROAD_W].forEach(x=&gt;{buildings.push(new THREE.Box3(new THREE.Vector3(x-5,-1,-HALF-40),new THREE.Vector3(x+5,5,HALF+40)));});
+    [-HALF-ROAD_W,HALF+ROAD_W].forEach(z=&gt;{buildings.push(new THREE.Box3(new THREE.Vector3(-HALF-40,-1,z-5),new THREE.Vector3(HALF+40,5,z+5)));});
 }
 function addTree(x,z,lm,tm){const g=new THREE.Group();const tr=new THREE.Mesh(new THREE.CylinderGeometry(0.28,0.38,2.2,5),tm);tr.position.y=1.1;const lv=new THREE.Mesh(new THREE.SphereGeometry(1.8,6,5),lm);lv.position.y=3.5;lv.castShadow=true;g.add(tr);g.add(lv);g.position.set(x,0,z);scene.add(g);}
 
@@ -10138,22 +10047,22 @@ function createVehicle(color, label) {
     wGeo.rotateZ(Math.PI/2);
     const wMat = new THREE.MeshStandardMaterial({color:0x111111,roughness:0.9});
     const hubMat = new THREE.MeshStandardMaterial({color:0xaaaaaa,metalness:0.9,roughness:0.1});
-    [[1.15,0.44,1.5,'fl'],[-1.15,0.44,1.5,'fr'],[1.15,0.44,-1.5,'rl'],[-1.15,0.44,-1.5,'rr']].forEach(([wx,wy,wz,tag])=>{
+    [[1.15,0.44,1.5,'fl'],[-1.15,0.44,1.5,'fr'],[1.15,0.44,-1.5,'rl'],[-1.15,0.44,-1.5,'rr']].forEach(([wx,wy,wz,tag])=&gt;{
         const w = new THREE.Mesh(wGeo, wMat); w.name=tag;
         w.position.set(wx,wy,wz); w.castShadow=true; g.add(w);
         const hub = new THREE.Mesh(new THREE.CylinderGeometry(0.18,0.18,0.4,6), hubMat);
-        hub.rotation.z = Math.PI/2; hub.position.set(wx+(wx>0?0.2:-0.2),wy,wz); g.add(hub);
+        hub.rotation.z = Math.PI/2; hub.position.set(wx+(wx&gt;0?0.2:-0.2),wy,wz); g.add(hub);
     });
 
     // Headlights
     const hlMat = new THREE.MeshStandardMaterial({color:0xffffee, emissive:0xffffee, emissiveIntensity:2});
-    [[0.7,0.6,2.25],[-0.7,0.6,2.25]].forEach(([hx,hy,hz])=>{
+    [[0.7,0.6,2.25],[-0.7,0.6,2.25]].forEach(([hx,hy,hz])=&gt;{
         const hl = new THREE.Mesh(new THREE.BoxGeometry(0.5,0.25,0.1), hlMat);
         hl.position.set(hx,hy,hz); g.add(hl);
     });
     // Tail lights
     const tlMat = new THREE.MeshStandardMaterial({color:0xff2200, emissive:0xff2200, emissiveIntensity:1.5});
-    [[0.7,0.6,-2.25],[-0.7,0.6,-2.25]].forEach(([tx,ty,tz])=>{
+    [[0.7,0.6,-2.25],[-0.7,0.6,-2.25]].forEach(([tx,ty,tz])=&gt;{
         const tl = new THREE.Mesh(new THREE.BoxGeometry(0.5,0.2,0.1), tlMat);
         tl.position.set(tx,ty,tz); g.add(tl);
     });
@@ -10175,7 +10084,7 @@ function createVehicle(color, label) {
 // ═══════════════════════════════════════════════════════════
 // Waypoints: intersections on road grid
 const WP = [];
-ROADS.forEach(z => ROADS.forEach(x => WP.push(new THREE.Vector3(x,0,z))));
+ROADS.forEach(z =&gt; ROADS.forEach(x =&gt; WP.push(new THREE.Vector3(x,0,z))));
 // WP[row*GRID+col] = intersection
 
 // Pre-defined AI routes (indices into WP)
@@ -10196,7 +10105,7 @@ const AI_NAMES = ['CAR_BOT1','CAR_BOT2','CAR_BOT3','CAR_BOT4','CAR_BOT5'];
 const AI_SPEEDS = [0.28,0.24,0.31,0.26,0.22];
 
 function spawnAICars() {
-    AI_ROUTES.forEach((route, i) => {
+    AI_ROUTES.forEach((route, i) =&gt; {
         const col = CAR_COLORS[(i+2) % CAR_COLORS.length];
         const mesh = createVehicle(col, '🤖 '+AI_NAMES[i].replace('CAR_',''));
         const startWP = WP[route[0]];
@@ -10217,7 +10126,7 @@ function spawnAICars() {
 }
 
 function updateAI() {
-    aiCars.forEach((ai, idx) => {
+    aiCars.forEach((ai, idx) =&gt; {
         const cur = ai.mesh.position;
         const target = WP[ai.route[ai.wpIdx]];
         const dx = target.x - cur.x;
@@ -10225,20 +10134,20 @@ function updateAI() {
         const dist = Math.sqrt(dx*dx + dz*dz);
 
         // Advance waypoint when close
-        if (dist < 3.5) {
+        if (dist &lt; 3.5) {
             ai.wpIdx = (ai.wpIdx+1) % ai.route.length;
         }
 
         // Steering toward waypoint
         const desiredDir = Math.atan2(dx, dz);
         let dA = desiredDir - ai.dir;
-        while (dA > Math.PI) dA -= Math.PI*2;
-        while (dA < -Math.PI) dA += Math.PI*2;
+        while (dA &gt; Math.PI) dA -= Math.PI*2;
+        while (dA &lt; -Math.PI) dA += Math.PI*2;
         ai.dir += Math.sign(dA) * Math.min(Math.abs(dA), 0.055);
 
         // Speed control
         const turnSharpness = Math.abs(dA);
-        const targetSpd = turnSharpness > 0.4 ? ai.targetSpeed * 0.6 : ai.targetSpeed;
+        const targetSpd = turnSharpness &gt; 0.4 ? ai.targetSpeed * 0.6 : ai.targetSpeed;
         ai.speed += (targetSpd - ai.speed) * 0.05;
 
         // Move
@@ -10248,13 +10157,13 @@ function updateAI() {
         // Simple collision avoid with player
         const pdx = playerCar ? playerCar.position.x - nx : 999;
         const pdz = playerCar ? playerCar.position.z - nz : 999;
-        if (Math.sqrt(pdx*pdx+pdz*pdz) > 4) {
+        if (Math.sqrt(pdx*pdx+pdz*pdz) &gt; 4) {
             ai.mesh.position.set(nx, 0.4, nz);
         }
         ai.mesh.rotation.y = ai.dir;
 
         // Wheel spin
-        ai.mesh.children.forEach(ch => {
+        ai.mesh.children.forEach(ch =&gt; {
             if(ch.name&amp;&amp;ch.name.length===2) ch.rotation.x += ai.speed*3;
         });
     });
@@ -10270,7 +10179,7 @@ function updatePhysics() {
     if (keys.up)   speed = Math.min(speed+ACCEL, MAX_SPD);
     else if(keys.down) speed = Math.max(speed-BRAKE, -MAX_REV);
     else speed *= (1-FRICTION);
-    if (Math.abs(speed)<0.001) speed=0;
+    if (Math.abs(speed)&lt;0.001) speed=0;
 
     // Steering (speed-sensitive)
     const spFactor = Math.min(Math.abs(speed)/MAX_SPD, 1);
@@ -10309,7 +10218,7 @@ function updatePhysics() {
     }
 
     // Wheel spin + front wheel steer
-    playerCar.children.forEach(ch => {
+    playerCar.children.forEach(ch =&gt; {
         if (!ch.name || ch.name.length!==2) return;
         ch.rotation.x -= speed*3;
         if (ch.name[0]==='f') ch.rotation.y = -steer*8;
@@ -10331,17 +10240,13 @@ function updatePhysics() {
     // Speedometer
     const kmh = Math.round(Math.abs(speed)*130);
     document.getElementById('speed-val').innerText = kmh;
-    document.getElementById('gear-display').innerText = speed>0.02?'D':speed<-0.02?'R':'N';
+    document.getElementById('gear-display').innerText = speed&gt;0.02?'D':speed&lt;-0.02?'R':'N';
 
-    // Firebase sync (throttled)
+    // Socket sync (throttled ~15fps)
     const now=Date.now();
-    if (roomId &amp;&amp; myId &amp;&amp; now-lastSync>60) {
+    if (roomId &amp;&amp; myId &amp;&amp; now-lastSync&gt;65) {
         lastSync=now;
-        db.ref('car_world/'+roomId+'/players/'+myId).update({x:playerCar.position.x,z:playerCar.position.z,r:carDir});
-        if(now-lastActivity>120000) {
-            db.ref('car_world/'+roomId).update({lastActivity:now});
-            lastActivity=now;
-        }
+        socket.emit('car:pos', { x:playerCar.position.x, z:playerCar.position.z, r:carDir });
     }
 }
 
@@ -10363,19 +10268,19 @@ function drawMinimap() {
 
     // Roads
     ctx.strokeStyle='rgba(255,255,255,0.6)'; ctx.lineWidth=ROAD_W*scale;
-    ROADS.forEach(r=>{
+    ROADS.forEach(r=&gt;{
         ctx.beginPath(); ctx.moveTo(r*scale+ox,-HALF*scale+oz); ctx.lineTo(r*scale+ox,HALF*scale+oz); ctx.stroke();
         ctx.beginPath(); ctx.moveTo(-HALF*scale+ox,r*scale+oz); ctx.lineTo(HALF*scale+ox,r*scale+oz); ctx.stroke();
     });
 
     // AI cars (orange dots)
-    aiCars.forEach(ai=>{
+    aiCars.forEach(ai=&gt;{
         const ax=ai.mesh.position.x*scale+ox, az=ai.mesh.position.z*scale+oz;
         ctx.fillStyle='#ff8c00'; ctx.beginPath(); ctx.arc(ax,az,3.5,0,Math.PI*2); ctx.fill();
     });
 
     // Other players (blue dots)
-    Object.values(otherCars).forEach(op=>{
+    Object.values(otherCars).forEach(op=&gt;{
         const px=op.position.x*scale+ox, pz=op.position.z*scale+oz;
         ctx.fillStyle='#3498db'; ctx.beginPath(); ctx.arc(px,pz,4,0,Math.PI*2); ctx.fill();
     });
@@ -10399,7 +10304,7 @@ function drawMinimap() {
 // ═══════════════════════════════════════════════════════════
 function syncOtherPlayers(playersData) {
     if (!playersData) return;
-    Object.keys(playersData).forEach(pid => {
+    Object.keys(playersData).forEach(pid =&gt; {
         if (pid===myId) return;
         const d = playersData[pid];
         if (!otherCars[pid]) {
@@ -10414,7 +10319,7 @@ function syncOtherPlayers(playersData) {
         }
     });
     // Remove disconnected
-    Object.keys(otherCars).forEach(pid => {
+    Object.keys(otherCars).forEach(pid =&gt; {
         if (!playersData[pid]) { scene.remove(otherCars[pid]); delete otherCars[pid]; }
     });
     // Update count
@@ -10422,7 +10327,7 @@ function syncOtherPlayers(playersData) {
 }
 
 function lerpOtherCars() {
-    Object.values(otherCars).forEach(op=>{
+    Object.values(otherCars).forEach(op=&gt;{
         if (op.userData.tx!==undefined) {
             op.position.x += (op.userData.tx - op.position.x)*0.15;
             op.position.z += (op.userData.tz - op.position.z)*0.15;
@@ -10434,9 +10339,13 @@ function lerpOtherCars() {
 // ═══════════════════════════════════════════════════════════
 // GAME LOOP
 // ═══════════════════════════════════════════════════════════
-let lastTime=0;
-function animate(t=0) {
+let lastTime = 0;
+const _FRAME_MS = 1000 / 60;
+function animate(t = 0) {
     requestAnimationFrame(animate);
+    const dt = t - lastTime;
+    if (dt &lt; _FRAME_MS - 1) return; // 60fps lock
+    lastTime = t - (dt % _FRAME_MS); // compensate drift
     updatePhysics();
     updateAI();
     lerpOtherCars();
@@ -10449,23 +10358,23 @@ function animate(t=0) {
 // ═══════════════════════════════════════════════════════════
 function setupControls() {
     // Keyboard
-    window.addEventListener('keydown', e=>{
+    window.addEventListener('keydown', e=&gt;{
         if(e.code==='KeyW'||e.code==='ArrowUp') keys.up=1;
         if(e.code==='KeyS'||e.code==='ArrowDown') keys.down=1;
         if(e.code==='KeyA'||e.code==='ArrowLeft') keys.left=1;
         if(e.code==='KeyD'||e.code==='ArrowRight') keys.right=1;
     });
-    window.addEventListener('keyup', e=>{
+    window.addEventListener('keyup', e=&gt;{
         if(e.code==='KeyW'||e.code==='ArrowUp') keys.up=0;
         if(e.code==='KeyS'||e.code==='ArrowDown') keys.down=0;
         if(e.code==='KeyA'||e.code==='ArrowLeft') keys.left=0;
         if(e.code==='KeyD'||e.code==='ArrowRight') keys.right=0;
     });
     // Touch
-    const tb=(id,k)=>{
+    const tb=(id,k)=&gt;{
         const el=document.getElementById(id);
-        el.addEventListener('touchstart',e=>{e.preventDefault();keys[k]=1;el.classList.add('pressed');},{passive:false});
-        el.addEventListener('touchend',e=>{e.preventDefault();keys[k]=0;el.classList.remove('pressed');},{passive:false});
+        el.addEventListener('touchstart',e=&gt;{e.preventDefault();keys[k]=1;el.classList.add('pressed');},{passive:false});
+        el.addEventListener('touchend',e=&gt;{e.preventDefault();keys[k]=0;el.classList.remove('pressed');},{passive:false});
     };
     tb('t-gas','up'); tb('t-brake','down'); tb('t-left','left'); tb('t-right','right');
     document.getElementById('touch-controls').style.display='flex';
@@ -10475,56 +10384,45 @@ function setupControls() {
 // ROOM SYSTEM
 // ═══════════════════════════════════════════════════════════
 function createRoom() {
-    roomId = Math.floor(1000+Math.random()*9000).toString();
-    myId = 'p1';
-    db.ref('car_world/'+roomId).set({
-        status:'waiting', lastActivity:Date.now(),
-        players:{p1:{x:0,z:0,r:0,n:playerName,color:0xe74c3c}}
-    }).then(()=>{
-        document.getElementById('room-code-display').innerText = roomId;
-        db.ref('car_world/'+roomId+'/players/p1').onDisconnect().remove();
-        var _roomEmptyTimer=null;
-        db.ref('car_world/'+roomId+'/players').on('value',snap=>{
-            if(snap.exists()) { syncOtherPlayers(snap.val()); if(_roomEmptyTimer){clearTimeout(_roomEmptyTimer);_roomEmptyTimer=null;} }
-            else {
-                if(!_roomEmptyTimer) _roomEmptyTimer=setTimeout(function(){
-                    db.ref('car_world/'+roomId).remove();
-                },8000);
-            }
-        });
-        startGame(ROADS[0]+3, ROADS[0]+3);
-    });
+    socket.emit('car:create', { playerName, color: CAR_COLORS[0] });
 }
+socket.on('car:created', ({ roomId: rid, myId: mid }) => {
+    roomId = rid; myId = mid;
+    document.getElementById('room-code-display').innerText = roomId;
+    startGame(ROADS[0]+3, ROADS[0]+3);
+});
 
 function joinRoom() {
     const code = document.getElementById('roomInput').value.trim();
-    if (!code||code.length<4) return;
-    db.ref('car_world/'+code).once('value').then(snap=>{
-        if(!snap.exists()) { document.getElementById('lobby-status').innerText='Room not found!'; return; }
-        const players = snap.val().players||{};
-        let slot=null;
-        for(let i=1;i<=8;i++) {
-            const k='p'+i;
-            if(!players[k]||players[k].n===playerName) {slot=k;break;}
-        }
-        if(!slot) { document.getElementById('lobby-status').innerText='Room full!'; return; }
-        roomId=code; myId=slot;
-        const color=CAR_COLORS[(parseInt(slot.replace('p',''))-1)%CAR_COLORS.length];
-        db.ref('car_world/'+roomId+'/players/'+myId).set({x:5,z:5,r:0,n:playerName,color});
-        db.ref('car_world/'+roomId+'/players/'+myId).onDisconnect().remove();
-        document.getElementById('room-code-display').innerText = roomId;
-        var _roomEmptyTimerJ=null;
-        db.ref('car_world/'+roomId+'/players').on('value',snap=>{
-            if(snap.exists()) { syncOtherPlayers(snap.val()); if(_roomEmptyTimerJ){clearTimeout(_roomEmptyTimerJ);_roomEmptyTimerJ=null;} }
-            else {
-                if(!_roomEmptyTimerJ) _roomEmptyTimerJ=setTimeout(function(){
-                    db.ref('car_world/'+roomId).remove();
-                },8000);
-            }
-        });
-        startGame(ROADS[1]+3, ROADS[1]+3);
-    });
+    if (!code||code.length&lt;4) return;
+    socket.emit('car:join', { code, playerName, color: CAR_COLORS[1] });
 }
+socket.on('car:joined', ({ roomId: rid, myId: mid, players }) => {
+    roomId = rid; myId = mid;
+    document.getElementById('room-code-display').innerText = roomId;
+    syncOtherPlayers(players);
+    startGame(ROADS[1]+3, ROADS[1]+3);
+});
+socket.on('car:error', msg =&gt; { document.getElementById('lobby-status').innerText = msg; });
+socket.on('car:player-joined', ({ id, x, z, r, n, color }) =&gt; {
+    if (!otherCars[id]) {
+        const col = color || CAR_COLORS[Object.keys(otherCars).length % CAR_COLORS.length];
+        otherCars[id] = createVehicle(col, n||id);
+        otherCars[id].position.set(x||0, 0.4, z||0);
+        scene.add(otherCars[id]);
+        document.getElementById('player-count').innerText = (Object.keys(otherCars).length+1)+' player(s)';
+    }
+});
+socket.on('car:pos', ({ id, x, z, r }) =&gt; {
+    if (id === myId || !otherCars[id]) return;
+    otherCars[id].userData.tx = x;
+    otherCars[id].userData.tz = z;
+    otherCars[id].userData.tr = r;
+});
+socket.on('car:player-left', ({ id }) =&gt; {
+    if (otherCars[id]) { scene.remove(otherCars[id]); delete otherCars[id]; }
+    document.getElementById('player-count').innerText = (Object.keys(otherCars).length+1)+' player(s)';
+});
 
 function startGame(spawnX, spawnZ) {
     const col = CAR_COLORS[(parseInt(myId.replace('p',''))-1)%CAR_COLORS.length];
@@ -10544,12 +10442,12 @@ function startGame(spawnX, spawnZ) {
     var hist=[];
     function measure(){
         var t0=performance.now();
-        fetch('https://bittuhere-90415-default-rtdb.asia-southeast1.firebasedatabase.app/.json?shallow=true',{cache:'no-store'})
+        fetch('https://arcade-hub-email.onrender.com/ping',{cache:'no-store'})
         .then(function(){
-            var p=Math.round(performance.now()-t0); hist.push(p); if(hist.length>5)hist.shift();
+            var p=Math.round(performance.now()-t0); hist.push(p); if(hist.length&gt;5)hist.shift();
             var avg=Math.round(hist.reduce(function(a,b){return a+b;},0)/hist.length);
             var b=document.getElementById('car-ping-badge'),m=document.getElementById('car-ping-ms');
-            if(b&amp;&amp;m){m.innerText=avg;b.className='ping-badge '+(avg<80?'ping-good':avg<200?'ping-medium':'ping-bad');}
+            if(b&amp;&amp;m){m.innerText=avg;b.className='ping-badge '+(avg&lt;80?'ping-good':avg&lt;200?'ping-medium':'ping-bad');}
         }).catch(function(){
             var b=document.getElementById('car-ping-badge'),m=document.getElementById('car-ping-ms');
             if(b&amp;&amp;m){m.innerText='999+';b.className='ping-badge ping-bad';}
@@ -10563,8 +10461,27 @@ function startGame(spawnX, spawnZ) {
 // ═══ IN-GAME CHAT ═══
 var chatOpen=false;
 function toggleChat(){var cp=document.getElementById('chat-panel');chatOpen=!chatOpen;cp.style.transform=chatOpen?'translateX(0)':'translateX(100%)';if(chatOpen){document.getElementById('chat-input').focus();var u=document.getElementById('chat-unread');u.style.display='none';u.innerText='';}}
-function sendChat(){var inp=document.getElementById('chat-input');var txt=(inp.value||'').trim();if(!txt||!roomId)return;db.ref('car_world/'+roomId+'/chat').push({n:playerName,msg:txt,t:Date.now()});inp.value='';}
-function listenChat(){if(!roomId)return;var msgDiv=document.getElementById('chat-messages');var unread=document.getElementById('chat-unread');var uc=0;db.ref('car_world/'+roomId+'/chat').limitToLast(30).on('child_added',function(snap){var d=snap.val();var div=document.createElement('div');div.style.cssText='margin-bottom:4px;font-size:.82rem;word-break:break-word;';var isMe=d.n===playerName;div.innerHTML='<span style=&quot;color:'+(isMe?'#00f3ff':'#2ecc71')+';font-weight:bold;&quot;>'+d.n+':</span> <span style=&quot;color:rgba(255,255,255,.85);&quot;>'+d.msg+'</span>';msgDiv.appendChild(div);msgDiv.scrollTop=msgDiv.scrollHeight;if(!chatOpen){uc++;unread.style.display='flex';unread.innerText=uc>9?'9+':uc;}});}
+function sendChat(){
+    var inp=document.getElementById('chat-input');
+    var txt=(inp.value||'').trim();
+    if(!txt||!roomId)return;
+    socket.emit('car:chat',{msg:txt});
+    inp.value='';
+}
+function listenChat(){
+    if(!roomId)return;
+    var msgDiv=document.getElementById('chat-messages');
+    var unread=document.getElementById('chat-unread');
+    var uc=0;
+    socket.on('car:chat',function(d){
+        var div=document.createElement('div');
+        div.style.cssText='margin-bottom:4px;font-size:.82rem;word-break:break-word;';
+        var isMe=d.n===playerName;
+        div.innerHTML='&lt;span style=&quot;color:'+(isMe?'#00f3ff':'#2ecc71')+';font-weight:bold;&quot;&gt;'+d.n+':&lt;/span&gt; &lt;span style=&quot;color:rgba(255,255,255,.85);&quot;&gt;'+d.msg+'&lt;/span&gt;';
+        msgDiv.appendChild(div);msgDiv.scrollTop=msgDiv.scrollHeight;
+        if(!chatOpen){uc++;unread.style.display='flex';unread.innerText=uc&gt;9?'9+':uc;}
+    });
+}
 document.addEventListener('keydown',function(e){if(e.key==='Enter'&amp;&amp;chatOpen){sendChat();e.preventDefault();}if(e.key==='Escape'&amp;&amp;chatOpen){toggleChat();}});
 // AUTO-JOIN FROM INVITE
 // ═══════════════════════════════════════════════════════════
@@ -10581,15 +10498,15 @@ window.addEventListener('message', function(e){
 window.addEventListener('load', function(){
     initThree();
     // Hide loading, show lobby after world builds
-    setTimeout(()=>{
+    setTimeout(()=&gt;{
         document.getElementById('loading-screen').style.display='none';
         document.getElementById('lobby').style.display='flex';
     }, 800);
 });
 
-</script>
-</body>
-</html>"></iframe>
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;"></iframe>
         </div>
     </div>
 
@@ -10610,24 +10527,27 @@ window.addEventListener('load', function(){
                     redirect in <span id="ty-seconds" style="color:#00f3ff;font-weight:bold;">10</span>s</div>
             </div>
         </div>
-        <div id="section-game-arcadecraft" class="spa-section hidden-right game-frame">
+        </div>
+    </div>
+
+    <!-- ARCADECRAFT SECTION -->
+    <div id="section-game-arcadecraft" class="spa-section hidden-right game-frame">
         <div class="game-section-wrapper">
             <iframe id="iframe-arcadecraft" allow="fullscreen; screen-orientation; clipboard-read; clipboard-write"
                 style="width:100%;height:100%;border:none;display:block;" src="eaglercraft.html">
             </iframe>
         </div>
-        </div>
-        <!-- ArcadeCraft fixed back button (shown only when in game) -->
-        <button id="arcadecraft-back-btn" onclick="spaGoBack()" style="
-            display:none;position:fixed;top:12px;left:12px;z-index:99999;
-            background:rgba(0,0,0,0.60);backdrop-filter:blur(8px);
-            border:1px solid rgba(255,255,255,0.28);color:#fff;
-            border-radius:22px;padding:7px 16px;font-size:.8rem;
-            cursor:pointer;letter-spacing:1px;font-family:inherit;
-            box-shadow:0 2px 12px rgba(0,0,0,0.5);">
-            &#8592; Hub
-        </button>
     </div>
+    <!-- ArcadeCraft fixed back button (shown only when in game) -->
+    <button id="arcadecraft-back-btn" onclick="spaGoBack()" style="
+        display:none;position:fixed;top:12px;left:12px;z-index:99999;
+        background:rgba(0,0,0,0.60);backdrop-filter:blur(8px);
+        border:1px solid rgba(255,255,255,0.28);color:#fff;
+        border-radius:22px;padding:7px 16px;font-size:.8rem;
+        cursor:pointer;letter-spacing:1px;font-family:inherit;
+        box-shadow:0 2px 12px rgba(0,0,0,0.5);">
+        &#8592; Hub
+    </button>
     <style>
         /* ty-container border glow via opacity on a pseudo-layer instead of animating box-shadow */
         @keyframes tyGlow {
@@ -10666,7 +10586,7 @@ window.addEventListener('load', function(){
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const db   = firebase.database();
         const auth = firebase.auth();
-        const GAS_URL = 'https://script.google.com/macros/s/AKfycbwlxmDtDcMz4Y1dn9PU0jlcYWAceVPut9q5x9BvQBZnJT-MSFMvc3fy4w-axBKh3vzq/exec';
+        const GAS_URL = 'https://script.google.com/macros/s/AKfycbw5RNkwwAM9OR8PMcb1A7dpq8Tf69inqb92bsROBhbkouwthfe2gJivY9fwMqkQdc_J/exec';
         async function gasCall(payload) {
             const r = await fetch(GAS_URL, { method:'POST', body:JSON.stringify(payload) });
             return r.json();
@@ -11105,10 +11025,10 @@ function disableGlobalZoom() {
                 setTimeout(async () => {
                     const res = await gasCall({ action:'send-code', email:d.email, username:u, purpose:'verify' }).catch(()=>({ok:false}));
                     if (res.ok) _openVerifyPage(d.email);
-                    else { initHub(); MapsTo('section-hub','right'); }
+                    else MapsTo('section-hub','right');
                 }, 500);
             } else {
-                setTimeout(() => { initHub(); MapsTo('section-hub', 'right'); }, 800);
+                setTimeout(() => MapsTo('section-hub', 'right'), 800);
             }
         }
 
@@ -11142,7 +11062,7 @@ function disableGlobalZoom() {
                 const u = localStorage.getItem('playerName');
                 if (u) await db.ref('users/' + u).update({ emailVerified:true, forceVerify:null });
                 st.style.color='#00ff88'; st.innerText = 'Email verified!';
-                setTimeout(() => { initHub(); MapsTo('section-hub','right'); }, 900);
+                setTimeout(() => MapsTo('section-hub','right'), 900);
             }
         }
         async function verifyResendCode() {
@@ -11160,36 +11080,64 @@ function disableGlobalZoom() {
         }
 
         // ── GOOGLE SIGN IN ────────────────────────────────────────────────
+        // Handle redirect result on page load (for mobile/popup-blocked fallback)
+        auth.getRedirectResult().then(result => {
+            if (result && result.user) _handleGoogleUser(result.user.email.toLowerCase());
+        }).catch(err => {
+            if (err.code && err.code !== 'auth/no-current-user' && err.code !== 'auth/null-user')
+                console.warn('Google redirect result:', err.message);
+        });
+
+        async function _handleGoogleUser(gEmail) {
+            let found = null;
+            const snap1 = await db.ref('users').orderByChild('googleEmail').equalTo(gEmail).once('value');
+            if (snap1.exists()) { snap1.forEach(c => { found = { key:c.key, val:c.val() }; }); }
+            if (!found) {
+                const snap2 = await db.ref('users').orderByChild('email').equalTo(gEmail).once('value');
+                if (snap2.exists()) { snap2.forEach(c => { found = { key:c.key, val:c.val() }; }); }
+            }
+            if (found) {
+                if (!found.val.googleEmail) await db.ref('users/' + found.key).update({ googleEmail:gEmail, emailVerified:true });
+                if (found.val.blocked) { showNotify('Account is BLOCKED.', 'error'); return; }
+                loginSuccess(found.key, Object.assign({}, found.val, { emailVerified:true }));
+            } else {
+                _pendingGoogle = { email: gEmail };
+                document.getElementById('google-setup-email-label').innerText = gEmail;
+                document.getElementById('gsetup-username').value = '';
+                document.getElementById('gsetup-password').value = '';
+                document.getElementById('gsetup-confirm').value = '';
+                document.getElementById('gsetup-status').innerText = '';
+                MapsTo('section-google-setup', 'right');
+            }
+        }
+
         async function googleSignIn() {
             const btn = document.getElementById('google-btn');
             btn.disabled = true; btn.style.opacity = '0.6';
             try {
                 const provider = new firebase.auth.GoogleAuthProvider();
-                const result   = await auth.signInWithPopup(provider);
-                const gEmail   = result.user.email.toLowerCase();
-                let found = null;
-                const snap1 = await db.ref('users').orderByChild('googleEmail').equalTo(gEmail).once('value');
-                if (snap1.exists()) { snap1.forEach(c => { found = { key:c.key, val:c.val() }; }); }
-                if (!found) {
-                    const snap2 = await db.ref('users').orderByChild('email').equalTo(gEmail).once('value');
-                    if (snap2.exists()) { snap2.forEach(c => { found = { key:c.key, val:c.val() }; }); }
-                }
-                if (found) {
-                    if (!found.val.googleEmail) await db.ref('users/' + found.key).update({ googleEmail:gEmail, emailVerified:true });
-                    if (found.val.blocked) { showNotify('Account is BLOCKED.', 'error'); return; }
-                    loginSuccess(found.key, Object.assign({}, found.val, { emailVerified:true }));
-                } else {
-                    _pendingGoogle = { email: gEmail };
-                    document.getElementById('google-setup-email-label').innerText = gEmail;
-                    document.getElementById('gsetup-username').value = '';
-                    document.getElementById('gsetup-password').value = '';
-                    document.getElementById('gsetup-confirm').value = '';
-                    document.getElementById('gsetup-status').innerText = '';
-                    MapsTo('section-google-setup', 'right');
+                provider.addScope('email');
+                provider.addScope('profile');
+                try {
+                    // Try popup first (desktop)
+                    const result = await auth.signInWithPopup(provider);
+                    await _handleGoogleUser(result.user.email.toLowerCase());
+                } catch (popErr) {
+                    // Popup blocked (mobile/strict browser) → redirect
+                    if (popErr.code === 'auth/popup-blocked' ||
+                        popErr.code === 'auth/cancelled-popup-request' ||
+                        popErr.code === 'auth/operation-not-supported-in-this-environment') {
+                        await auth.signInWithRedirect(provider);
+                        // Page redirects — result handled by getRedirectResult above on reload
+                    } else if (popErr.code !== 'auth/popup-closed-by-user') {
+                        throw popErr;
+                    }
                 }
             } catch(err) {
-                if (err.code !== 'auth/popup-closed-by-user') showNotify('Google Sign In failed: ' + err.message, 'error');
-            } finally { btn.disabled = false; btn.style.opacity = '1'; }
+                showNotify('Google Sign In failed: ' + (err.message || err.code), 'error');
+            } finally {
+                btn.disabled = false; btn.style.opacity = '1';
+            }
         }
         async function googleSetupComplete() {
             const uname   = document.getElementById('gsetup-username').value.trim().toLowerCase();
