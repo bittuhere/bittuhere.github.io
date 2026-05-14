@@ -1585,6 +1585,34 @@
             overflow-y: auto;
         }
 
+        /* ── Notification toggle bar ── */
+        .notif-bar {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 8px 12px; background: rgba(0,243,255,.05);
+            border: 1px solid rgba(0,243,255,.12); border-radius: 10px;
+            margin-bottom: 12px; gap: 8px;
+        }
+        .notif-bar-label {
+            font-size: .74rem; color: rgba(255,255,255,.55);
+            display: flex; align-items: center; gap: 6px;
+            flex: 1; min-width: 0; line-height: 1.3;
+        }
+        .notif-bar-label span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        /* Toggle switch */
+        .tog-wrap { position: relative; width: 44px; height: 24px; flex-shrink: 0; }
+        .tog-wrap input { opacity: 0; width: 0; height: 0; position: absolute; }
+        .tog-slider {
+            position: absolute; inset: 0; cursor: pointer;
+            background: rgba(255,255,255,.15); border-radius: 24px; transition: background .2s;
+        }
+        .tog-slider::before {
+            content: ''; position: absolute; height: 18px; width: 18px;
+            left: 3px; bottom: 3px; background: white; border-radius: 50%;
+            transition: transform .2s; box-shadow: 0 1px 4px rgba(0,0,0,.4);
+        }
+        .tog-wrap input:checked + .tog-slider { background: #00f3ff; }
+        .tog-wrap input:checked + .tog-slider::before { transform: translateX(20px); }
+
         .sidebar h2 {
             font-family: 'Teko', sans-serif;
             color: #00f3ff;
@@ -5196,6 +5224,17 @@
     <div id="section-chat" class="spa-section hidden-right"
         style="background:#111;display:flex;height:100vh;overflow:hidden;">
         <div class="sidebar">
+            <!-- Notification toggle — changes label based on context -->
+            <div class="notif-bar" id="chat-notif-bar">
+                <span class="notif-bar-label">
+                    <span>🔔</span>
+                    <span id="notif-bar-text">Turn on/off notifications</span>
+                </span>
+                <label class="tog-wrap" title="Toggle notifications">
+                    <input type="checkbox" id="notif-master-chk" onchange="handleNotifToggle(this)">
+                    <span class="tog-slider"></span>
+                </label>
+            </div>
             <button class="btn-back-chat" onclick="MapsTo('section-hub','left')">&#8592; Back</button>
             <div class="user-status" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">Your Username:
                 <span id="chat-display-username">...</span><span class="ping-badge ping-good" id="chat-ping-badge"><span
@@ -9378,12 +9417,13 @@ function _exitFs(cb){if(document.fullscreenElement||document.webkitFullscreenEle
 
     <div id=&quot;lobby&quot;>
         <h3>Create or Join Room</h3>
-        <button class=&quot;main-btn btn-create&quot; onclick=&quot;createRoom()&quot;>Create New Game</button>
+        <button class=&quot;main-btn btn-create&quot; id=&quot;btn-create&quot; onclick=&quot;createRoom()&quot;>Create New Game</button>
         <br><br>
         <p>OR</p>
         <input type=&quot;text&quot; id=&quot;roomInput&quot; placeholder=&quot;Enter Room Code&quot;>
         <br>
-        <button class=&quot;main-btn btn-join&quot; onclick=&quot;joinRoom()&quot;>Join Game</button>
+        <button class=&quot;main-btn btn-join&quot; id=&quot;btn-join&quot; onclick=&quot;joinRoom()&quot;>Join Game</button>
+        <div id=&quot;lobby-status&quot; style=&quot;margin-top:12px;font-size:.82rem;min-height:18px;&quot;></div>
     </div>
 
     <div id=&quot;game-area&quot;>
@@ -9494,7 +9534,18 @@ function _exitFs(cb){if(document.fullscreenElement||document.webkitFullscreenEle
         }
 
         // --- SOCKET LISTENERS ---
+        socket.on('connect',       () => _lbSt('✅ Connected to server.', '#2ecc71'));
+        socket.on('connect_error', err => {
+            clearTimeout(_createTmo); clearTimeout(_joinTmo); _resetBtns();
+            _lbSt('❌ Cannot reach server: ' + (err.message || 'Network error') + '. Check internet or retry.', '#ff3366');
+        });
+        socket.on('disconnect', reason => {
+            _lbSt('⚠️ Disconnected: ' + reason + '. Reconnecting…', '#f39c12');
+        });
+
         socket.on('ttt:created', ({ roomId: rid }) => {
+            clearTimeout(_createTmo);
+            _lbSt('✅ Room created! Share code: ' + rid, '#2ecc71');
             roomId = rid; mySymbol = 'X';
             enterGameUI();
             statusMsg.innerText = &quot;Waiting for opponent...&quot;;
@@ -9538,14 +9589,43 @@ function _exitFs(cb){if(document.fullscreenElement||document.webkitFullscreenEle
             chatMsgs.appendChild(div);
             chatMsgs.scrollTop = chatMsgs.scrollHeight;
         });
-        socket.on('ttt:error', msg =&gt; window.parent.postMessage({type:'notify',msg,nt:'error'},'*'));
-        socket.on('ttt:opponent-left', () =&gt; {
+        socket.on('ttt:error', msg => {
+            clearTimeout(_createTmo); clearTimeout(_joinTmo);
+            _resetBtns();
+            _lbSt('❌ ' + msg, '#ff3366');
+            window.parent.postMessage({type:'notify', msg, nt:'error'}, '*');
+        });
+        socket.on('ttt:opponent-left', () => {
             statusMsg.innerText = &quot;Opponent Disconnected!&quot;;
             statusMsg.style.color = &quot;red&quot;; gameActive = false;
         });
 
+        // --- STATUS HELPERS ---
+        let _createTmo, _joinTmo;
+
+        function _lbSt(msg, color) {
+            const el = document.getElementById('lobby-status');
+            if (el) { el.innerText = msg; el.style.color = color || '#00f3ff'; }
+        }
+        function _setBtn(id, disabled, text) {
+            const b = document.getElementById(id); if (!b) return;
+            b.disabled = disabled; if (text) b.innerText = text;
+            b.style.opacity = disabled ? '0.5' : '1';
+            b.style.cursor  = disabled ? 'not-allowed' : 'pointer';
+        }
+        function _resetBtns() {
+            _setBtn('btn-create', false, 'Create New Game');
+            _setBtn('btn-join',   false, 'Join Game');
+        }
+
         // --- GAME LOGIC ---
         function createRoom() {
+            _setBtn('btn-create', true, '⏳ Connecting…');
+            _lbSt('🔌 Connecting to game server…', '#00f3ff');
+            _createTmo = setTimeout(() => {
+                _resetBtns();
+                _lbSt('❌ Server timeout. It may be waking up (~30 s). Please retry.', '#ff3366');
+            }, 15000);
             socket.emit('ttt:create', { playerName: myName });
         }
 
@@ -9557,12 +9637,18 @@ function _exitFs(cb){if(document.fullscreenElement||document.webkitFullscreenEle
             }
         });
         function joinRoom() {
-            const code = document.getElementById('roomInput').value.trim();
-            if (code.length !== 4) return window.parent.postMessage({type:'notify',msg:'Enter a valid 4-digit code!',nt:'error'},'*');
+            const code = document.getElementById('roomInput').value.trim().toUpperCase();
+            if (code.length !== 4) { _lbSt('❌ Enter a valid 4-character room code.', '#ff3366'); return; }
+            _setBtn('btn-join', true, '⏳ Joining…');
+            _lbSt('🔌 Looking for room ' + code + '…', '#00f3ff');
+            _joinTmo = setTimeout(() => {
+                _resetBtns();
+                _lbSt('❌ Server timeout. It may be waking up (~30 s). Please retry.', '#ff3366');
+            }, 15000);
             mySymbol = 'O'; roomId = code;
             socket.emit('ttt:join', { code, playerName: myName });
             enterGameUI();
-            statusMsg.innerText = &quot;Connecting...&quot;;
+            statusMsg.innerText = &quot;Connecting…&quot;;
         }
 
         function enterGameUI() {
@@ -9729,11 +9815,11 @@ function _exitFs(cb){if(document.fullscreenElement||document.webkitFullscreenEle
     &lt;div class=&quot;lobby-card&quot;&gt;
         &lt;div class=&quot;lobby-title&quot;&gt;🏎️ CITY DRIFT&lt;/div&gt;
         &lt;div class=&quot;lobby-sub&quot;&gt;MULTIPLAYER RACING ONLINE&lt;/div&gt;
-        &lt;button class=&quot;lobby-btn btn-create&quot; onclick=&quot;createRoom(); handleMobileRotation();&quot;&gt;🚀 CREATE ROOM&lt;/button&gt;
+        &lt;button class=&quot;lobby-btn btn-create&quot; id=&quot;btn-create&quot; onclick=&quot;createRoom(); handleMobileRotation();&quot;&gt;🚀 CREATE ROOM&lt;/button&gt;
         &lt;input class=&quot;lobby-input&quot; id=&quot;roomInput&quot; placeholder=&quot;ROOM CODE&quot; maxlength=&quot;4&quot;&gt;
-        &lt;button class=&quot;lobby-btn btn-join&quot; onclick=&quot;joinRoom(); handleMobileRotation()&quot;&gt;🔑 JOIN ROOM&lt;/button&gt;
+        &lt;button class=&quot;lobby-btn btn-join&quot; id=&quot;btn-join&quot; onclick=&quot;joinRoom(); handleMobileRotation()&quot;&gt;🔑 JOIN ROOM&lt;/button&gt;
         &lt;button class=&quot;lobby-btn btn-back&quot; onclick=&quot;window.parent.postMessage('spa-back','*')&quot;&gt;← BACK TO HUB&lt;/button&gt;
-        &lt;div class=&quot;lobby-status&quot; id=&quot;lobby-status&quot;&gt;&lt;/div&gt;
+        &lt;div class=&quot;lobby-status&quot; id=&quot;lobby-status&quot; style=&quot;min-height:18px;&quot;&gt;&lt;/div&gt;
     &lt;/div&gt;
 &lt;/div&gt;
 
@@ -10383,27 +10469,73 @@ function setupControls() {
 // ═══════════════════════════════════════════════════════════
 // ROOM SYSTEM
 // ═══════════════════════════════════════════════════════════
+let _carCreateTmo, _carJoinTmo;
+
+function _carSt(msg, color) {
+    const el = document.getElementById('lobby-status');
+    if (el) { el.innerText = msg; el.style.color = color || '#00f3ff'; }
+}
+function _carBtn(id, disabled, text) {
+    const b = document.getElementById(id); if (!b) return;
+    b.disabled = disabled; if (text) b.innerText = text;
+    b.style.opacity = disabled ? '0.5' : '1';
+    b.style.cursor  = disabled ? 'not-allowed' : 'pointer';
+}
+function _carResetBtns() {
+    _carBtn('btn-create', false, '🚀 CREATE ROOM');
+    _carBtn('btn-join',   false, '🔑 JOIN ROOM');
+}
+
+socket.on('connect',       () => _carSt('✅ Connected to server.', '#2ecc71'));
+socket.on('connect_error', err =&gt; {
+    clearTimeout(_carCreateTmo); clearTimeout(_carJoinTmo); _carResetBtns();
+    _carSt('❌ Cannot reach server: ' + (err.message || 'Network error') + '. Check internet or retry.', '#ff3366');
+});
+socket.on('disconnect', reason =&gt; {
+    _carSt('⚠️ Disconnected: ' + reason + '. Reconnecting…', '#f39c12');
+});
+
 function createRoom() {
+    _carBtn('btn-create', true, '⏳ Connecting…');
+    _carSt('🔌 Connecting to game server…', '#00f3ff');
+    _carCreateTmo = setTimeout(() => {
+        _carResetBtns();
+        _carSt('❌ Server timeout. It may be waking up (~30 s). Please retry.', '#ff3366');
+    }, 15000);
     socket.emit('car:create', { playerName, color: CAR_COLORS[0] });
 }
-socket.on('car:created', ({ roomId: rid, myId: mid }) => {
+socket.on('car:created', ({ roomId: rid, myId: mid }) =&gt; {
+    clearTimeout(_carCreateTmo);
+    _carSt('✅ Room created! Share code: ' + rid, '#2ecc71');
     roomId = rid; myId = mid;
     document.getElementById('room-code-display').innerText = roomId;
     startGame(ROADS[0]+3, ROADS[0]+3);
 });
 
 function joinRoom() {
-    const code = document.getElementById('roomInput').value.trim();
-    if (!code||code.length&lt;4) return;
+    const code = document.getElementById('roomInput').value.trim().toUpperCase();
+    if (!code || code.length &lt; 4) { _carSt('❌ Enter a valid 4-character room code.', '#ff3366'); return; }
+    _carBtn('btn-join', true, '⏳ Joining…');
+    _carSt('🔌 Looking for room ' + code + '…', '#00f3ff');
+    _carJoinTmo = setTimeout(() => {
+        _carResetBtns();
+        _carSt('❌ Server timeout. It may be waking up (~30 s). Please retry.', '#ff3366');
+    }, 15000);
     socket.emit('car:join', { code, playerName, color: CAR_COLORS[1] });
 }
-socket.on('car:joined', ({ roomId: rid, myId: mid, players }) => {
+socket.on('car:joined', ({ roomId: rid, myId: mid, players }) =&gt; {
+    clearTimeout(_carJoinTmo);
+    _carSt('✅ Joined room: ' + rid, '#2ecc71');
     roomId = rid; myId = mid;
     document.getElementById('room-code-display').innerText = roomId;
     syncOtherPlayers(players);
     startGame(ROADS[1]+3, ROADS[1]+3);
 });
-socket.on('car:error', msg =&gt; { document.getElementById('lobby-status').innerText = msg; });
+socket.on('car:error', msg =&gt; {
+    clearTimeout(_carCreateTmo); clearTimeout(_carJoinTmo);
+    _carResetBtns();
+    _carSt('❌ ' + msg, '#ff3366');
+});
 socket.on('car:player-joined', ({ id, x, z, r, n, color }) =&gt; {
     if (!otherCars[id]) {
         const col = color || CAR_COLORS[Object.keys(otherCars).length % CAR_COLORS.length];
@@ -12234,6 +12366,8 @@ function disableGlobalZoom() {
             if (chatInit) return; chatInit = true;
             const myName = localStorage.getItem('playerName'); if (!myName) return;
             document.getElementById('chat-display-username').innerText = myName;
+            // Init notification toggle state
+            initNotifToggle(null);
             LC.fn('section-chat', () => {
                 chatInit = false; currentChatFriend = null; currentChatId = null;
                 const mi = document.getElementById('msgInput'), sb = document.getElementById('sendBtn');
@@ -12426,9 +12560,119 @@ function disableGlobalZoom() {
             document.body.classList.add('chatting');
             document.querySelectorAll('.friend-item').forEach(el => el.classList.remove('active'));
             const fi = document.getElementById('friend-' + fn); if (fi) fi.classList.add('active');
+            // Update notif toggle to show per-friend context
+            initNotifToggle(fn);
             loadChatMsgs();
         }
-        function closeChatPanel() { document.body.classList.remove('chatting'); currentChatFriend = null; document.getElementById('msgInput').disabled = true; document.getElementById('sendBtn').disabled = true; }
+        function closeChatPanel() {
+            document.body.classList.remove('chatting');
+            currentChatFriend = null;
+            document.getElementById('msgInput').disabled = true;
+            document.getElementById('sendBtn').disabled = true;
+            // Reset notif bar to global label
+            initNotifToggle(null);
+        }
+
+        // ─── NOTIFICATION SYSTEM ──────────────────────────────────────────────
+        function _notifKey(friend) { return friend ? 'notif_friend_' + friend : 'notif_all'; }
+
+        function _notifEnabled(friend) {
+            if (!('Notification' in window)) return false;
+            if (Notification.permission !== 'granted') return false;
+            // Per-friend override (null = inherit global)
+            const key = localStorage.getItem(_notifKey(friend));
+            if (friend && key !== null) return key !== 'false';
+            return localStorage.getItem('notif_all') !== 'false';
+        }
+
+        function initNotifToggle(friend) {
+            const chk = document.getElementById('notif-master-chk');
+            const txt = document.getElementById('notif-bar-text');
+            if (!chk || !txt) return;
+            chk.dataset.friend = friend || '';
+            txt.textContent = friend
+                ? 'Turn on/off notifications from ' + friend
+                : 'Turn on/off notifications';
+            chk.checked = _notifEnabled(friend);
+        }
+
+        function handleNotifToggle(chk) {
+            const friend = chk.dataset.friend || null;
+            const wantOn = chk.checked;
+
+            if (!('Notification' in window)) {
+                chk.checked = false;
+                showNotify('❌ Notifications not supported in this browser.', 'error');
+                return;
+            }
+
+            if (wantOn) {
+                if (Notification.permission === 'granted') {
+                    localStorage.setItem(_notifKey(friend), 'true');
+                    showNotify('🔔 Notifications ' + (friend ? 'from ' + friend + ' ' : '') + 'enabled!', 'success');
+                } else if (Notification.permission === 'denied') {
+                    chk.checked = false;
+                    showConfirm(
+                        'Notifications are blocked by your browser. To allow them, click the 🔒 icon in your address bar → Site settings → Notifications → Allow.',
+                        null, '⚠️'
+                    );
+                } else {
+                    // 'default' — need to ask
+                    chk.checked = false;
+                    showConfirm(
+                        'Your browser will show a permission request. Click "Allow" to enable notifications.\n\nIf you cancel and want to allow later, you will need to allow from site permissions (🔒 icon in your browser address bar).',
+                        function () {
+                            Notification.requestPermission().then(function (perm) {
+                                if (perm === 'granted') {
+                                    chk.checked = true;
+                                    localStorage.setItem(_notifKey(friend), 'true');
+                                    // Test notification
+                                    try {
+                                        new Notification('🎮 Arcade Hub', {
+                                            body: 'Notifications are now ON! You\'ll be notified like this.',
+                                            icon: 'https://bittuhere.github.io/favicon.ico',
+                                            tag: 'arcade-test', silent: true
+                                        });
+                                    } catch (_) {}
+                                    showNotify('🔔 Notifications enabled!', 'success');
+                                } else {
+                                    chk.checked = false;
+                                    showNotify('❌ Permission denied. Allow from browser site settings.', 'error');
+                                }
+                            });
+                        },
+                        '🔔'
+                    );
+                }
+            } else {
+                localStorage.setItem(_notifKey(friend), 'false');
+                showNotify('🔕 Notifications ' + (friend ? 'from ' + friend + ' ' : '') + 'turned off.', 'info');
+            }
+        }
+
+        // WhatsApp-style notification when a chat message arrives
+        function _sendChatNotif(from, text) {
+            if (!('Notification' in window) || Notification.permission !== 'granted') return;
+            if (!_notifEnabled(from)) return;
+            // Don't notify if the user is actively reading this chat
+            if (currentChatFriend === from && !document.hidden) return;
+            try {
+                const n = new Notification(from, {
+                    body: text.length > 80 ? text.slice(0, 77) + '…' : text,
+                    icon: 'https://bittuhere.github.io/favicon.ico',
+                    badge: 'https://bittuhere.github.io/favicon.ico',
+                    tag: 'chat-' + from,   // replaces older notif from same sender
+                    renotify: true,
+                    timestamp: Date.now()
+                });
+                n.onclick = function () {
+                    window.focus();
+                    try { openChatWith(from); } catch (_) {}
+                    n.close();
+                };
+                setTimeout(() => { try { n.close(); } catch (_) {} }, 8000);
+            } catch (_) {}
+        }
         function loadChatMsgs() {
             const mn = localStorage.getItem('playerName'), mc = document.getElementById('chat-messages');
             mc.innerHTML = '';
@@ -12457,6 +12701,8 @@ function disableGlobalZoom() {
                     ? '<span style="color:#888;font-style:italic;font-size:0.82rem;">📢 ' + _lfy(d.text) + '</span>'
                     : '<span>' + _lfy(d.text) + '</span><span class="msg-time">' + fmtTime(d.timestamp) + ' ' + sh + '</span>';
                 mc.appendChild(div); requestAnimationFrame(() => { mc.scrollTop = mc.scrollHeight; });
+                // Fire WhatsApp-style notification for incoming messages
+                if (!isMine && !isSystem) _sendChatNotif(d.sender, d.text);
             });
             LC.fb('section-chat', db.ref('chats/' + currentChatId), 'child_changed', snap => {
                 const d = snap.val(), el = document.getElementById('msg-' + snap.key);
