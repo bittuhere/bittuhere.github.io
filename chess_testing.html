@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Chess Multiplayer</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{--light:#f0d9b5;--dark:#b58863;--bg:#1a1a2e;--panel:#16213e;--border:#0f3460;--gold:#e8b84b;--goldh:#ffd166;--text:#e2e8f0;--muted:#64748b;--sz:min(92vw,92vh,460px);--sq:calc(var(--sz)/8);}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;overflow-x:hidden;overscroll-behavior:none;}
+body{display:flex;flex-direction:column;align-items:center;min-height:100dvh;}
+
+/* ── LOBBY ── */
+.lob-ov{position:fixed;inset:0;background:rgba(10,22,40,.97);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;}
+.lob-card{background:var(--panel);border:1px solid var(--border);border-radius:20px;padding:32px 28px;max-width:360px;width:100%;text-align:center;}
+.lob-card h2{color:var(--gold);letter-spacing:3px;font-size:1.6rem;margin-bottom:6px;}
+.lob-card p{color:var(--muted);font-size:.85rem;margin-bottom:24px;}
+#lobbyStatus{font-size:.82rem;min-height:20px;margin:10px 0;color:#00f3ff;}
+.lob-btn{width:100%;padding:12px;border:none;border-radius:10px;font-size:1rem;font-weight:700;cursor:pointer;margin-bottom:10px;letter-spacing:1px;transition:.2s;}
+.lob-btn.pri{background:linear-gradient(90deg,var(--gold),#f0a500);color:#000;}
+.lob-btn.sec{background:rgba(255,255,255,.08);color:var(--text);border:1px solid rgba(255,255,255,.15);}
+.lob-btn:hover{filter:brightness(1.12);}
+.lob-sep{display:flex;align-items:center;gap:10px;margin:10px 0;color:var(--muted);font-size:.8rem;}
+.lob-sep::before,.lob-sep::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.1);}
+.lob-row{display:flex;gap:8px;}
+.lob-inp{flex:1;padding:11px;border-radius:10px;border:1px solid var(--border);background:rgba(0,0,0,.3);color:#fff;font-size:1.1rem;letter-spacing:4px;text-align:center;text-transform:uppercase;}
+.lob-row .lob-btn{width:auto;padding:11px 18px;margin:0;}
+
+/* ── HEADER ── */
+header{width:100%;background:linear-gradient(135deg,#0a1628,#0f3460);padding:8px 12px;display:flex;align-items:center;justify-content:space-between;gap:6px;box-shadow:0 2px 20px rgba(0,0,0,.6);position:sticky;top:0;z-index:100;flex-shrink:0;}
+header h1{font-size:clamp(.85rem,3vw,1.2rem);color:var(--gold);letter-spacing:2px;font-weight:800;white-space:nowrap;}
+.hcenter{display:flex;align-items:center;gap:6px;flex:1;justify-content:center;min-width:0;}
+#turnBadge{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);border-radius:30px;padding:4px 10px;font-size:clamp(.65rem,2vw,.82rem);font-weight:600;white-space:nowrap;}
+#turnDot{width:10px;height:10px;border-radius:50%;border:2px solid rgba(255,255,255,.3);transition:background .35s,box-shadow .35s;flex-shrink:0;}
+.hbtns{display:flex;gap:4px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end;}
+.hbtn{background:rgba(255,255,255,.09);color:var(--text);border:1px solid rgba(255,255,255,.16);padding:5px 9px;border-radius:16px;cursor:pointer;font-weight:600;font-size:clamp(.58rem,1.6vw,.74rem);transition:.2s;white-space:nowrap;}
+.hbtn:hover{background:rgba(255,255,255,.18);}
+.hbtn.pri{background:var(--gold);color:#000;border-color:var(--gold);}
+.hbtn.danger{background:rgba(231,76,60,.25);border-color:rgba(231,76,60,.5);color:#e74c3c;}
+.room-badge{background:rgba(0,243,255,.1);border:1px solid rgba(0,243,255,.3);color:#00f3ff;border-radius:16px;padding:4px 10px;font-size:.72rem;font-weight:700;display:none;}
+
+/* ── VOICE BAR ── */
+#voiceBar{display:none;background:rgba(0,243,255,.06);border-bottom:1px solid rgba(0,243,255,.2);padding:4px 14px;font-size:.75rem;color:#00f3ff;text-align:center;letter-spacing:.5px;}
+
+/* ── CHECK BANNER ── */
+#chkBanner{position:fixed;top:60px;left:50%;transform:translateX(-50%) translateY(-120px);background:linear-gradient(135deg,#c0392b,#e74c3c);color:#fff;padding:7px 20px;border-radius:30px;font-weight:700;font-size:.88rem;box-shadow:0 4px 24px rgba(0,0,0,.5);z-index:300;pointer-events:none;transition:transform .42s cubic-bezier(.34,1.56,.64,1);}
+#chkBanner.show{transform:translateX(-50%) translateY(0);}
+
+/* ── MAIN LAYOUT ── */
+.gwrap{display:flex;gap:10px;padding:10px;justify-content:center;align-items:flex-start;flex-wrap:wrap;max-width:1100px;width:100%;flex:1;}
+.side-panel{display:flex;flex-direction:column;gap:8px;flex:0 0 155px;min-width:130px;max-width:175px;}
+.pcard{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:10px;}
+.plbl{font-size:.65rem;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:7px;padding-bottom:4px;border-bottom:1px solid rgba(255,255,255,.06);}
+.prow{display:flex;align-items:center;gap:7px;}
+.pdot{width:12px;height:12px;border-radius:50%;border:2px solid rgba(255,255,255,.22);flex-shrink:0;transition:box-shadow .3s;}
+.pdot.wd{background:#f8f8f8;}.pdot.bd{background:#111;border-color:#777;}.pdot.on{box-shadow:0 0 0 3px var(--gold);}
+.pname{font-weight:700;font-size:.84rem;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.adv{background:rgba(232,184,75,.14);border:1px solid rgba(232,184,75,.28);color:var(--gold);border-radius:8px;padding:1px 6px;font-size:.68rem;font-weight:700;min-width:22px;text-align:center;}
+.caprow{display:flex;flex-wrap:wrap;gap:1px;min-height:20px;}
+.cp{width:20px;height:20px;background-size:600% 200%;background-repeat:no-repeat;flex-shrink:0;border-radius:2px;}
+
+/* ── HISTORY ── */
+.hpanel{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:10px;flex:0 0 155px;min-width:130px;max-width:175px;display:flex;flex-direction:column;gap:7px;}
+#mlog{overflow-y:auto;max-height:320px;font-family:'Consolas','Courier New',monospace;font-size:.76rem;scrollbar-width:thin;scrollbar-color:var(--border) transparent;}
+.mrow{display:grid;grid-template-columns:22px 1fr 1fr;gap:2px;padding:2px 3px;border-radius:4px;align-items:center;}
+.mrow:last-child{background:rgba(232,184,75,.1);}
+.mnum{color:var(--muted);font-size:.7rem;}
+
+/* ── BOARD ── */
+.barea{display:flex;flex-direction:column;align-items:center;gap:7px;}
+.bouter{display:flex;align-items:stretch;border:3px solid #2a3a1a;border-radius:4px;box-shadow:0 10px 50px rgba(0,0,0,.8),0 0 0 4px rgba(15,52,96,.3);overflow:hidden;}
+.rbar{width:16px;background:linear-gradient(to bottom,#2d3d1d,#1a2a0a);display:flex;flex-direction:column;justify-content:space-around;align-items:center;flex-shrink:0;}
+.rlbl{height:var(--sq);display:flex;align-items:center;justify-content:center;font-size:clamp(6px,1.3vw,10px);font-weight:700;color:#8faa7a;user-select:none;}
+.bcol{display:flex;flex-direction:column;}
+#board{width:var(--sz);height:var(--sz);display:grid;grid-template-columns:repeat(8,var(--sq));grid-template-rows:repeat(8,var(--sq));position:relative;}
+.fbar{height:16px;background:linear-gradient(to right,#2d3d1d,#1a2a0a);display:flex;justify-content:space-around;align-items:center;}
+.flbl{width:var(--sq);text-align:center;font-size:clamp(6px,1.3vw,10px);font-weight:700;color:#8faa7a;user-select:none;}
+
+/* ── SQUARES ── */
+.sq{width:var(--sq);height:var(--sq);position:relative;cursor:pointer;background-size:600% 200%;background-repeat:no-repeat;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent;transition:filter .08s;}
+.sq.light{background-color:var(--light);}.sq.dark{background-color:var(--dark);}
+.sq:hover{filter:brightness(1.1);}.sq.emp{background-image:none!important;}
+.sq.sel::after{content:'';position:absolute;inset:0;background:rgba(20,85,30,.5);pointer-events:none;z-index:3;}
+.sq.lm::after{content:'';position:absolute;inset:0;background:rgba(205,210,106,.42);pointer-events:none;z-index:2;}
+.sq.chk{background:radial-gradient(circle at 50% 50%,rgba(255,10,10,.95) 0%,rgba(231,76,60,.72) 30%,rgba(180,0,0,.18) 65%,transparent 100%)!important;}
+.sq.vmove::before{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:30%;height:30%;border-radius:50%;background:rgba(20,85,30,.44);pointer-events:none;z-index:4;}
+.sq.vcap::before{content:'';position:absolute;inset:0;border-radius:50%;border:calc(var(--sq)*.18) solid rgba(20,85,30,.44);pointer-events:none;z-index:4;}
+.piece-anim{position:absolute;pointer-events:none;z-index:10;background-size:600% 200%;background-repeat:no-repeat;transition:none;}
+
+/* ── STATUS BAR ── */
+#sbar{font-size:clamp(.7rem,2.2vw,.85rem);color:var(--muted);padding:4px 10px;border-radius:8px;transition:color .2s;text-align:center;}
+#sbar.err{color:#e74c3c;font-weight:700;}
+
+/* ── OVERLAYS ── */
+.overlay{position:fixed;inset:0;background:rgba(10,22,40,.85);backdrop-filter:blur(6px);z-index:500;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s;}
+.overlay.show{opacity:1;pointer-events:all;}
+.ocard{background:var(--panel);border:1px solid var(--border);border-radius:18px;padding:28px 24px;text-align:center;max-width:320px;width:90%;}
+.otitle{font-size:1.6rem;font-weight:800;color:var(--gold);margin-bottom:8px;letter-spacing:1px;}
+.omsg{color:var(--muted);font-size:.88rem;margin-bottom:20px;min-height:20px;}
+.obtn{padding:10px 22px;border:none;border-radius:10px;background:rgba(255,255,255,.1);color:var(--text);font-size:.9rem;font-weight:700;cursor:pointer;transition:.2s;border:1px solid rgba(255,255,255,.15);}
+.obtn.pri{background:var(--gold);color:#000;border-color:var(--gold);}
+.obtn:hover{filter:brightness(1.15);}
+.obtn-row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:16px;}
+
+/* ── PROMO ── */
+.prmOv{position:fixed;inset:0;background:rgba(10,22,40,.88);backdrop-filter:blur(4px);z-index:600;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s;}
+.prmOv.show{opacity:1;pointer-events:all;}
+.prmCard{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;}
+.prmCard p{margin-bottom:14px;font-size:.9rem;color:var(--muted);}
+#prmChoices{display:flex;gap:8px;justify-content:center;}
+.prmbtn{width:56px;height:56px;border-radius:10px;cursor:pointer;background-size:600% 200%;background-repeat:no-repeat;border:2px solid transparent;transition:.2s;}
+.prmbtn:hover{border-color:var(--gold);transform:scale(1.1);}
+
+/* ── CHAT SIDEBAR ── */
+.chat-sb{position:fixed;right:0;top:0;bottom:0;width:280px;background:var(--panel);border-left:1px solid var(--border);display:none;flex-direction:column;z-index:400;box-shadow:-4px 0 20px rgba(0,0,0,.4);}
+.chat-hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border);font-weight:700;color:var(--gold);font-size:.9rem;letter-spacing:1px;flex-shrink:0;}
+.chat-hdr-btn{background:none;border:none;color:var(--muted);cursor:pointer;font-size:1.1rem;padding:2px 6px;border-radius:6px;}
+.chat-hdr-btn:hover{color:var(--text);}
+#chatMsgs{flex:1;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:6px;scrollbar-width:thin;scrollbar-color:var(--border) transparent;}
+.cmsg{padding:7px 10px;border-radius:10px;font-size:.82rem;max-width:92%;word-break:break-word;line-height:1.4;}
+.cme{background:rgba(0,243,255,.12);border:1px solid rgba(0,243,255,.2);align-self:flex-end;}
+.copp{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);align-self:flex-start;}
+.cname{font-weight:700;font-size:.72rem;opacity:.7;display:block;margin-bottom:2px;}
+.chat-inp-row{display:flex;gap:6px;padding:10px;border-top:1px solid var(--border);flex-shrink:0;}
+#chatInp{flex:1;padding:8px 10px;border-radius:8px;border:1px solid var(--border);background:rgba(0,0,0,.3);color:#fff;font-size:.85rem;}
+.chat-send-btn{padding:8px 12px;border:none;border-radius:8px;background:var(--gold);color:#000;font-weight:700;cursor:pointer;}
+.chat-unread{position:absolute;top:-4px;right:-4px;background:#e74c3c;color:#fff;border-radius:50%;width:16px;height:16px;font-size:.6rem;display:none;align-items:center;justify-content:center;font-weight:700;}
+
+/* ── MIC MODALS ── */
+.mic-modal{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);z-index:9000;display:none;align-items:center;justify-content:center;padding:20px;}
+.mic-card{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:28px;max-width:360px;width:100%;text-align:center;}
+.mic-card h3{color:var(--gold);margin-bottom:12px;letter-spacing:1px;}
+.mic-card p{color:var(--muted);font-size:.84rem;margin-bottom:10px;line-height:1.5;}
+.mic-card .lob-btn{margin-top:10px;}
+</style>
+</head>
+<body>
+
+<!-- LOBBY -->
+<div class="lob-ov" id="lobbyOv">
+  <div class="lob-card">
+    <button class="lob-btn sec" style="margin-bottom:16px;" onclick="goBack()">&#8592; Back to Hub</button>
+    <h2>&#9822; CHESS</h2>
+    <p>Multiplayer &#8212; Play with a friend online</p>
+    <div id="lobbyStatus"></div>
+    <button class="lob-btn pri" onclick="createRoom()">Create Room</button>
+    <div class="lob-sep"><span>OR</span></div>
+    <div class="lob-row">
+      <input id="codeInput" class="lob-inp" placeholder="CODE" maxlength="4" oninput="this.value=this.value.toUpperCase()">
+      <button class="lob-btn pri" style="width:auto;padding:11px 18px;margin:0;" onclick="joinRoom()">Join</button>
+    </div>
+  </div>
+</div>
+
+<!-- MIC PERMISSION MODAL -->
+<div class="mic-modal" id="micModal">
+  <div class="mic-card">
+    <h3>&#127908; Enable Microphone</h3>
+    <p>Your browser will show a permission request. Click <strong>"Allow"</strong> to enable microphone.</p>
+    <p>If you cancel and want to allow later, you will need to allow from site permissions (&#128274; icon in your browser address bar).</p>
+    <button class="lob-btn pri" onclick="proceedWithMic()">OK, Got It</button>
+    <button class="lob-btn sec" onclick="document.getElementById('micModal').style.display='none'">Cancel</button>
+  </div>
+</div>
+
+<!-- MIC BLOCKED MODAL -->
+<div class="mic-modal" id="micBlockedModal">
+  <div class="mic-card">
+    <h3>&#128274; Microphone Blocked</h3>
+    <p>Microphone access is blocked by your browser. To allow:</p>
+    <p>Click the &#128274; icon in your address bar &#8594; Site settings &#8594; Microphone &#8594; Allow.</p>
+    <button class="lob-btn pri" onclick="document.getElementById('micBlockedModal').style.display='none'">Got It</button>
+  </div>
+</div>
+
+<!-- Remote audio (hidden) -->
+<audio id="remoteAudio" autoplay playsinline style="display:none"></audio>
+
+<!-- HEADER -->
+<header>
+  <h1>&#9822; CHESS</h1>
+  <div class="hcenter">
+    <div id="turnBadge">
+      <div id="turnDot" style="background:#f8f8f8;box-shadow:0 0 8px rgba(255,255,255,.75);"></div>
+      <span id="turnTxt">White's Turn</span>
+    </div>
+  </div>
+  <div class="hbtns">
+    <span class="room-badge" id="roomBadge">&#128683; <b id="roomCodeTxt">----</b></span>
+    <button class="hbtn" id="voiceBtn" onclick="toggleVoice()" style="display:none;position:relative;">&#127908;<span class="chat-unread" id="voiceUnread"></span></button>
+    <button class="hbtn" id="muteBtn" onclick="toggleMute()" style="display:none;">&#128264;</button>
+    <button class="hbtn" id="chatBtn" onclick="toggleChat()" style="display:none;position:relative;">&#128172;<span class="chat-unread" id="chatUnread"></span></button>
+    <button class="hbtn" id="drawBtn" onclick="offerDraw()" style="display:none;">&#129309; Draw</button>
+    <button class="hbtn danger" id="resignBtn" onclick="resignGame()" style="display:none;">&#9873; Resign</button>
+    <button class="hbtn" onclick="undoMove()">&#8617; Undo</button>
+    <button class="hbtn" onclick="flipBoard()">&#8645;</button>
+    <button class="hbtn pri" onclick="newGame()">New</button>
+    <button class="hbtn" onclick="goBack()">&#8592; Hub</button>
+  </div>
+</header>
+
+<!-- VOICE STATUS BAR -->
+<div id="voiceBar" style="display:none;background:rgba(0,243,255,.06);border-bottom:1px solid rgba(0,243,255,.15);padding:3px 14px;font-size:.73rem;color:#00f3ff;text-align:center;width:100%;">
+  <span id="voiceStatus">Connecting voice...</span>
+</div>
+
+<div id="chkBanner"></div>
+
+<!-- GAME WRAP -->
+<div class="gwrap">
+  <!-- Left panel -->
+  <div class="side-panel">
+    <div class="pcard">
+      <div class="plbl">Players</div>
+      <div class="prow" style="margin-bottom:8px;">
+        <div class="pdot wd" id="wDot"></div>
+        <span class="pname" id="wName">White</span>
+        <span class="adv" id="wAdv"></span>
+      </div>
+      <div class="prow">
+        <div class="pdot bd" id="bDot"></div>
+        <span class="pname" id="bName">Black</span>
+        <span class="adv" id="bAdv"></span>
+      </div>
+    </div>
+    <div class="pcard">
+      <div class="plbl">Captured by White</div>
+      <div class="caprow" id="wCap"></div>
+    </div>
+    <div class="pcard">
+      <div class="plbl">Captured by Black</div>
+      <div class="caprow" id="bCap"></div>
+    </div>
+  </div>
+
+  <!-- Board -->
+  <div class="barea">
+    <div id="sbar">Select a piece to start</div>
+    <div class="bouter">
+      <div class="rbar" id="rbar"></div>
+      <div class="bcol">
+        <div id="board"></div>
+        <div class="fbar" id="fbar"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- History panel -->
+  <div class="hpanel">
+    <div class="plbl">Move History</div>
+    <div id="mlog"></div>
+  </div>
+</div>
+
+<!-- CHAT SIDEBAR -->
+<div class="chat-sb" id="chatSidebar">
+  <div class="chat-hdr">
+    <span>&#128172; Game Chat</span>
+    <button class="chat-hdr-btn" onclick="toggleChat()">&#10005;</button>
+  </div>
+  <div id="chatMsgs"></div>
+  <div class="chat-inp-row">
+    <input id="chatInp" class="" placeholder="Type message..." onkeypress="if(event.key==='Enter')sendChat()">
+    <button class="chat-send-btn" onclick="sendChat()">&#8594;</button>
+  </div>
+</div>
+
+<!-- PROMOTION OVERLAY -->
+<div class="prmOv" id="prmOv">
+  <div class="prmCard">
+    <p>Choose promotion piece</p>
+    <div id="prmChoices"></div>
+  </div>
+</div>
+
+<!-- END OVERLAY -->
+<div class="overlay" id="endOv">
+  <div class="ocard">
+    <div class="otitle" id="endTitle"></div>
+    <div class="omsg" id="endMsg"></div>
+    <div class="obtn-row">
+      <button class="obtn" onclick="newGame()">New Game</button>
+      <button class="obtn pri" id="rematchBtn" onclick="requestRematch()" style="display:none">Request Rematch</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════ CHESS ENGINE ═══════════════
+const game = new Chess();
+
+// ═══════════════ PIECE SPRITE ═══════════════
+const PIMG = 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Chess_Pieces_Sprite.svg/800px-Chess_Pieces_Sprite.svg.png';
+const PX   = { k:'0%', q:'20%', r:'40%', b:'60%', n:'80%', p:'100%' };
+const PY   = { w:'0%', b:'100%' };
+const PORD = ['q','r','b','n','p'];
+const PVAL = { q:9, r:5, b:3, n:3, p:1, k:0 };
+
+// ═══════════════ STATE ═══════════════
+let selSq      = null;
+let legalMvs   = [];
+let flipped    = false;
+let animating  = false;
+let pendingProm = null;
+let gOver      = false;
+const FILES    = ['a','b','c','d','e','f','g','h'];
+const RANKS    = ['8','7','6','5','4','3','2','1'];
+
+// ═══════════════ BOARD BUILD ═══════════════
+function resizeBoard() {
+  const vmin = Math.min(window.innerWidth, window.innerHeight);
+  const sz = Math.max(220, Math.min(vmin * 0.88, 460));
+  document.documentElement.style.setProperty('--sz', sz + 'px');
+  document.documentElement.style.setProperty('--sq', (sz/8) + 'px');
+}
+window.addEventListener('resize', () => { resizeBoard(); buildBoard(); render(); });
+
+function buildBoard() {
+  const bd = document.getElementById('board');
+  bd.innerHTML = '';
+  const rb = document.getElementById('rbar'); rb.innerHTML = '';
+  const fb = document.getElementById('fbar'); fb.innerHTML = '';
+
+  const ranks = flipped ? ['1','2','3','4','5','6','7','8'] : RANKS;
+  const files  = flipped ? ['h','g','f','e','d','c','b','a'] : FILES;
+
+  ranks.forEach(r => {
+    const d = document.createElement('div'); d.className='rlbl'; d.textContent=r;
+    rb.appendChild(d);
+  });
+  files.forEach(f => {
+    const d = document.createElement('div'); d.className='flbl'; d.textContent=f;
+    fb.appendChild(d);
+  });
+
+  ranks.forEach(r => files.forEach(f => {
+    const sqn  = f + r;
+    const isLt = (FILES.indexOf(f) + RANKS.indexOf(r)) % 2 === 0;
+    const sq   = document.createElement('div');
+    sq.className = 'sq ' + (isLt ? 'light' : 'dark');
+    sq.setAttribute('data-sq', sqn);
+    sq.addEventListener('click', onSqClick);
+    bd.appendChild(sq);
+  }));
+}
+
+function getSqEl(sqn) { return document.querySelector(`[data-sq="${sqn}"]`); }
+
+function render() {
+  document.querySelectorAll('.sq').forEach(sq => {
+    const sqn   = sq.getAttribute('data-sq');
+    const piece = game.get(sqn);
+    sq.classList.remove('sel','lm','vmove','vcap','chk','emp');
+
+    if (!piece) {
+      sq.style.backgroundImage = 'none'; sq.classList.add('emp');
+    } else {
+      sq.style.backgroundImage    = 'url(' + PIMG + ')';
+      sq.style.backgroundPosition = PX[piece.type] + ' ' + PY[piece.color];
+    }
+
+    if (sqn === selSq) sq.classList.add('sel');
+
+    const hist = game.history({ verbose:true });
+    if (hist.length) {
+      const last = hist[hist.length-1];
+      if (sqn === last.from || sqn === last.to) sq.classList.add('lm');
+    }
+    legalMvs.forEach(m => {
+      if (m.to === sqn) {
+        sq.classList.add(piece ? 'vcap' : 'vmove');
+      }
+    });
+    if (game.in_check()) {
+      const kingColor = game.turn();
+      const bd2       = game.board();
+      bd2.forEach(row => row.forEach(p => {
+        if (p && p.type === 'k' && p.color === kingColor && sqn === FILES[bd2[0].indexOf ? 0:0]) {}
+      }));
+      const allSqs = game.board();
+      for (let r=0;r<8;r++) for (let f=0;f<8;f++) {
+        const p = allSqs[r][f];
+        if (p && p.type==='k' && p.color===game.turn()) {
+          const ksq = FILES[f] + (8-r);
+          if (sqn===ksq) sq.classList.add('chk');
+        }
+      }
+    }
+  });
+  updateTurnUI();
+}
+
+// ═══════════════ ANIMATION ═══════════════
+function sqCenter(sqn) {
+  const el = getSqEl(sqn);
+  if (!el) return {x:0,y:0};
+  const r = el.getBoundingClientRect();
+  return { x: r.left + r.width/2, y: r.top + r.height/2 };
+}
+let movingPiece = null;
+
+function animateHop(from, to, piece, extras, done) {
+  animating = true;
+  const sqSz = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--sq'));
+  const bd   = document.getElementById('board').getBoundingClientRect();
+
+  function doAnim(f, t, pc, cb) {
+    const fEl  = getSqEl(f);
+    const c1   = sqCenter(f), c2 = sqCenter(t);
+    const anim = document.createElement('div');
+    anim.className = 'piece-anim';
+    anim.style.width  = sqSz + 'px';
+    anim.style.height = sqSz + 'px';
+    anim.style.backgroundImage    = 'url(' + PIMG + ')';
+    anim.style.backgroundPosition = PX[pc.type] + ' ' + PY[pc.color];
+    anim.style.left = (c1.x - bd.left - sqSz/2) + 'px';
+    anim.style.top  = (c1.y - bd.top  - sqSz/2) + 'px';
+    document.getElementById('board').appendChild(anim);
+    if (fEl) fEl.style.backgroundImage = 'none';
+
+    const dx = c2.x - c1.x, dy = c2.y - c1.y;
+    const dist = Math.sqrt(dx*dx + dy*dy);
+    const dur  = Math.max(80, Math.min(220, dist * 0.9));
+
+    requestAnimationFrame(() => {
+      anim.style.transition = `left ${dur}ms cubic-bezier(.4,0,.2,1), top ${dur}ms cubic-bezier(.4,0,.2,1)`;
+      anim.style.left = (c2.x - bd.left - sqSz/2) + 'px';
+      anim.style.top  = (c2.y - bd.top  - sqSz/2) + 'px';
+    });
+    setTimeout(() => { anim.remove(); cb && cb(); }, dur + 20);
+  }
+
+  doAnim(from, to, piece, () => {
+    if (extras && extras.length) {
+      let pending = extras.length;
+      extras.forEach(ex => doAnim(ex.from, ex.to, ex.piece, () => { if(--pending===0) done(); }));
+    } else { done(); }
+  });
+}
+
+// ═══════════════ EXECUTE MOVE ═══════════════
+function executeMove(from, to, prom) {
+  if (animating) return;
+  movingPiece = game.get(from);
+  const moveObj = game.move({ from, to, promotion: prom || 'q' });
+  if (!moveObj) return;
+  selSq = null; legalMvs = [];
+  updateTurnUI(); updateCaptured(); updateHistory();
+
+  let extras = null;
+  const Y = moveObj.color === 'w' ? '1' : '8';
+  if (moveObj.flags.includes('k')) extras = [{ from:'h'+Y, to:'f'+Y, piece:{type:'r',color:moveObj.color} }];
+  else if (moveObj.flags.includes('q')) extras = [{ from:'a'+Y, to:'d'+Y, piece:{type:'r',color:moveObj.color} }];
+
+  const animPiece = prom ? { type:'p', color:movingPiece.color } : movingPiece;
+  animateHop(from, to, animPiece, extras, () => {
+    animating = false; render(); checkState(moveObj);
+  });
+}
+
+// ═══════════════ GAME STATE ═══════════════
+function checkState(moveObj) {
+  if (game.in_checkmate()) {
+    const w = game.turn() === 'w' ? 'Black' : 'White';
+    showEnd('Checkmate!', w + ' wins!');
+  } else if (game.in_stalemate()) {
+    showEnd('Stalemate!', 'No legal moves — draw.');
+  } else if (game.in_draw()) {
+    let r = 'Draw by 50-move rule.';
+    if (game.in_threefold_repetition()) r = 'Draw — threefold repetition.';
+    else if (game.insufficient_material()) r = 'Draw — insufficient material.';
+    showEnd('Draw!', r);
+  } else if (game.in_check()) {
+    const who = game.turn() === 'w' ? 'White' : 'Black';
+    flashCheck(who + ' is in Check!');
+    setStatus(who + ' is in check — must move out!', true);
+  } else {
+    const t = game.turn() === 'w' ? 'White' : 'Black';
+    setStatus(t + "'s turn");
+  }
+}
+
+// ═══════════════ CLICK HANDLER ═══════════════
+function onSqClick() {
+  if (gOver || pendingProm || animating) return;
+  const sqn   = this.getAttribute('data-sq');
+  const piece = game.get(sqn);
+
+  if (!selSq) {
+    if (!piece) { setStatus('No piece here', true); return; }
+    if (piece.color !== game.turn()) { setStatus('Not your piece!', true); return; }
+    selSq    = sqn;
+    legalMvs = game.moves({ square:sqn, verbose:true });
+    setStatus('Selected ' + tName(piece.type) + ' — pick destination');
+    render();
+  } else {
+    if (sqn === selSq) { selSq=null; legalMvs=[]; render(); return; }
+    if (piece && piece.color === game.turn()) { selSq=sqn; legalMvs=game.moves({square:sqn,verbose:true}); setStatus('Selected '+tName(piece.type)); render(); return; }
+    if (!legalMvs.some(m => m.to === sqn)) { setStatus('Not a legal move', true); selSq=null; legalMvs=[]; render(); return; }
+    const isPromo = legalMvs.some(m => m.to===sqn && m.flags.includes('p'));
+    if (isPromo) { pendingProm={from:selSq,to:sqn}; selSq=null; legalMvs=[]; showPromoDialog(); render(); return; }
+    executeMove(selSq, sqn, null);
+  }
+}
+
+// ═══════════════ PROMOTION ═══════════════
+function showPromoDialog() {
+  const pp = game.get(pendingProm.from);
+  const c  = pp ? pp.color : game.turn();
+  const el = document.getElementById('prmChoices');
+  el.innerHTML = '';
+  ['q','r','b','n'].forEach(t => {
+    const btn = document.createElement('div');
+    btn.className = 'prmbtn';
+    btn.style.backgroundImage    = 'url(' + PIMG + ')';
+    btn.style.backgroundSize     = '600% 200%';
+    btn.style.backgroundPosition = PX[t] + ' ' + PY[c];
+    btn.addEventListener('click', () => doPromo(t));
+    el.appendChild(btn);
+  });
+  document.getElementById('prmOv').classList.add('show');
+}
+function doPromo(type) {
+  document.getElementById('prmOv').classList.remove('show');
+  if (!pendingProm) return;
+  const {from, to} = pendingProm; pendingProm = null;
+  executeMove(from, to, type);
+}
+
+// ═══════════════ UI HELPERS ═══════════════
+function updateTurnUI() {
+  const isW = game.turn() === 'w';
+  document.getElementById('turnDot').style.background  = isW ? '#f8f8f8' : '#111';
+  document.getElementById('turnDot').style.boxShadow   = isW ? '0 0 8px rgba(255,255,255,.75)' : '0 0 6px rgba(150,150,150,.4)';
+  document.getElementById('turnTxt').textContent = isW ? "White's Turn" : "Black's Turn";
+  document.getElementById('wDot').classList.toggle('on', isW);
+  document.getElementById('bDot').classList.toggle('on', !isW);
+}
+function updateCaptured() {
+  const bd = game.board();
+  const ob = { w:{p:0,n:0,b:0,r:0,q:0}, b:{p:0,n:0,b:0,r:0,q:0} };
+  bd.forEach(row => row.forEach(p => { if(p && p.type!=='k') ob[p.color][p.type]++; }));
+  const st = {p:8,n:2,b:2,r:2,q:1};
+  const bW={}, bB={};
+  PORD.forEach(t => {
+    const bm = st[t]-ob.b[t]; if(bm>0) bW[t]=bm;
+    const wm = st[t]-ob.w[t]; if(wm>0) bB[t]=wm;
+  });
+  renderCap('wCap', bW, 'b'); renderCap('bCap', bB, 'w');
+  let wm=0,bm2=0;
+  PORD.forEach(t => { wm+=ob.w[t]*PVAL[t]; bm2+=ob.b[t]*PVAL[t]; });
+  const d = wm-bm2;
+  document.getElementById('wAdv').textContent = d>0 ? '+'+d : '';
+  document.getElementById('bAdv').textContent = d<0 ? '+'+(- d) : '';
+}
+function renderCap(id, caps, color) {
+  const el = document.getElementById(id); el.innerHTML='';
+  PORD.forEach(t => {
+    for(let i=0;i<(caps[t]||0);i++){
+      const d=document.createElement('div'); d.className='cp';
+      d.style.backgroundImage='url('+PIMG+')';
+      d.style.backgroundSize='600% 200%';
+      d.style.backgroundPosition=PX[t]+' '+PY[color];
+      el.appendChild(d);
+    }
+  });
+}
+function updateHistory() {
+  const mvs=game.history(); const log=document.getElementById('mlog'); log.innerHTML='';
+  for(let i=0;i<mvs.length;i+=2){
+    const row=document.createElement('div'); row.className='mrow';
+    const n=document.createElement('span'); n.className='mnum'; n.textContent=(i/2+1)+'.';
+    const w=document.createElement('span'); w.className='mw'; w.textContent=mvs[i];
+    row.appendChild(n); row.appendChild(w);
+    if(i+1<mvs.length){ const b=document.createElement('span'); b.className='mb'; b.textContent=mvs[i+1]; row.appendChild(b); }
+    log.appendChild(row);
+  }
+  log.scrollTop=log.scrollHeight;
+}
+let _errTmr=null;
+function setStatus(msg,isErr){
+  const el=document.getElementById('sbar');
+  el.textContent=msg||'';
+  if(isErr){ el.classList.add('err'); clearTimeout(_errTmr); _errTmr=setTimeout(()=>{ el.classList.remove('err'); if(!gOver) el.textContent=(game.turn()==='w'?'White':'Black')+"'s turn"; },2100); }
+  else el.classList.remove('err');
+}
+function flashCheck(msg){
+  const b=document.getElementById('chkBanner'); b.textContent=msg; b.classList.add('show');
+  setTimeout(()=>b.classList.remove('show'),2900);
+}
+function showEnd(title,msg){
+  gOver=true;
+  document.getElementById('endTitle').textContent=title;
+  document.getElementById('endMsg').textContent=msg;
+  document.getElementById('endOv').classList.add('show');
+  if(isMultiplayer) document.getElementById('rematchBtn').style.display='inline-block';
+}
+function tName(t){ return {k:'King',q:'Queen',r:'Rook',b:'Bishop',n:'Knight',p:'Pawn'}[t]||t; }
+
+// ═══════════════ CONTROLS ═══════════════
+function undoMove(){
+  if(isMultiplayer) return setStatus("Can't undo in multiplayer!", true);
+  if(animating) return;
+  if(gOver){ gOver=false; document.getElementById('endOv').classList.remove('show'); }
+  game.undo(); selSq=null; legalMvs=[]; setStatus('Move undone'); render();
+}
+function flipBoard(){ if(animating) return; flipped=!flipped; buildBoard(); render(); }
+function newGame(){
+  if(isMultiplayer) return setStatus("Use 'New Game' from hub!", true);
+  if(animating) return;
+  game.reset(); selSq=null; legalMvs=[]; pendingProm=null; gOver=false; flipped=false; animating=false;
+  document.getElementById('endOv').classList.remove('show');
+  document.getElementById('prmOv').classList.remove('show');
+  document.getElementById('chkBanner').classList.remove('show');
+  buildBoard(); render(); setStatus("White's turn — select a piece");
+}
+
+// ═══════════════ MULTIPLAYER STATE ═══════════════
+const RENDER_URL = 'https://arcade-hub-email.onrender.com';
+const myName = localStorage.getItem('playerName') || 'Player';
+let isMultiplayer = false;
+let myColor  = 'w';
+let isMyTurn = false;
+let _isOppMove = false;
+let oppName  = '';
+let _roomId  = '';
+let voiceActive = false;
+let muted    = false;
+let peerConn = null;
+let localStream = null;
+let micPermAsked = false;
+let chatOpen = false;
+let chatUnread = 0;
+
+// ═══════════════ SOCKET ═══════════════
+const socket = io(RENDER_URL);
+
+socket.on('connect', () => { document.getElementById('lobbyStatus').innerText='Connected! Ready to play.'; document.getElementById('lobbyStatus').style.color='#2ecc71'; });
+socket.on('connect_error', () => { document.getElementById('lobbyStatus').innerText='Cannot reach server. Check internet.'; document.getElementById('lobbyStatus').style.color='#e74c3c'; });
+
+function _showGameUI() {
+  document.getElementById('lobbyOv').style.display = 'none';
+  document.getElementById('roomBadge').style.display = 'inline-flex';
+  document.getElementById('roomCodeTxt').innerText = _roomId;
+  document.getElementById('voiceBtn').style.display = 'inline-block';
+  document.getElementById('chatBtn').style.display  = 'inline-block';
+  document.getElementById('drawBtn').style.display  = 'inline-block';
+  document.getElementById('resignBtn').style.display= 'inline-block';
+}
+
+socket.on('chess:created', ({roomId}) => {
+  _roomId = roomId; myColor = 'w'; isMyTurn = true; isMultiplayer = true;
+  document.getElementById('wName').innerText = myName + ' (You)';
+  document.getElementById('bName').innerText = 'Waiting...';
+  _showGameUI(); flipped = false; buildBoard(); render();
+  setStatus('Waiting for opponent... Share code: ' + roomId);
+});
+socket.on('chess:opponent-joined', ({opponentName}) => {
+  oppName = opponentName;
+  document.getElementById('bName').innerText = opponentName;
+  setStatus("Game on! Your turn (White)");
+  isMyTurn = true;
+  window.parent.postMessage({type:'notify',msg:'Opponent joined: '+opponentName,nt:'success'},'*');
+});
+socket.on('chess:joined', ({roomId, color, opponentName}) => {
+  _roomId = roomId; myColor = 'b'; oppName = opponentName; isMultiplayer = true; isMyTurn = false;
+  document.getElementById('wName').innerText = opponentName;
+  document.getElementById('bName').innerText = myName + ' (You)';
+  _showGameUI(); flipped = true; buildBoard(); render();
+  setStatus("Connected! Opponent (White) moves first.");
+  window.parent.postMessage({type:'notify',msg:'Joined game vs '+opponentName,nt:'success'},'*');
+});
+socket.on('chess:move', ({from, to, promotion}) => {
+  _isOppMove = true;
+  executeMove(from, to, promotion || null);
+  _isOppMove = false;
+  isMyTurn = true;
+});
+socket.on('chess:opponent-left', () => {
+  setStatus('Opponent disconnected!'); isMultiplayer = false; isMyTurn = false;
+  window.parent.postMessage({type:'notify',msg:'Opponent disconnected!',nt:'error'},'*');
+});
+socket.on('chess:error', (msg) => { document.getElementById('lobbyStatus').innerText = msg; document.getElementById('lobbyStatus').style.color='#e74c3c'; });
+socket.on('chess:opponent-resigned', () => { showEnd('You Win!', 'Opponent resigned.'); });
+socket.on('chess:draw-offer', () => {
+  if (confirm(oppName + ' offers a draw. Accept?')) socket.emit('chess:draw-accept');
+  else socket.emit('chess:draw-decline');
+});
+socket.on('chess:draw-accepted', () => { showEnd('Draw Agreed', 'Both players agreed.'); });
+socket.on('chess:draw-declined', () => { setStatus('Draw declined by opponent.', true); });
+socket.on('chess:rematch-request', ({from}) => {
+  document.getElementById('endMsg').innerText = from + ' wants a rematch!';
+  const rb = document.getElementById('rematchBtn');
+  rb.innerText = 'Accept Rematch'; rb.disabled = false;
+  rb.style.background = 'linear-gradient(90deg,#2ecc71,#27ae60)';
+  window.parent.postMessage({type:'notify',msg:from+' wants a rematch!',nt:'invite'},'*');
+});
+socket.on('chess:rematch-sent', () => {
+  const rb = document.getElementById('rematchBtn');
+  rb.innerText = 'Waiting...'; rb.disabled = true;
+});
+socket.on('chess:rematch-start', () => {
+  game.reset(); gOver = false; selSq = null; legalMvs = [];
+  document.getElementById('endOv').classList.remove('show');
+  const rb = document.getElementById('rematchBtn');
+  rb.innerText = 'Request Rematch'; rb.disabled = false;
+  rb.style.background = '';
+});
+socket.on('chess:your-color', ({color}) => {
+  myColor = color === 'white' ? 'w' : 'b';
+  isMyTurn = (myColor === 'w'); flipped = (myColor === 'b');
+  document.getElementById('wName').innerText = (myColor==='w' ? myName+' (You)' : oppName);
+  document.getElementById('bName').innerText = (myColor==='b' ? myName+' (You)' : oppName);
+  buildBoard(); render();
+  setStatus(myColor==='w' ? "Your turn (White)" : "Opponent's turn (White)");
+});
+socket.on('chess:chat', ({n, msg}) => {
+  _addChatMsg(n, msg);
+  if (!chatOpen) {
+    chatUnread++;
+    const u = document.getElementById('chatUnread');
+    u.style.display='flex'; u.innerText = chatUnread > 9 ? '9+' : chatUnread;
+    window.parent.postMessage({type:'notify',msg:'[Chess] '+n+': '+msg,nt:'info'},'*');
+  }
+});
+
+// WebRTC voice
+socket.on('voice:offer', async ({offer}) => {
+  if (!peerConn) await _setupPeer();
+  await peerConn.setRemoteDescription(new RTCSessionDescription(offer));
+  const answer = await peerConn.createAnswer();
+  await peerConn.setLocalDescription(answer);
+  socket.emit('voice:answer', {answer});
+  document.getElementById('voiceBar').style.display = 'block';
+});
+socket.on('voice:answer', async ({answer}) => { if (peerConn) await peerConn.setRemoteDescription(new RTCSessionDescription(answer)); });
+socket.on('voice:candidate', async ({candidate}) => { try { if (peerConn) await peerConn.addIceCandidate(new RTCIceCandidate(candidate)); } catch(e){} });
+
+// Auto-join from invite
+window.addEventListener('message', e => {
+  if (e.data && e.data.type === 'auto-join' && e.data.code) {
+    document.getElementById('codeInput').value = e.data.code;
+    joinRoom();
+  }
+});
+
+// ═══════════════ ROOM FUNCTIONS ═══════════════
+function createRoom() { document.getElementById('lobbyStatus').innerText='Creating room...'; socket.emit('chess:create', {playerName: myName}); }
+function joinRoom() {
+  const code = document.getElementById('codeInput').value.trim().toUpperCase();
+  if (code.length !== 4) { document.getElementById('lobbyStatus').innerText='Enter a 4-digit code!'; return; }
+  document.getElementById('lobbyStatus').innerText = 'Joining room ' + code + '...';
+  socket.emit('chess:join', {code, playerName: myName});
+}
+function goBack() { stopVoice(); socket.disconnect(); window.parent.postMessage('spa-back','*'); }
+function requestRematch() { socket.emit('chess:rematch'); }
+function offerDraw() { socket.emit('chess:draw-offer'); setStatus('Draw offered...'); }
+function resignGame() {
+  if (!isMultiplayer) return;
+  if (!confirm('Resign the game?')) return;
+  socket.emit('chess:resign');
+  showEnd('You Resigned', 'Better luck next time!');
+}
+
+// ═══════════════ VOICE CHAT ═══════════════
+function toggleVoice() {
+  if (!voiceActive) { if (!micPermAsked) { micPermAsked=true; document.getElementById('micModal').style.display='flex'; } else startVoice(); }
+  else stopVoice();
+}
+function proceedWithMic() { document.getElementById('micModal').style.display='none'; startVoice(); }
+async function startVoice() {
+  try {
+    localStream = await navigator.mediaDevices.getUserMedia({audio:true,video:false});
+    await _setupPeer();
+    localStream.getTracks().forEach(t => peerConn.addTrack(t, localStream));
+    const offer = await peerConn.createOffer();
+    await peerConn.setLocalDescription(offer);
+    socket.emit('voice:offer', {offer});
+    voiceActive=true; muted=false;
+    document.getElementById('voiceBtn').innerText = '&#128308;';
+    document.getElementById('muteBtn').style.display='inline-block';
+    document.getElementById('voiceBar').style.display='block';
+    document.getElementById('voiceStatus').innerText='Connecting voice...';
+  } catch(err) {
+    if (err.name==='NotAllowedError'||err.name==='PermissionDeniedError') document.getElementById('micBlockedModal').style.display='flex';
+    else setStatus('Mic error: '+err.message, true);
+  }
+}
+function stopVoice() {
+  if (peerConn) { peerConn.close(); peerConn=null; }
+  if (localStream) { localStream.getTracks().forEach(t=>t.stop()); localStream=null; }
+  voiceActive=false; muted=false;
+  document.getElementById('voiceBtn').innerHTML='&#127908;';
+  document.getElementById('muteBtn').style.display='none';
+  document.getElementById('voiceBar').style.display='none';
+}
+function toggleMute() {
+  if (!localStream) return; muted=!muted;
+  localStream.getAudioTracks().forEach(t=>{t.enabled=!muted;});
+  document.getElementById('muteBtn').innerHTML = muted ? '&#128266;' : '&#128264;';
+}
+async function _setupPeer() {
+  peerConn = new RTCPeerConnection({iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'}]});
+  peerConn.onicecandidate = e => { if(e.candidate) socket.emit('voice:candidate',{candidate:e.candidate}); };
+  peerConn.ontrack = e => {
+    const audio = document.getElementById('remoteAudio');
+    audio.srcObject=e.streams[0]; audio.play().catch(()=>{});
+    document.getElementById('voiceStatus').innerText='Voice connected';
+  };
+  peerConn.onconnectionstatechange = () => {
+    if (peerConn) document.getElementById('voiceStatus').innerText='Voice: '+peerConn.connectionState;
+  };
+}
+
+// ═══════════════ CHAT ═══════════════
+function toggleChat() {
+  chatOpen=!chatOpen;
+  document.getElementById('chatSidebar').style.display=chatOpen?'flex':'none';
+  document.getElementById('chatBtn').innerHTML=chatOpen?'&#10005;':'&#128172;';
+  if (chatOpen) { chatUnread=0; document.getElementById('chatUnread').style.display='none'; }
+}
+function _addChatMsg(sender, msg) {
+  const wrap=document.getElementById('chatMsgs');
+  const d=document.createElement('div');
+  d.className='cmsg '+(sender===myName?'cme':'copp');
+  d.innerHTML='<span class="cname">'+sender+'</span><span class="ctxt">'+msg+'</span>';
+  wrap.appendChild(d); wrap.scrollTop=wrap.scrollHeight;
+}
+function sendChat() {
+  const inp=document.getElementById('chatInp'); const msg=inp.value.trim();
+  if(!msg||!_roomId) return;
+  socket.emit('chess:chat',{msg}); inp.value='';
+}
+
+// ═══════════════ MULTIPLAYER PATCHES ═══════════════
+// Patch executeMove to check turn and emit
+const _origExec = executeMove;
+executeMove = function(from, to, prom) {
+  if (isMultiplayer && !_isOppMove) {
+    if (!isMyTurn) { setStatus("Not your turn!", true); return; }
+    if (game.turn() !== myColor) { setStatus("Not your color!", true); return; }
+  }
+  _origExec(from, to, prom);
+  if (isMultiplayer && !_isOppMove) {
+    socket.emit('chess:move', {from, to, promotion: prom || null});
+    isMyTurn = false;
+  }
+};
+
+// Patch onSqClick to block when not your turn
+const _origClick = onSqClick;
+onSqClick = function() {
+  if (isMultiplayer && (!isMyTurn || game.turn() !== myColor)) {
+    setStatus("Not your turn!", true); return;
+  }
+  _origClick.call(this);
+};
+
+// Re-patch board squares after build
+const _origBuild = buildBoard;
+buildBoard = function() {
+  _origBuild();
+  if (isMultiplayer) {
+    document.querySelectorAll('.sq').forEach(sq => {
+      sq.removeEventListener('click', _origClick);
+      sq.addEventListener('click', onSqClick);
+    });
+  }
+};
+
+// ═══════════════ INIT ═══════════════
+resizeBoard();
+buildBoard();
+render();
+setStatus("White's turn — select a piece");
+</script>
+</body>
+</html>
