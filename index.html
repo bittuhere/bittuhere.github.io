@@ -11013,19 +11013,13 @@ function disableGlobalZoom() {
             e.preventDefault(); spaGoBack();
             history.pushState({ spa: currentSection }, '', '#' + currentSection);
         });
-        window.addEventListener('beforeunload', e => {
-            if (currentSection !== 'section-login') {
-                e.preventDefault(); e.returnValue = 'Are you sure you want to leave Arcade Hub?';
-                return e.returnValue;
-            }
-        });
         window.addEventListener('message', e => {
             if (e.data === 'spa-back') {
                 var isGame = currentSection && currentSection.startsWith('section-game');
                 if (isGame) { _setUserStatus('online'); MapsTo('section-hub', 'left'); } else { spaGoBack(); }
                 history.pushState({ spa: currentSection }, '', '#' + currentSection);
             }
-            if (e.data === 'spa-leaderboard') { MapsTo('section-leaderboard', 'right'); }
+            if (e.data === 'spa-leaderboard') { _setUserStatus('online'); MapsTo('section-leaderboard', 'right'); }
             if (e.data === 'score-saved' || e.data === 'score-syncing') { _showScoreSync(e.data); }
             if (e.data === 'fs-entered') { _fsActive = true; _updateRotateOverlay(); }
             if (e.data === 'fs-exited') { _fsActive = false; try { if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock(); } catch (_) { } _updateRotateOverlay(); }
