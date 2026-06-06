@@ -2878,7 +2878,7 @@
         }
 
         #inv-progress-bar.running {
-            transition: width 7s linear;
+            transition: width 15s linear;
             width: 0%;
         }
 
@@ -3950,7 +3950,11 @@
             <div class="neon-dot"></div>
         </div>
         <div class="loading-text">ARCADE HUB</div>
-        <div class="loading-sub">INITIALIZING...</div>
+        <div class="loading-sub" id="boot-sub">STARTING UP...</div>
+        <div id="boot-bar-wrap" style="width:180px;height:3px;background:rgba(0,243,255,.15);border-radius:2px;overflow:hidden;margin-top:14px;">
+            <div id="boot-bar" style="height:100%;background:#00f3ff;width:0%;transition:width 0.4s ease;box-shadow:0 0 8px #00f3ff;"></div>
+        </div>
+        <div id="boot-pct" style="color:rgba(0,243,255,.5);font-size:.72rem;letter-spacing:2px;margin-top:8px;">0%</div>
     </div>
 
     <!-- LOGIN -->
@@ -9554,7 +9558,11 @@ function _exitFs(cb){if(document.fullscreenElement||document.webkitFullscreenEle
         socket.on('ttt:state', ({ board, turn, status, winner }) => {
             updateBoardUI(board);
             restartBtn.style.display = 'none';
-            cells.forEach(c =&gt; c.classList.remove('win-highlight'));
+            restartBtn.innerText = 'Request Rematch';
+            restartBtn.disabled = false;
+            restartBtn.style.background = '';
+            restartBtn.style.color = '';
+            cells.forEach(c => c.classList.remove('win-highlight'));
             if (status === 'playing') {
                 gameActive = true;
                 if (turn === mySymbol) {
@@ -9573,14 +9581,27 @@ function _exitFs(cb){if(document.fullscreenElement||document.webkitFullscreenEle
                 }
                 if (winner) {
                     const winLine = checkWin(board, winner);
-                    if (winLine) winLine.forEach(i =&gt; cells[i].classList.add('win-highlight'));
+                    if (winLine) winLine.forEach(i => cells[i].classList.add('win-highlight'));
                 }
-                restartBtn.innerText = &quot;Request Rematch&quot;; restartBtn.disabled = false;
             } else if (status === 'draw') {
                 restartBtn.style.display = 'block'; isMyTurn = false; gameActive = false;
                 statusMsg.innerText = &quot;DRAW GAME&quot;; statusMsg.style.color = &quot;yellow&quot;;
-                restartBtn.innerText = &quot;Request Rematch&quot;; restartBtn.disabled = false;
             }
+        });
+        socket.on('ttt:rematch-request', ({ from }) => {
+            restartBtn.style.display = 'block';
+            restartBtn.innerText = '✅ Accept Rematch';
+            restartBtn.disabled = false;
+            restartBtn.style.background = 'linear-gradient(90deg,#2ecc71,#27ae60)';
+            restartBtn.style.color = '#000';
+            statusMsg.innerText = from + ' wants a rematch!';
+            statusMsg.style.color = '#f1c40f';
+        });
+        socket.on('ttt:rematch-sent', () => {
+            restartBtn.innerText = '⏳ Waiting for opponent...';
+            restartBtn.disabled = true;
+            restartBtn.style.background = '';
+            restartBtn.style.color = '';
         });
         socket.on('ttt:chat', ({ n, msg }) => {
             const div = document.createElement('div');
@@ -9682,8 +9703,6 @@ function _exitFs(cb){if(document.fullscreenElement||document.webkitFullscreenEle
         // --- CORE GAME ---
         function requestRematch() {
             socket.emit('ttt:rematch');
-            restartBtn.innerText = &quot;Request Sent...&quot;;
-            restartBtn.disabled = true;
         }
 
         function updateBoardUI(b) {
@@ -11013,13 +11032,14 @@ function disableGlobalZoom() {
             e.preventDefault(); spaGoBack();
             history.pushState({ spa: currentSection }, '', '#' + currentSection);
         });
+        // beforeunload removed — no false "Leave site?" on reload/navigate
         window.addEventListener('message', e => {
             if (e.data === 'spa-back') {
                 var isGame = currentSection && currentSection.startsWith('section-game');
                 if (isGame) { _setUserStatus('online'); MapsTo('section-hub', 'left'); } else { spaGoBack(); }
                 history.pushState({ spa: currentSection }, '', '#' + currentSection);
             }
-            if (e.data === 'spa-leaderboard') { _setUserStatus('online'); MapsTo('section-leaderboard', 'right'); }
+            if (e.data === 'spa-leaderboard') { MapsTo('section-leaderboard', 'right'); }
             if (e.data === 'score-saved' || e.data === 'score-syncing') { _showScoreSync(e.data); }
             if (e.data === 'fs-entered') { _fsActive = true; _updateRotateOverlay(); }
             if (e.data === 'fs-exited') { _fsActive = false; try { if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock(); } catch (_) { } _updateRotateOverlay(); }
@@ -11140,6 +11160,7 @@ function disableGlobalZoom() {
             localStorage.setItem('isLoggedIn', 'true');
             localStorage.setItem('playerName', u);
             try { db.ref('users/' + u).update({ lastLogin: firebase.database.ServerValue.TIMESTAMP }); } catch (e) { }
+            setTimeout(() => _startBgChatNotifListener(u), 2500);
             setTimeout(function() {
                 ['login-username','login-password'].forEach(id => { var el=document.getElementById(id); if(el) el.value=''; });
                 var st = document.getElementById('login-status'); if(st) st.innerText='';
@@ -12541,7 +12562,9 @@ function disableGlobalZoom() {
             showNotify(fromUser + '\'s request declined.', 'info');
         }
         function openChatWith(fn) {
-            const mn = localStorage.getItem('playerName'); currentChatFriend = fn; localStorage.setItem('lastReadChat', Date.now());
+            const mn = localStorage.getItem('playerName');
+            if (currentChatId) db.ref('chats/' + currentChatId).off();
+            currentChatFriend = fn; localStorage.setItem('lastReadChat', Date.now());
             currentChatId = [mn, fn].sort().join('_');
             db.ref('chats/' + currentChatId).once('value', snap => {
                 const msgs = snap.val();
@@ -12645,6 +12668,27 @@ function disableGlobalZoom() {
         }
 
         // WhatsApp-style notification when a chat message arrives
+        var _bgChatRefs = [];
+        function _startBgChatNotifListener(myName) {
+            _bgChatRefs.forEach(r => { try { r.off(); } catch(e) {} });
+            _bgChatRefs = [];
+            db.ref('friends/' + myName).once('value', snap => {
+                if (!snap.exists()) return;
+                Object.keys(snap.val()).forEach(friend => {
+                    const cid = [myName, friend].sort().join('_');
+                    const ref = db.ref('chats/' + cid).limitToLast(1);
+                    ref.on('child_added', msgSnap => {
+                        const d = msgSnap.val();
+                        if (!d || d.sender === myName) return;
+                        if (!d.timestamp || (Date.now() - d.timestamp) > 30000) return;
+                        if (currentChatFriend === friend && !document.hidden) return;
+                        _sendChatNotif(d.sender, d.text);
+                    });
+                    _bgChatRefs.push(ref);
+                });
+            });
+        }
+
         function _sendChatNotif(from, text) {
             if (!('Notification' in window) || Notification.permission !== 'granted') return;
             if (!_notifEnabled(from)) return;
@@ -12670,9 +12714,10 @@ function disableGlobalZoom() {
         function loadChatMsgs() {
             const mn = localStorage.getItem('playerName'), mc = document.getElementById('chat-messages');
             mc.innerHTML = '';
-            db.ref('chats/' + currentChatId).off();
+            const thisChatId = currentChatId;
             var _lastMsgDate = '';
-            LC.fb('section-chat', db.ref('chats/' + currentChatId), 'child_added', snap => {
+            LC.fb('section-chat', db.ref('chats/' + thisChatId), 'child_added', snap => {
+                if (currentChatId !== thisChatId) return;
                 const d = snap.val(), id = snap.key;
                 if (d.timestamp) {
                     const msgDate = new Date(d.timestamp).toDateString();
@@ -12696,9 +12741,10 @@ function disableGlobalZoom() {
                     : '<span>' + _lfy(d.text) + '</span><span class="msg-time">' + fmtTime(d.timestamp) + ' ' + sh + '</span>';
                 mc.appendChild(div); requestAnimationFrame(() => { mc.scrollTop = mc.scrollHeight; });
                 // Fire WhatsApp-style notification for incoming messages
-                if (!isMine && !isSystem) _sendChatNotif(d.sender, d.text);
+                if (!isMine && !isSystem && d.timestamp && (Date.now() - d.timestamp) < 30000) _sendChatNotif(d.sender, d.text);
             });
-            LC.fb('section-chat', db.ref('chats/' + currentChatId), 'child_changed', snap => {
+            LC.fb('section-chat', db.ref('chats/' + thisChatId), 'child_changed', snap => {
+                if (currentChatId !== thisChatId) return;
                 const d = snap.val(), el = document.getElementById('msg-' + snap.key);
                 if (el && d.read && d.sender === mn) { const t = el.querySelector('.msg-status'); if (t) { t.classList.remove('tick-sent'); t.classList.add('tick-read'); } }
             });
@@ -13725,13 +13771,12 @@ showSection('global', document.querySelector('.admin-btn'));
 
         function _showInvitePopup(inv) {
             _inviteCurrent = inv;
-            var icon = inv.game === 'ttt' ? '❌' : '🏎️';
-            var gameName = inv.game === 'ttt' ? 'Tic-Tac-Toe Online' : 'Car Game Multiplayer';
+            var icon = inv.game === 'ttt' ? '❌' : inv.game === 'chess' ? '♟️' : '🏎️';
+            var gameName = inv.game === 'ttt' ? 'Tic-Tac-Toe Online' : inv.game === 'chess' ? 'Chess Online' : 'Car Multiplayer';
             document.getElementById('inv-icon').innerText = icon;
             document.getElementById('inv-title').innerText = gameName.toUpperCase();
-            document.getElementById('inv-msg').innerText = inv.from + ' invites you!\nCode: ' + inv.code + '\n⏱ Auto-declines in 15s';
+            document.getElementById('inv-msg').innerText = '👤 ' + inv.from + ' invited you!\n🎮 Code: ' + inv.code;
             document.getElementById('invite-popup').classList.add('inv-show');
-            // Start countdown progress bar
             var bar = document.getElementById('inv-progress-bar');
             if (bar) {
                 bar.classList.remove('running');
@@ -13741,7 +13786,7 @@ showSection('global', document.querySelector('.admin-btn'));
                 });
             }
             if (_inviteTimer) clearTimeout(_inviteTimer);
-            _inviteTimer = setTimeout(function () { _dismissInvitePopup(false); }, 7000);
+            _inviteTimer = setTimeout(function () { _dismissInvitePopup(false); }, 15000);
         }
 
         function _dismissInvitePopup(accepted) {
@@ -13775,12 +13820,13 @@ showSection('global', document.querySelector('.admin-btn'));
             if (!_inviteCurrent) return;
             var inv = _inviteCurrent;
             _dismissInvitePopup(true);
-            var gameKey = inv.game === 'ttt' ? 'multittt' : 'multicar';
+            var gameKey = inv.game === 'ttt' ? 'multittt' : inv.game === 'chess' ? 'chess' : 'multicar';
             openGame(gameKey);
+            var delay = (inv.game === 'multicar') ? 1400 : 600;
             setTimeout(function () {
                 var fr = document.getElementById('iframe-' + gameKey);
                 if (fr && fr.contentWindow) fr.contentWindow.postMessage({ type: 'auto-join', code: inv.code }, '*');
-            }, 1800);
+            }, delay);
         };
         document.getElementById('inv-reject').onclick = function () { _dismissInvitePopup(false); };
 
@@ -13937,51 +13983,55 @@ showSection('global', document.querySelector('.admin-btn'));
             });
         })();
 
+        function _bp(pct, text) {
+            var b = document.getElementById('boot-bar');
+            var s = document.getElementById('boot-sub');
+            var p = document.getElementById('boot-pct');
+            if (b) b.style.width = pct + '%';
+            if (s) s.innerText = text;
+            if (p) p.innerText = pct + '%';
+        }
         (function boot() {
             showLoader();
+            _bp(10, 'STARTING UP...');
             let bootTimedOut = false;
-
-            // Fallback: hide loader after 8 seconds and show error if still stuck
             const fallbackTimeout = setTimeout(() => {
                 if (!bootTimedOut) {
                     bootTimedOut = true;
+                    _bp(100, 'TIMEOUT — CHECK CONNECTION');
                     hideLoader();
-                    const loginStatus = document.getElementById('login-status');
-                    if (loginStatus) {
-                        loginStatus.innerText = '⚠️ Connection timeout. Please check your internet and refresh.';
-                        loginStatus.className = 'status-msg l-error';
-                        document.getElementById('trouble-link').style.display = 'block';
-                    }
+                    const ls = document.getElementById('login-status');
+                    if (ls) { ls.innerText = '⚠️ Connection timeout. Please check internet and refresh.'; ls.className = 'status-msg l-error'; document.getElementById('trouble-link').style.display = 'block'; }
                 }
             }, 8000);
-
+            _bp(30, 'LOADING FIREBASE...');
             const checkFB = setInterval(() => {
                 if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
                     clearInterval(checkFB);
                     clearTimeout(fallbackTimeout);
+                    _bp(60, 'FIREBASE READY...');
                     const li = localStorage.getItem('isLoggedIn') === 'true';
                     const pn = localStorage.getItem('playerName');
                     if (li && pn) {
+                        _bp(80, 'CHECKING SESSION...');
                         db.ref('users/' + pn.toLowerCase().trim()).once('value')
                             .then(snap => {
                                 if (snap.exists() && !(snap.val() && snap.val().blocked)) {
-                                    initHub();
-                                    MapsTo('section-hub', 'right');
+                                    _bp(95, 'LOADING PROFILE...');
+                                    setTimeout(() => { _bp(100, 'READY!'); initHub(); MapsTo('section-hub', 'right'); }, 200);
                                 } else {
-                                    localStorage.clear();
-                                    hideLoader();
+                                    _bp(100, 'SESSION EXPIRED');
+                                    localStorage.clear(); hideLoader();
                                 }
                             })
                             .catch(() => {
+                                _bp(100, 'CONNECTION ERROR');
                                 hideLoader();
-                                const loginStatus = document.getElementById('login-status');
-                                if (loginStatus) {
-                                    loginStatus.innerText = '❌ Cannot connect to database. Please refresh.';
-                                    loginStatus.className = 'status-msg l-error';
-                                    document.getElementById('trouble-link').style.display = 'block';
-                                }
+                                const ls = document.getElementById('login-status');
+                                if (ls) { ls.innerText = '❌ Cannot connect to database. Please refresh.'; ls.className = 'status-msg l-error'; document.getElementById('trouble-link').style.display = 'block'; }
                             });
                     } else {
+                        _bp(100, 'READY!');
                         hideLoader();
                     }
                     history.replaceState({ spa: currentSection }, '', '#' + currentSection);
