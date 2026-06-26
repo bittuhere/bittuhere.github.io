@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="100%" height="100%">
+  <circle cx="250" cy="250" r="235" fill="#08141a" stroke="#2be2e8" stroke-width="16" />
+  
+  <circle cx="250" cy="250" r="215" fill="#0d0d16" stroke="#12252e" stroke-width="12" />
+  
+  <circle cx="250" cy="250" r="195" fill="none" stroke="#2be2e8" stroke-width="4" />
+  
+  <circle cx="250" cy="250" r="185" fill="#070a0e" stroke="#2e0854" stroke-width="16" />
+  
+  <path d="M 160,340 L 250,140 L 340,340 L 295,340 L 282,310 L 218,310 L 205,340 Z 
+           M 250,195 L 232,270 L 268,270 Z" 
+        fill="#0b3199" 
+        stroke="#2be2e8" 
+        stroke-width="10" 
+        stroke-linejoin="round" 
+        fill-rule="evenodd" />
+</svg>
