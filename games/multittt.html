@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+     <script>
+        // SECURITY CHECK
+        // SECURITY CHECK & FIREBASE VERIFICATION
+        const storedName = localStorage.getItem('playerName');
+        
+        // Basic Local Check
+        if (localStorage.getItem('isLoggedIn') !== 'true' || !storedName) {
+            window.parent.postMessage('spa-back','*');
+        } else {
+            // Extra Protection: Check if user actually exists in Firebase
+            const checkId = storedName.toLowerCase().trim();
+            if (typeof db !== 'undefined' && db) {
+                db.ref('users/' + checkId).once('value', snap => {
+                    if (!snap.exists()) {
+                        window.parent.postMessage({type:'notify',msg:'⛔ Access denied! Please re-login.',nt:'error'},'*');
+                        localStorage.clear();
+                        window.parent.postMessage('spa-back','*');
+                    }
+                });
+            }
+        }
+            </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multiplayer Tic Tac Toe</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Teko:wght@500;700&display=swap');
+
+        body {
+            background: #111;
+            color: white;
+            font-family: 'Teko', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow-x: hidden;
+            padding-bottom: 50px;
+            /* Space for scrolling */
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin: 0;
+            color: #00f3ff;
+            text-shadow: 0 0 10px #00f3ff;
+        }
+
+        /* --- SIDEBAR & INVITE BTN --- */
+        .invite-toggle-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 2.5rem;
+            cursor: pointer;
+            z-index: 100;
+            text-shadow: 0 0 5px #00f3ff;
+            transition: transform 0.3s;
+        }
+
+        .invite-toggle-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .sidebar-menu {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 300px;
+            height: 100%;
+            background: rgba(10, 10, 10, 0.95);
+            border-left: 2px solid #00f3ff;
+            transform: translateX(100%);
+            transition: transform 0.4s ease;
+            z-index: 200;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        .sidebar-menu.active {
+            transform: translateX(0);
+        }
+
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #333;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        .close-btn {
+            background: transparent;
+            border: none;
+            color: #ff0055;
+            font-size: 2.5rem;
+            cursor: pointer;
+        }
+
+        #invite-list {
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+
+        .invite-item {
+            background: #222;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid #333;
+        }
+
+        .btn-send-invite {
+            background: #00f3ff;
+            color: black;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+
+        /* --- GAME UI --- */
+        #lobby {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 30px;
+            border-radius: 15px;
+            border: 1px solid #333;
+        }
+
+        input {
+            padding: 10px;
+            font-size: 1.2rem;
+            width: 150px;
+            text-align: center;
+            border-radius: 5px;
+            border: none;
+            margin-bottom: 10px;
+        }
+
+        .main-btn {
+            padding: 10px 20px;
+            font-size: 1.2rem;
+            font-family: 'Teko', sans-serif;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            transition: 0.2s;
+            margin: 5px;
+        }
+
+        .btn-create {
+            background: #00f3ff;
+            color: black;
+        }
+
+        .btn-join {
+            background: #ff0055;
+            color: white;
+        }
+
+        .main-btn:hover {
+            transform: scale(1.05);
+        }
+
+        #game-area {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .status {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: #aaa;
+            min-height: 30px;
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            background: #222;
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .cell {
+            width: 80px;
+            height: 80px;
+            background: #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3.5rem;
+            cursor: pointer;
+            color: white;
+            transition: 0.2s;
+        }
+
+        .cell.X {
+            color: #00f3ff;
+            text-shadow: 0 0 10px #00f3ff;
+        }
+
+        .cell.O {
+            color: #ff0055;
+            text-shadow: 0 0 10px #ff0055;
+        }
+
+        @keyframes winPulse {
+            0% {
+                transform: scale(1);
+                filter: brightness(1);
+            }
+
+            50% {
+                transform: scale(1.1);
+                filter: brightness(1.5);
+                background: #444;
+            }
+
+            100% {
+                transform: scale(1);
+                filter: brightness(1);
+            }
+        }
+
+        .cell.win-highlight {
+            animation: winPulse 0.8s ease-in-out infinite;
+            border: 2px solid white;
+        }
+
+        .room-code-display {
+            margin-top: 10px;
+            font-size: 1.2rem;
+            color: yellow;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+
+        #restartBtn {
+            display: none;
+            background: linear-gradient(45deg, #00ff88, #00b359);
+            color: black;
+            box-shadow: 0 0 15px #00ff88;
+            margin-top: 15px;
+            padding: 10px 20px;
+            font-size: 1.2rem;
+            font-family: 'Teko', sans-serif;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        /* --- IN-GAME CHAT --- */
+        .chat-box {
+            width: 100%;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 10px;
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            height: 200px;
+        }
+
+        .chat-messages {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .chat-msg {
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            font-family: sans-serif;
+            max-width: 80%;
+        }
+
+        .msg-me {
+            align-self: flex-end;
+            background: #00f3ff;
+            color: black;
+        }
+
+        .msg-opp {
+            align-self: flex-start;
+            background: #333;
+            color: white;
+            border: 1px solid #444;
+        }
+
+        .chat-input-area {
+            display: flex;
+            border-top: 1px solid #333;
+        }
+
+        .chat-input {
+            flex-grow: 1;
+            background: #111;
+            border: none;
+            color: white;
+            padding: 10px;
+            outline: none;
+        }
+
+        .chat-send-btn {
+            background: #00f3ff;
+            color: black;
+            border: none;
+            padding: 0 15px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body><style>#spabk{position:fixed;top:10px;left:10px;z-index:99999;background:rgba(0,0,0,0.8);color:#00f3ff;border:1px solid #00f3ff;padding:8px 18px;border-radius:20px;cursor:pointer;font-family:Segoe UI,sans-serif;font-size:.9rem;backdrop-filter:blur(5px);}#spabk:hover{background:#00f3ff;color:#000;}</style><button id="spabk" onclick="tttBackBtn(); exitLandscapeAndRelease();">← Hub</button>
+
+    <button class="invite-toggle-btn" onclick="toggleSidebar()">☰</button>
+    <div class="sidebar-menu" id="inviteSidebar" ontouchstart="event.stopPropagation()" ontouchmove="event.stopPropagation()">
+        <div class="sidebar-header">
+            <span style="font-size:1.5rem; color:#00f3ff;">INVITE FRIEND</span>
+            <button class="close-btn" onclick="toggleSidebar()">×</button>
+        </div>
+        <div id="invite-list">
+            <p style="color:#666;">Loading friends...</p>
+        </div>
+    </div>
+
+    <h1>ONLINE TIC TAC TOE</h1>
+
+    <div id="lobby">
+        <h3>Create or Join Room</h3>
+        <button class="main-btn btn-create" id="btn-create" onclick="createRoom()">Create New Game</button>
+        <br><br>
+        <p>OR</p>
+        <input type="text" id="roomInput" placeholder="Enter Room Code">
+        <br>
+        <button class="main-btn btn-join" id="btn-join" onclick="joinRoom()">Join Game</button>
+        <div id="lobby-status" style="margin-top:12px;font-size:.82rem;min-height:18px;"></div>
+    </div>
+
+    <div id="game-area">
+        <div class="status" id="statusMsg">Waiting...</div>
+
+        <div class="board">
+            <div class="cell" onclick="makeMove(0)" id="c0"></div>
+            <div class="cell" onclick="makeMove(1)" id="c1"></div>
+            <div class="cell" onclick="makeMove(2)" id="c2"></div>
+            <div class="cell" onclick="makeMove(3)" id="c3"></div>
+            <div class="cell" onclick="makeMove(4)" id="c4"></div>
+            <div class="cell" onclick="makeMove(5)" id="c5"></div>
+            <div class="cell" onclick="makeMove(6)" id="c6"></div>
+            <div class="cell" onclick="makeMove(7)" id="c7"></div>
+            <div class="cell" onclick="makeMove(8)" id="c8"></div>
+        </div>
+
+        <button id="restartBtn" onclick="requestRematch()">Request Rematch</button>
+        <div class="room-code-display">Room Code: <span id="displayCode">---</span></div>
+        <button onclick="leaveGame(false)"
+            style="margin-top:10px; background:#444; color:white; border:none; padding:8px 15px; border-radius:5px; cursor:pointer;">Leave
+            Game</button>
+
+        <div class="chat-box">
+            <div class="chat-messages" id="gameChatMsgs">
+                <div style="text-align:center; color:#555; font-size:0.8rem;">Game Chat Started</div>
+            </div>
+            <div class="chat-input-area">
+                <input type="text" class="chat-input" id="gameChatInput" placeholder="Type message..."
+                    onkeypress="handleChatKey(event)">
+                <button class="chat-send-btn" onclick="sendGameMessage()">→</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+
+    <script>
+        // --- CONFIG ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyD8KMiqZTr39IPw8LENyahLILLNbkFfQXM",
+            authDomain: "bittuhere-90415.firebaseapp.com",
+            databaseURL: "https://bittuhere-90415-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "bittuhere-90415",
+            storageBucket: "bittuhere-90415.firebasestorage.app",
+            messagingSenderId: "600472267274",
+            appId: "1:600472267274:web:b5f8394f99e17b232f3ca7",
+            measurementId: "G-JD1YFCG7G3"
+        };
+
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+        const socket = io('https://arcade-hub-email.onrender.com');
+
+        // Game Vars
+        let mySymbol = '';
+        let roomId = '';
+        let isMyTurn = false;
+        let gameActive = true;
+        const myName = localStorage.getItem('playerName') || "Player";
+
+        // UI
+        const lobby = document.getElementById('lobby');
+        const gameArea = document.getElementById('game-area');
+        const statusMsg = document.getElementById('statusMsg');
+        const displayCode = document.getElementById('displayCode');
+        const restartBtn = document.getElementById('restartBtn');
+        const cells = document.querySelectorAll('.cell');
+        const sidebar = document.getElementById('inviteSidebar');
+        const inviteList = document.getElementById('invite-list');
+        const chatMsgs = document.getElementById('gameChatMsgs');
+
+        // --- SIDEBAR ---
+        function toggleSidebar() {
+            sidebar.classList.toggle('active');
+            if (sidebar.classList.contains('active')) loadFriendsForInvite();
+        }
+
+        function loadFriendsForInvite() {
+            if (!myName) return;
+            db.ref('friends/' + myName).once('value', snapshot => {
+                inviteList.innerHTML = "";
+                if (snapshot.exists()) {
+                    Object.keys(snapshot.val()).forEach(friendName => {
+                        const div = document.createElement('div');
+                        div.className = 'invite-item';
+                        div.innerHTML = `<span>${friendName}</span><button class="btn-send-invite" onclick="sendInvite('${friendName}')">SEND CODE</button>`;
+                        inviteList.appendChild(div);
+                    });
+                } else inviteList.innerHTML = "<p>No friends found.</p>";
+            });
+        }
+
+        function sendInvite(friendName) {
+            if (!roomId) return window.parent.postMessage({type:'notify',msg:'Create a game first!',nt:'error'},'*');
+            // Write to Firebase invites/<recipientName> — NOT postMessage (that only goes to self)
+            db.ref('invites/' + friendName.toLowerCase()).push({
+                from: myName, game: 'ttt', code: roomId, time: Date.now()
+            });
+            var chatId = [myName, friendName].sort().join('_');
+            db.ref('chats/' + chatId).push({
+                sender: myName, text: '🎮 Join my Tic-Tac-Toe! Code: ' + roomId, timestamp: Date.now()
+            });
+            window.parent.postMessage({type:'notify',msg:'✓ Invite sent to '+friendName+'!',nt:'invite'},'*');
+            toggleSidebar();
+        }
+
+        // --- SOCKET LISTENERS ---
+        socket.on('connect',       () => _lbSt('✅ Connected to server.', '#2ecc71'));
+        socket.on('connect_error', err => {
+            clearTimeout(_createTmo); clearTimeout(_joinTmo); _resetBtns();
+            _lbSt('❌ Cannot reach server: ' + (err.message || 'Network error') + '. Check internet or retry.', '#ff3366');
+        });
+        socket.on('disconnect', reason => {
+            _lbSt('⚠️ Disconnected: ' + reason + '. Reconnecting…', '#f39c12');
+        });
+
+        socket.on('ttt:created', ({ roomId: rid }) => {
+            clearTimeout(_createTmo);
+            _lbSt('✅ Room created! Share code: ' + rid, '#2ecc71');
+            roomId = rid; mySymbol = 'X';
+            enterGameUI();
+            statusMsg.innerText = "Waiting for opponent...";
+            setTimeout(() => { if (!sidebar.classList.contains('active')) toggleSidebar(); }, 600);
+        });
+        socket.on('ttt:state', ({ board, turn, status, winner }) => {
+            updateBoardUI(board);
+            restartBtn.style.display = 'none';
+            restartBtn.innerText = 'Request Rematch';
+            restartBtn.disabled = false;
+            restartBtn.style.background = '';
+            restartBtn.style.color = '';
+            cells.forEach(c => c.classList.remove('win-highlight'));
+            if (status === 'playing') {
+                gameActive = true;
+                if (turn === mySymbol) {
+                    statusMsg.innerText = "YOUR TURN (" + mySymbol + ")";
+                    statusMsg.style.color = "#00f3ff"; isMyTurn = true;
+                } else {
+                    statusMsg.innerText = "Opponent's Turn";
+                    statusMsg.style.color = "#aaa"; isMyTurn = false;
+                }
+            } else if (status === 'finished') {
+                restartBtn.style.display = 'block'; isMyTurn = false; gameActive = false;
+                if (winner === mySymbol) {
+                    statusMsg.innerText = "YOU WON! 🎉"; statusMsg.style.color = "#00ff00";
+                } else {
+                    statusMsg.innerText = "YOU LOST 💀"; statusMsg.style.color = "#ff0000";
+                }
+                if (winner) {
+                    const winLine = checkWin(board, winner);
+                    if (winLine) winLine.forEach(i => cells[i].classList.add('win-highlight'));
+                }
+            } else if (status === 'draw') {
+                restartBtn.style.display = 'block'; isMyTurn = false; gameActive = false;
+                statusMsg.innerText = "DRAW GAME"; statusMsg.style.color = "yellow";
+            }
+        });
+        socket.on('ttt:rematch-request', ({ from }) => {
+            restartBtn.style.display = 'block';
+            restartBtn.innerText = '✅ Accept Rematch';
+            restartBtn.disabled = false;
+            restartBtn.style.background = 'linear-gradient(90deg,#2ecc71,#27ae60)';
+            restartBtn.style.color = '#000';
+            statusMsg.innerText = from + ' wants a rematch!';
+            statusMsg.style.color = '#f1c40f';
+        });
+        socket.on('ttt:rematch-sent', () => {
+            restartBtn.innerText = '⏳ Waiting for opponent...';
+            restartBtn.disabled = true;
+            restartBtn.style.background = '';
+            restartBtn.style.color = '';
+        });
+        socket.on('ttt:chat', ({ n, msg }) => {
+            const div = document.createElement('div');
+            div.className = 'chat-msg ' + (n === myName ? 'msg-me' : 'msg-opp');
+            div.innerText = msg;
+            chatMsgs.appendChild(div);
+            chatMsgs.scrollTop = chatMsgs.scrollHeight;
+        });
+        socket.on('ttt:error', msg => {
+            clearTimeout(_createTmo); clearTimeout(_joinTmo);
+            _resetBtns();
+            _lbSt('❌ ' + msg, '#ff3366');
+            window.parent.postMessage({type:'notify', msg, nt:'error'}, '*');
+        });
+        socket.on('ttt:opponent-left', () => {
+            statusMsg.innerText = "Opponent Disconnected!";
+            statusMsg.style.color = "red"; gameActive = false;
+        });
+
+        // --- STATUS HELPERS ---
+        let _createTmo, _joinTmo;
+
+        function _lbSt(msg, color) {
+            const el = document.getElementById('lobby-status');
+            if (el) { el.innerText = msg; el.style.color = color || '#00f3ff'; }
+        }
+        function _setBtn(id, disabled, text) {
+            const b = document.getElementById(id); if (!b) return;
+            b.disabled = disabled; if (text) b.innerText = text;
+            b.style.opacity = disabled ? '0.5' : '1';
+            b.style.cursor  = disabled ? 'not-allowed' : 'pointer';
+        }
+        function _resetBtns() {
+            _setBtn('btn-create', false, 'Create New Game');
+            _setBtn('btn-join',   false, 'Join Game');
+        }
+
+        // --- GAME LOGIC ---
+        function createRoom() {
+            _setBtn('btn-create', true, '⏳ Connecting…');
+            _lbSt('🔌 Connecting to game server…', '#00f3ff');
+            _createTmo = setTimeout(() => {
+                _resetBtns();
+                _lbSt('❌ Server timeout. It may be waking up (~30 s). Please retry.', '#ff3366');
+            }, 15000);
+            socket.emit('ttt:create', { playerName: myName });
+        }
+
+        // Listen for auto-join from parent (invite accept)
+        window.addEventListener('message', function(e) {
+            if (e.data && e.data.type === 'auto-join' && e.data.code) {
+                document.getElementById('roomInput').value = e.data.code;
+                joinRoom();
+            }
+        });
+        function joinRoom() {
+            const code = document.getElementById('roomInput').value.trim().toUpperCase();
+            if (code.length !== 4) { _lbSt('❌ Enter a valid 4-character room code.', '#ff3366'); return; }
+            _setBtn('btn-join', true, '⏳ Joining…');
+            _lbSt('🔌 Looking for room ' + code + '…', '#00f3ff');
+            _joinTmo = setTimeout(() => {
+                _resetBtns();
+                _lbSt('❌ Server timeout. It may be waking up (~30 s). Please retry.', '#ff3366');
+            }, 15000);
+            mySymbol = 'O'; roomId = code;
+            socket.emit('ttt:join', { code, playerName: myName });
+            enterGameUI();
+            statusMsg.innerText = "Connecting…";
+        }
+
+        function enterGameUI() {
+            lobby.style.display = 'none';
+            gameArea.style.display = 'flex';
+            displayCode.innerText = roomId;
+            chatMsgs.innerHTML = '<div style="text-align:center; color:#555; font-size:0.8rem;">Game Chat Started</div>';
+        }
+
+        // --- LEAVE & CLEANUP ---
+        function tttBackBtn() {
+            socket.disconnect();
+            window.parent.postMessage('spa-back','*');
+        }
+        function leaveGame(goBack) {
+            socket.disconnect();
+            if (goBack) window.parent.postMessage('spa-back','*');
+            else location.reload();
+        }
+
+        // --- CHAT LOGIC ---
+        function sendGameMessage() {
+            const input = document.getElementById('gameChatInput');
+            const txt = input.value.trim();
+            if (!txt || !roomId) return;
+            socket.emit('ttt:chat', { msg: txt });
+            input.value = "";
+        }
+        function handleChatKey(e) { if (e.key === 'Enter') sendGameMessage(); }
+
+        // --- CORE GAME ---
+        function requestRematch() {
+            socket.emit('ttt:rematch');
+        }
+
+        function updateBoardUI(b) {
+            cells.forEach((c, i) => {
+                c.innerText = b[i]; c.className = 'cell ' + b[i];
+            });
+        }
+        function makeMove(i) {
+            if (!isMyTurn || !gameActive) return;
+            if (document.getElementById('c' + i).innerText !== "") return;
+            socket.emit('ttt:move', { index: i });
+        }
+        function checkWin(b, p) {
+            const wins = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]];
+            for (let w of wins) if (b[w[0]] === p && b[w[1]] === p && b[w[2]] === p) return w;
+            return null;
+        }
+    </script>
+</body>
+
+
+</html>

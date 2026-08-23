@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <script>
+        // SECURITY CHECK
+        // If user is not logged in, kick them to login.html
+        if (localStorage.getItem('isLoggedIn') !== 'true') {
+            window.parent.postMessage('spa-back','*');
+        }
+    </script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rock Paper Scissors</title>
+    <style>
+        :root {
+            --bg: #1a1a1a;
+            --surface: #2d2d2d;
+            --primary: #e74c3c;
+            --accent: #f1c40f;
+            --text: #ffffff;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .game-card {
+            background: var(--surface);
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .scoreboard {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 2rem;
+            font-size: 1.2rem;
+            font-weight: bold;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        .battle-area {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* Vertically align items */
+            gap: 1rem;
+            margin: 2rem 0;
+            min-height: 140px;
+        }
+
+        /* Container for Emoji + Label */
+        .fighter-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100px;
+        }
+
+        .emoji-display {
+            font-size: 4rem;
+        }
+
+        .label-text {
+            margin-top: 5px;
+            font-size: 1rem;
+            color: #aaa;
+            font-weight: 500;
+        }
+
+        .choice-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid transparent;
+            font-size: 2rem;
+            padding: 15px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin: 0 5px;
+        }
+
+        .choice-btn:hover {
+            transform: scale(1.1);
+            background: rgba(255, 255, 255, 0.2);
+            border-color: var(--accent);
+        }
+
+        #result-text {
+            font-size: 1.2rem;
+            margin: 1rem 0;
+            min-height: 1.6em;
+            color: var(--accent);
+        }
+
+        .back-btn {
+            margin-top: 20px;
+            text-decoration: none;
+            color: #888;
+            font-size: 0.9rem;
+            border: 1px solid #444;
+            padding: 8px 16px;
+            border-radius: 20px;
+            display: inline-block;
+            transition: 0.3s;
+        }
+
+        .back-btn:hover {
+            background: #444;
+            color: #fff;
+        }
+    </style>
+</head>
+
+<body><style>#spabk{position:fixed;top:10px;left:10px;z-index:99999;background:rgba(0,0,0,0.8);color:#00f3ff;border:1px solid #00f3ff;padding:8px 18px;border-radius:20px;cursor:pointer;font-family:Segoe UI,sans-serif;font-size:.9rem;backdrop-filter:blur(5px);}#spabk:hover{background:#00f3ff;color:#000;}</style><button id="spabk" onclick="window.parent.postMessage('spa-back','*'); exitLandscapeAndRelease();">← Hub</button>
+
+    <div class="game-card">
+        <h1>You vs AI</h1>
+
+        <div class="scoreboard">
+            <div>You: <span id="user-score">0</span></div>
+            <div>AI: <span id="comp-score">0</span></div>
+        </div>
+
+        <div class="battle-area">
+            <div class="fighter-box">
+                <div id="user-display" class="emoji-display">❔</div>
+                <div id="user-label" class="label-text">Player</div>
+            </div>
+
+            <div style="font-size: 2rem; font-weight: bold; color: #555;">VS</div>
+
+            <div class="fighter-box">
+                <div id="comp-display" class="emoji-display">❔</div>
+                <div id="comp-label" class="label-text">Computer</div>
+            </div>
+        </div>
+
+        <p id="result-text">Choose your weapon!</p>
+
+        <div class="controls">
+            <button class="choice-btn" onclick="play(0)">🪨</button>
+            <button class="choice-btn" onclick="play(1)">📄</button>
+            <button class="choice-btn" onclick="play(2)">✂️</button>
+        </div>
+
+        <button class="back-btn" onclick="window.parent.postMessage('spa-back','*')">← Back to Menu</button>
+    </div>
+
+    <script>
+        let userScore = 0;
+        let compScore = 0;
+        const options = ["Rock", "Paper", "Scissors"];
+        const emojis = ["🪨", "📄", "✂️"];
+
+        function play(userChoiceIndex) {
+            const compChoiceIndex = Math.floor(Math.random() * 3);
+
+            // Update Emojis
+            document.getElementById("user-display").innerText = emojis[userChoiceIndex];
+            document.getElementById("comp-display").innerText = emojis[compChoiceIndex];
+
+            // Update Text Labels underneath
+            document.getElementById("user-label").innerText = options[userChoiceIndex];
+            document.getElementById("comp-label").innerText = options[compChoiceIndex];
+
+            let message = "";
+
+            // Logic
+            if (userChoiceIndex === compChoiceIndex) {
+                message = "It's a Tie!";
+                document.getElementById("result-text").style.color = "white";
+            }
+            else if (
+                (userChoiceIndex === 0 && compChoiceIndex === 2) ||
+                (userChoiceIndex === 1 && compChoiceIndex === 0) ||
+                (userChoiceIndex === 2 && compChoiceIndex === 1)
+            ) {
+                message = "You Win!";
+                userScore++;
+                document.getElementById("result-text").style.color = "#2ecc71";
+            }
+            else {
+                message = "You Lose!";
+                compScore++;
+                document.getElementById("result-text").style.color = "#e74c3c";
+            }
+
+            document.getElementById("result-text").innerText = message;
+            document.getElementById("user-score").innerText = userScore;
+            document.getElementById("comp-score").innerText = compScore;
+        }
+    </script>
+</body>
+
+</html>

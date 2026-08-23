@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script>
+        // SECURITY CHECK & FIREBASE VERIFICATION
+        const storedName = localStorage.getItem('playerName');
+        
+        // Basic Local Check
+        if (localStorage.getItem('isLoggedIn') !== 'true' || !storedName) {
+            window.parent.postMessage('spa-back','*');
+        } else {
+            // Extra Protection: Check if user actually exists in Firebase
+            const checkId = storedName.toLowerCase().trim();
+            if (typeof db !== 'undefined' && db) {
+                db.ref('users/' + checkId).once('value', snap => {
+                    if (!snap.exists()) {
+                        window.parent.postMessage({type:'notify',msg:'⛔ Access denied! Please re-login.',nt:'error'},'*');
+                        localStorage.clear();
+                        window.parent.postMessage('spa-back','*');
+                    }
+                });
+            }
+        }
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Snake Game | Arcade Hub</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Teko:wght@500;700&display=swap');
+        body { margin: 0; background: #0f0c29; color: white; font-family: 'Teko', sans-serif; overflow: hidden; touch-action: none; display: flex; align-items: center; justify-content: center; height: 90vh;}
+        #game-container { position: relative; width: 360px; height: 360px; border: 4px solid #00f3ff; box-shadow: 0 0 20px rgba(0, 243, 255, 0.3); }
+        canvas { background: #000; display: block; }
+        .overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.92); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10; text-align: center; height: 390px; width: 360px; border: 4px solid #00f3ff; box-shadow: 0 0 20px rgba(0, 243, 255, 0.3);}
+        h1 { font-size: 3rem; margin: 0; color: #00f3ff; line-height: 1; }
+        .btn { background: #00f3ff; color: #000; border: none; padding: 10px 30px; font-family: 'Teko'; font-size: 1.5rem; cursor: pointer; border-radius: 5px; margin-top: 15px; font-weight: bold; }
+        .settings-btn { position: absolute; top: 10px; right: 10px; background: none; border: 2px solid #00f3ff; color: #00f3ff; font-family: 'Teko'; cursor: pointer; border-radius: 50%; width: 40px; height: 40px; font-size: 1.2rem; }
+        /* Control Settings Button Style */
+        .ctrl-settings-btn { position: absolute; top: 10px; left: 10px; background: none; border: 2px solid #00f3ff; color: #00f3ff; font-family: 'Teko'; cursor: pointer; border-radius: 50%; width: 40px; height: 40px; font-size: 1.2rem; }
+
+    
+        /* Buttons ab grid se bahar freely move kar sakte hain */
+        #controls { position: fixed; inset: 0; pointer-events: none; z-index: 20; }
+        /* Buttons look and isolated transitions */
+        .ctrl-btn { 
+            position: fixed; width: 65px; height: 65px; 
+            background: rgba(255,255,255,0.1); border: 1px solid #00f3ff; 
+            color: white; border-radius: 15px; display: flex; 
+            align-items: center; justify-content: center; font-size: 1.8rem; 
+            pointer-events: auto; touch-action: none;
+            /* Only animate colors, NOT position (important for dragging) */
+            transition: background 0.1s, box-shadow 0.1s, border-color 0.1s; 
+        }
+
+        /* Click Effect: Only triggers when NOT in customizing mode */
+        #controls:not(.customizing) .ctrl-btn:active {
+            background: rgba(0, 243, 255, 0.5) !important;
+            box-shadow: 0 0 15px #00f3ff, inset 0 0 10px #00f3ff;
+            border-color: #ffffff !important;
+        }
+
+        .customizing .ctrl-btn { 
+            border: 2px dashed #00f3ff; 
+            background: rgba(0, 243, 255, 0.2); 
+            transition: none !important; /* Dragging ke waqt transition band */
+        }
+        #score-board { position: fixed; top: 20px; left: 20px; font-size: 2rem; color: #00f3ff; }
+        @keyframes gameOver { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .animate-go { animation: gameOver 0.5s ease-out; }
+    </style>
+</head>
+<body><style>#spabk{position:fixed;top:10px;left:10px;z-index:99999;background:rgba(0,0,0,0.8);color:#00f3ff;border:1px solid #00f3ff;padding:8px 18px;border-radius:20px;cursor:pointer;font-family:Segoe UI,sans-serif;font-size:.9rem;backdrop-filter:blur(5px);}#spabk:hover{background:#00f3ff;color:#000;}</style><button id="spabk" onclick="window.parent.postMessage( 'spa-back','*'); exitLandscapeAndRelease();">← Hub</button>
+
+    <div id="score-board">Score: 0</div>
+
+    <div id="game-container">
+        <canvas id="snakeGame" width="360" height="360"></canvas>
+                <div id="home-screen" class="overlay">
+            <h1>Snake Game</h1>
+            <button class="settings-btn" onclick="toggleSettings()">⚙️</button>
+            <button class="ctrl-settings-btn" onclick="toggleCtrlSettings()">🎮</button>
+            <p>Ready to break the record?</p>
+            <button class="btn" onclick="startGame()">START GAME</button>
+        </div>
+
+        <div id="ctrl-custom-screen" class="overlay" style="display: none;">
+            <h1>CUSTOM CONTROLS</h1>
+            <p style="color:#00f3ff;">Drag the buttons below to your comfort!</p>
+            <div style="display: flex; gap: 15px; margin-top: 20px;">
+                <button class="btn" onclick="resetControls()">RESET</button>
+                <button class="btn" style="background:red; color:white;" onclick="toggleCtrlSettings()">CLOSE</button>
+            </div>
+        </div>
+
+        <div id="settings-screen" class="overlay" style="display: none;">
+            <h1>SETTINGS</h1>
+            <button class="btn" id="blocky-btn" onclick="setMode('blocky')">BLOCKY (Classic)</button>
+            <button class="btn" id="smooth-btn" onclick="setMode('smooth')">SMOOTH (Modern)</button>
+            <button class="btn" style="background:none; color:white; border:1px solid white;" onclick="toggleSettings()">BACK</button>
+        </div>
+        <div id="game-over" class="overlay" style="display: none;">
+            <h1 style="color: #ff3366;">GAME OVER</h1>
+            <p id="final-score">Score: 0</p>
+            <p id="high-score-msg" style="color: #00ff88;"></p>
+            <button class="btn" style="background: none; color: #dbad04; border:1px solid #dbad04;" onclick="window.parent.postMessage('spa-leaderboard','*')">RANK</button>
+            <button class="btn" style="background:none; color:#00f3ff; border:1px solid #00f3ff;" onclick="window.parent.postMessage('spa-back','*')">HOME</button>
+            <button class="btn" onclick="resetGame()">RETRY</button>
+        </div>
+    </div>
+
+        <div id="controls">
+        <button id="btn-up" class="ctrl-btn" onclick="changeDir('UP')" style="bottom: 90px; left: 50%; transform: translateX(-50%);">▲</button>
+        <button id="btn-left" class="ctrl-btn" onclick="changeDir('LEFT')" style="bottom: 20px; left: calc(50% - 109px);">◀</button>
+        <button id="btn-down" class="ctrl-btn" onclick="changeDir('DOWN')" style="bottom: 20px; left: 50%; transform: translateX(-50%);">▼</button>
+        <button id="btn-right" class="ctrl-btn" onclick="changeDir('RIGHT')" style="bottom: 20px; left: calc(50% + 44px);">▶</button>
+    </div>
+
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="_engine.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyD8KMiqZTr39IPw8LENyahLILLNbkFfQXM",
+            authDomain: "bittuhere-90415.firebaseapp.com",
+            databaseURL: "https://bittuhere-90415-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "bittuhere-90415",
+            storageBucket: "bittuhere-90415.firebasestorage.app",
+            messagingSenderId: "600472267274",
+            appId: "1:600472267274:web:b5f8394f99e17b232f3ca7"
+        };
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+        const playerName = localStorage.getItem('playerName') || "Guest";
+    
+        // Load Saved Control Positions
+        const controls = document.getElementById('controls');
+        const savedPos = JSON.parse(localStorage.getItem('snake_controls_pos'));
+        if (savedPos) {
+            controls.style.left = savedPos.left;
+            controls.style.top = savedPos.top;
+            controls.style.bottom = 'auto';
+        }
+
+        const canvas = document.getElementById("snakeGame");
+
+        const ctx = canvas.getContext("2d");
+        const box = 20;
+        let snake, food, d, score, gameRunning = false;
+        let moveMode = localStorage.getItem('snakeMode') || 'blocky';
+        let moveTimer = 0;
+        let lastFrame = 0;
+        const logicInterval = 260; // ms between snake steps (speed is now refresh-rate independent)
+
+        function toggleSettings() {
+            const ss = document.getElementById('settings-screen');
+            ss.style.display = ss.style.display === 'none' ? 'flex' : 'none';
+            updateSettingsUI();
+        }
+
+        function setMode(mode) {
+            moveMode = mode;
+            localStorage.setItem('snakeMode', mode);
+            updateSettingsUI();
+        }
+
+        function updateSettingsUI() {
+            document.getElementById('blocky-btn').style.opacity = moveMode === 'blocky' ? '1' : '0.5';
+            document.getElementById('smooth-btn').style.opacity = moveMode === 'smooth' ? '1' : '0.5';
+        }
+
+        function initGameData() {
+            snake = [{ x: 9 * box, y: 10 * box, oldX: 9 * box, oldY: 10 * box }];
+            food = { x: Math.floor(Math.random() * 17 + 1) * box, y: Math.floor(Math.random() * 17 + 1) * box };
+            score = 0;
+            d = null;
+            moveTimer = 0;
+            lastFrame = 0;
+            document.getElementById('score-board').innerText = "Score: 0";
+        }
+
+        function startGame() {
+            document.getElementById("home-screen").style.display = "none";
+            document.getElementById("settings-screen").style.display = "none";
+            initGameData();
+            gameRunning = true;
+            requestAnimationFrame(gameLoop);
+        }
+
+        function changeDir(dir) {
+            if (dir == "LEFT" && d != "RIGHT") d = "LEFT";
+            else if (dir == "UP" && d != "DOWN") d = "UP";
+            else if (dir == "RIGHT" && d != "LEFT") d = "RIGHT";
+            else if (dir == "DOWN" && d != "UP") d = "DOWN";
+        }
+
+        function gameLoop(timestamp) {
+            if (!gameRunning) return;
+
+            // REAL delta time (clamped) — fixes the bug where the snake moved
+            // 2x faster on 120Hz screens. Now identical on 60/90/120/144Hz.
+            var dt = lastFrame ? (timestamp - lastFrame) : 16.6;
+            lastFrame = timestamp;
+            if (dt > 100) dt = 100; // clamp tab-switch / lag spikes
+
+            ctx.fillStyle = "black";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Logic Timing — scaled by real elapsed time, NOT a fixed per-frame constant
+            if (d) {
+                moveTimer += dt;
+                if (moveTimer >= logicInterval) {
+                    moveTimer -= logicInterval; // -= keeps speed exact (avoids drift)
+                    updateLogic();
+                }
+            }
+
+            const progress = (moveMode === 'smooth' && d) ? Math.min(moveTimer / logicInterval, 1) : 0;
+
+            // Draw Snake
+            for (let i = 0; i < snake.length; i++) {
+                ctx.fillStyle = (i == 0) ? "#00f3ff" : "#006677";
+                
+                // Interpolated Position Calculation
+                let sX = (snake[i].oldX !== undefined) ? snake[i].oldX : snake[i].x;
+                let sY = (snake[i].oldY !== undefined) ? snake[i].oldY : snake[i].y;
+                let renderX = sX + (snake[i].x - sX) * progress;
+                let renderY = sY + (snake[i].y - sY) * progress;
+
+                ctx.fillRect(renderX, renderY, box, box);
+
+                // --- FACE ONLY ON HEAD ---
+                if (i === 0) {
+                    ctx.fillStyle = "black";
+                    ctx.fillRect(renderX + 4, renderY + 4, 3, 3); 
+                    ctx.fillRect(renderX + 13, renderY + 4, 3, 3);
+                    ctx.fillRect(renderX + 6, renderY + 13, 8, 2); 
+                }
+            }
+
+            // Food
+            ctx.fillStyle = "#ff3366";
+            ctx.fillRect(food.x, food.y, box, box);
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        function updateLogic() {
+            // Correct Old Position Tracking
+            const oldPositions = snake.map(s => ({x: s.x, y: s.y}));
+
+            let snakeX = snake[0].x;
+            let snakeY = snake[0].y;
+
+            if (d == "LEFT") snakeX -= box;
+            if (d == "UP") snakeY -= box;
+            if (d == "RIGHT") snakeX += box;
+            if (d == "DOWN") snakeY += box;
+
+            if (snakeX == food.x && snakeY == food.y) {
+                score++;
+                document.getElementById('score-board').innerText = "Score: " + score;
+                food = { x: Math.floor(Math.random() * 17 + 1) * box, y: Math.floor(Math.random() * 17 + 1) * box };
+            } else {
+                snake.pop();
+            }
+
+            let newHead = { x: snakeX, y: snakeY };
+            
+            if (snakeX < 0 || snakeX >= canvas.width || snakeY < 0 || snakeY >= canvas.height || collision(newHead, snake)) {
+                gameRunning = false;
+                handleGameOver();
+                return;
+            }
+            
+            snake.unshift(newHead);
+
+            // Sync oldX/oldY for smooth sliding
+            for(let i=0; i<snake.length; i++) {
+                if (oldPositions[i]) {
+                    snake[i].oldX = oldPositions[i].x;
+                    snake[i].oldY = oldPositions[i].y;
+                } else {
+                    snake[i].oldX = snake[i].x;
+                    snake[i].oldY = snake[i].y;
+                }
+            }
+        }
+
+        function collision(head, array) {
+            for (let i = 0; i < array.length; i++) {
+                if (head.x == array[i].x && head.y == array[i].y) return true;
+            }
+            return false;
+        }
+
+                function handleGameOver() {
+            
+            const go = document.getElementById("game-over");
+            go.style.display = "flex";
+            go.classList.add("animate-go");
+            document.getElementById("final-score").innerText = "Score: " + score;
+            
+            const msgEl = document.getElementById("high-score-msg");
+            
+            // 1. Local Storage Backup
+            const localBest = parseInt(localStorage.getItem('snake_highscore')) || 0;
+            if (score > localBest) {
+                localStorage.setItem('snake_highscore', score);
+            }
+
+            // 2. Firebase Syncing with Status
+            db.ref('users/' + playerName.toLowerCase()).once('value', snap => {
+                const cloudBest = snap.val()?.snake_highscore || 0;
+                
+                if (score > cloudBest) {
+                    msgEl.innerText = "Syncing score, please wait...";
+                    msgEl.style.color = "#f1c40f"; // Syncing status color
+
+                    db.ref('users/' + playerName.toLowerCase()).update({ 
+                        snake_highscore: score 
+                    }).then(() => {
+                        // Success Message
+                        msgEl.innerText = "Succesfully Synced! NEW HIGH SCORE! 🔥";
+                        msgEl.style.color = "#00ff88"; 
+                    }).catch(err => {
+                        // Network Error handling
+                        msgEl.innerText = "Sync Failed! (Saved Locally)";
+                        msgEl.style.color = "#ff3366";
+                        console.error("Firebase Error:", err);
+                    });
+                } else {
+                    // Show highest between Cloud and Local
+                    msgEl.innerText = "Best: " + Math.max(cloudBest, localBest);
+                    msgEl.style.color = "#00f3ff";
+                }
+            });
+        }
+
+
+        function resetGame() {
+    // Game over screen ko chupao
+    document.getElementById("game-over").style.display = "none";
+    document.getElementById("game-over").classList.remove("animate-go");
+
+    // Wapas Home Screen dikhao
+    document.getElementById("home-screen").style.display = "flex";
+
+    // Game state reset — loop stops itself via gameRunning flag
+    gameRunning = false;
+    d = null; // Direction reset
+}
+
+                        updateSettingsUI();
+
+        // --- ADVANCED INDIVIDUAL CUSTOM CONTROLS ---
+        let isCustomizing = false;
+        const controlButtons = document.querySelectorAll('.ctrl-btn');
+
+        // Saved positions load karein
+        function loadButtonPositions() {
+            controlButtons.forEach(btn => {
+                const pos = JSON.parse(localStorage.getItem('pos_' + btn.id));
+                if (pos) {
+                    btn.style.left = pos.left;
+                    btn.style.bottom = pos.bottom;
+                    btn.style.transform = 'none'; // Custom pos par transform hata dein
+                }
+            });
+        }
+        loadButtonPositions();
+
+        function toggleCtrlSettings() {
+            isCustomizing = !isCustomizing;
+            const screen = document.getElementById('ctrl-custom-screen');
+            screen.style.display = isCustomizing ? 'flex' : 'none';
+            document.getElementById('controls').classList.toggle('customizing', isCustomizing);
+        }
+
+        function resetControls() {
+                window.parent.postMessage({type:'confirm',msg:'Reset all controls to default positions?',icon:'🎮',action:'reset-snake'},'*');
+        }
+        function _doResetControls() {
+                controlButtons.forEach(btn => localStorage.removeItem('pos_' + btn.id));
+                const def={'btn-up':['50%','90px','translateX(-50%)'],'btn-left':['calc(50% - 109px)','20px',''],'btn-down':['50%','20px','translateX(-50%)'],'btn-right':['calc(50% + 44px)','20px','']};
+                controlButtons.forEach(btn=>{const d=def[btn.id];if(d){btn.style.left=d[0];btn.style.bottom=d[1];btn.style.transform=d[2];}});
+                loadButtonPositions();
+        }
+
+        window.addEventListener('message',function(e){if(e.data&&e.data.type==='confirm-yes'&&e.data.action==='reset-snake')_doResetControls();});
+        // Individual Button Dragging Logic
+        controlButtons.forEach(btn => {
+            let activeDrag = false;
+
+            btn.addEventListener("touchstart", (e) => {
+                if (!isCustomizing) return;
+                activeDrag = true;
+                btn.style.opacity = "0.6"; // Dragging visual feedback
+            }, {passive: false});
+
+            window.addEventListener("touchmove", (e) => {
+                if (!activeDrag || !isCustomizing) return;
+                e.preventDefault();
+                let touch = e.touches[0];
+                
+                // Position update (Screen ke hisab se)
+                btn.style.left = (touch.clientX - btn.offsetWidth / 2) + "px";
+                btn.style.bottom = (window.innerHeight - touch.clientY - btn.offsetHeight / 2) + "px";
+                btn.style.transform = "none";
+            }, {passive: false});
+
+            window.addEventListener("touchend", () => {
+                if (!activeDrag) return;
+                activeDrag = false;
+                btn.style.opacity = "1";
+                
+                // Position save karein
+                localStorage.setItem('pos_' + btn.id, JSON.stringify({
+                    left: btn.style.left,
+                    bottom: btn.style.bottom
+                }));
+            });
+        });
+
+        // PC Friendly Controls (Arrow Keys & WASD)
+        document.addEventListener("keydown", e => {
+            const key = e.key.toLowerCase();
+            if (key === "arrowleft" || key === "a") changeDir("LEFT");
+            else if (key === "arrowup" || key === "w") changeDir("UP");
+            else if (key === "arrowright" || key === "d") changeDir("RIGHT");
+            else if (key === "arrowdown" || key === "s") changeDir("DOWN");
+        });
+    </script>
+</body>
+</html>

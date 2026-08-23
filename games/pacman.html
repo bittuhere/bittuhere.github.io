@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Pac-Man</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Teko:wght@500;700&display=swap');
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            padding: 0;
+            background: black;
+            color: white;
+            font-family: 'Teko', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+        #game-container {
+            position: relative;
+            /*
+             * Fit into viewport by BOTH width and height simultaneously.
+             * Board is 608 × 672 px (19×32 cols, 21×32 rows).
+             * min() picks whichever constraint is tighter:
+             *   - 100vw  → constrain by screen width
+             *   - (100vh - 8px) * 608/672 → constrain by screen height keeping ratio
+             *   - 608px  → never exceed native size
+             */
+            width: min(calc(100vw - 4px), calc((100vh - 8px) * 608 / 672), 608px);
+            border: 4px solid  #CFFF04;
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.3);
+        }
+        canvas {
+            background: #000;
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+        /* Score sits on top of the canvas, not above it */
+        #game-container h2 {
+            position: absolute;
+            top: 6px;
+            right: 10px;
+            margin: 0;
+            z-index: 40;
+            font-size: 1.2rem;
+            color: #CFFF04;
+            text-shadow: 0 0 8px #CFFF04;
+            pointer-events: none;
+        }
+        .overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.92);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            text-align: center;
+            border: 4px solid  #CFFF04;
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.3);
+        }
+        h1 {
+            font-size: 3rem;
+            margin: 0;
+            color:  #CFFF04;
+            line-height: 1;
+        }
+        h2 {
+            font-size: 3rem;
+            margin: 0;
+            color:  #CFFF04;
+            line-height: 1;
+        }
+        .btn {
+            background:  #CFFF04;
+            color: black;
+            border: none;
+            padding: 10px 30px;
+            font-family: 'Teko', sans-serif;
+            font-size: 1.5rem;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+        .settings-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: 2px solid  #CFFF04;
+            color:  #CFFF04;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+        .ctrl-settings-btn {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: none;
+            border: 2px solid  #CFFF04;
+            color:  #CFFF04;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+        /* controls z-index raised so they never get covered */
+        #controls {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 100;
+        }
+        .ctrl-btn {
+            position: fixed;
+            width: 65px;
+            height: 65px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid  #CFFF04;
+            color: white;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            pointer-events: auto;
+            touch-action: none;
+            transition: background 0.1s, box-shadow 0.1s, border-color 0.1s;
+        }
+        #controls:not(.customizing) .ctrl-btn:active {
+            background: rgba(0, 243, 255, 0.5) !important;
+            box-shadow: 0 0 15px  #CFFF04, inset 0 0 10px  #CFFF04;
+            border-color: #ffffff !important;
+        }
+        .customizing .ctrl-btn {
+            border: 2px dashed  #CFFF04;
+            background: rgba(0, 243, 255, 0.2);
+            transition: none !important;
+        }
+        @keyframes gameOver {
+            from { transform: scale(0.5); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .animate-go { animation: gameOver 0.5s ease-out; }
+
+        /* scared timer UI */
+        #scared-timer {
+            position: absolute;
+            top: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 60;
+            background: rgba(0,0,0,0.7);
+            border: 2px solid #CFFF04;
+            color: #CFFF04;
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-family: 'Teko', sans-serif;
+            font-size: 18px;
+            display: none;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body><style>#spabk{position:fixed;top:10px;left:10px;z-index:99999;background:rgba(0,0,0,0.8);color:#00f3ff;border:1px solid #00f3ff;padding:8px 18px;border-radius:20px;cursor:pointer;font-family:Segoe UI,sans-serif;font-size:.9rem;backdrop-filter:blur(5px);}#spabk:hover{background:#00f3ff;color:#000;}</style><button id="spabk" onclick="window.parent.postMessage('spa-back','*'); exitLandscapeAndRelease();">← Hub</button>
+    <div id="game-container">
+        <div id="scared-timer">6</div>
+        <h2 style="z-index: 40;">Score: <span id="span">0</span></h2>
+        <canvas id="board"></canvas>
+        
+        <div id="home-screen" class="overlay">
+            <h1>Pac-Man</h1>
+            <button class="settings-btn" onclick="toggleSettings()">⚙️</button>
+            <button class="ctrl-settings-btn" onclick="toggleCtrlSettings()">🎮</button>
+            <p>Ready to play Pac-Man!</p>
+            <button class="btn" onclick="startGame()">START GAME</button>
+        </div>
+
+        <div id="ctrl-custom-screen" class="overlay" style="display: none;">
+            <h1 style="color: #ffff;">CUSTOM CONTROLS</h1>
+            <p style="color: #CFFF04;">Drag the buttons below to your comfort!</p>
+            <div style="display: flex; gap: 15px; margin-top: 20px;">
+                <button class="btn" onclick="resetControls()">RESET</button>
+                <button class="btn" style="background:red; color:white;" onclick="toggleCtrlSettings()">CLOSE</button>
+            </div>
+        </div>
+
+        <div id="settings-screen" class="overlay" style="display: none;">
+            <h1>SETTINGS</h1>
+            <p>No settings available.</p>
+            <button class="btn" style="background:none; color:white; border:1px solid white;" onclick="toggleSettings()">BACK</button>
+        </div>
+
+        <div id="game-over" class="overlay" style="display: none;">
+            <h1 style="color: #ff3366;">GAME OVER</h1>
+            <p id="final-score">Score: 0</p>
+            <p id="high-score-msg" style="color: #00ff88;"></p>
+            <button class="btn" style="background:none; color:#dbad04; border:1px solid #dbad04;"
+                onclick="window.parent.postMessage('spa-leaderboard','*')">RANK</button>
+            <button class="btn" style="background:none; color: #CFFF04; border:1px solid  #CFFF04;"
+                onclick="window.parent.postMessage('spa-back','*')">HOME</button>
+            <button class="btn" onclick="resetGame()">RETRY</button>
+        </div>
+    </div>
+
+    <div id="controls">
+        <button id="btn-up" class="ctrl-btn" onclick="changeDir('UP')"
+            style="bottom: 90px; left: 50%; transform: translateX(-50%);">▲</button>
+        <button id="btn-left" class="ctrl-btn" onclick="changeDir('LEFT')"
+            style="bottom: 20px; left: calc(50% - 109px);">◀</button>
+        <button id="btn-down" class="ctrl-btn" onclick="changeDir('DOWN')"
+            style="bottom: 20px; left: 50%; transform: translateX(-50%);">▼</button>
+        <button id="btn-right" class="ctrl-btn" onclick="changeDir('RIGHT')"
+            style="bottom: 20px; left: calc(50% + 44px);">▶</button>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+    <script>
+        // Firebase config (same as snake)
+        const firebaseConfig = {
+            apiKey: "AIzaSyD8KMiqZTr39IPw8LENyahLILLNbkFfQXM",
+            authDomain: "bittuhere-90415.firebaseapp.com",
+            databaseURL: "https://bittuhere-90415-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "bittuhere-90415",
+            storageBucket: "bittuhere-90415.firebasestorage.app",
+            messagingSenderId: "600472267274",
+            appId: "1:600472267274:web:b5f8394f99e17b232f3ca7"
+        };
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+        const playerName = localStorage.getItem('playerName') || "Guest";
+
+        // Game variables
+        let board, context;
+        const rowCount = 21, columnCount = 19, tileSize = 32;
+        const boardWidth = columnCount * tileSize, boardHeight = rowCount * tileSize;
+        let walls = new Set(), foods = new Set(), ghosts = new Set();
+        let powerPellets = new Set();
+        let pacman;
+        const directions = ['U','D','L','R'];
+
+        // state
+        let score = 0, lives = 1, gameOver = false;
+        let gameRunning = false; // prevents input & duplicate loops
+        let spanScore = null;
+
+        // image variables (declare here)
+        let wallImage, blueGhostImage, orangeGhostImage, pinkGhostImage, redGhostImage;
+        let pacmanUpImage, pacmanDownImage, pacmanLeftImage, pacmanRightImage, pacmanEatImage;
+        let scaredGhostImage;
+
+        // scared timers & UI
+        let scaredTimeout = null;
+        let scaredInterval = null;
+        let scaredEndAt = 0;
+        const SCARED_DURATION_MS = 6000;
+        const scaredTimerEl = () => document.getElementById('scared-timer');
+
+        // pellet candidate positions (computed from tileMap 'O' chars)
+        let candidatePelletPositions = []; // array of {r,c}
+        let chosenPelletPositions = []; // exactly N chosen
+
+        // Setup canvas and load images on window load
+        window.onload = function() {
+            spanScore = document.getElementById("span");
+            board = document.getElementById("board");
+            board.width = boardWidth;
+            board.height = boardHeight;
+            context = board.getContext("2d");
+            loadImages();
+
+            // compute pellet candidates & tunnel metadata
+            computeCandidatePelletsAndTunnel();
+
+            // load control button positions AFTER DOM ready
+            loadButtonPositions();
+
+            // draw initial frame so user can see the map area
+            loadMap();
+            resetPositions();
+            draw();
+        }
+
+        function loadImages() {
+            wallImage = new Image(); wallImage.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACBSURBVHhe7dChFYBAEMTQg5rwWErGnqcnMLHgeck3WbszkiSJ1kJf7cd1c/7SPLfPH1eq1QBUqwGoVgNQrQagWg1AtRqAajUA1WoAqtUAVKsBqFYDUK0GoFoNQLUagGo1ANVqAKrVAFSrAahWA1CtBqBaDUC1GoBqNQBNkiSRGeMBZX0EYEQsEOkAAAAASUVORK5CYII=";
+            blueGhostImage = new Image(); blueGhostImage.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAEuSURBVHhe7ZqxbQJREEQPenAfZCbBogcqcObMLgU6oAJ6MCS4KtvBiGB9x/qznM/SvJe8Tfg6VpoR90UHANbM5NF4PR8/Nd7Ebvk06jPOZVtYgGxLOV/VjFepdgQRkG2hA+RfM3XmM1o7gQjIttAB8iCtmd8+rjT18/Zx0nQbrednnUAEZFvoAHmQrAOyTGZknVA9f/aNxl6IgGwLHSAPUu2A9fNBUz+LlwdN/VTPf99v6IBrsADZlh/5uPdv/6k7IJ4f3w2IgGwLHSBfqN75ZZn96/uACB0QYAGyLXfvgP8OHRBgAbItLEC2hQXItrAA2RYWINvCAmRbWIBsS/N9QHyfbr0/yP6zUz2v9fmJgGwLHSBfiBnKMhtpzWCk+vlI9n2IgGyL/QIAwJmu+wLDbl9mxfF/7wAAAABJRU5ErkJggg==";
+            orangeGhostImage = new Image(); orangeGhostImage.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAEvSURBVHhe7ZpBagJBEEXHxINlGc3ShescLJATuFOzcZF7RTTCQ0LPjJWykBj+fyCvEWxmCv+XaeyMMdJM8M342s4PLK9iOtvc9BofsCweAJalnK9qxqtUO8IRwLK4A/Cv+evMR2Q7wRHAsrgD8CjZzD8+r1kNs/94YXUd2f2jTnAEsCzuADxK1AFRJiOiTqjuP/mG5SCOAJbFHYBHqXbA0+uK1TC75RurYar7f74v3AGX8ACwLL0BnDL/88Xb/5bofvwNwLLID6D3G1nNffZ5PUt1//Z8wBHAsrgD8JlqB9w77oAGDwDL4gFgWTwALIsHgGXxALAsHgCWxQPAsqTPA9rn6ez5QfSfnep+2et3BLAs7gB8ps1QlNmWbAZbqp9vie7HEcCyyA/AGKNM1x0Bv7xuR6pEcDAAAAAASUVORK5CYII=";
+            pinkGhostImage = new Image(); pinkGhostImage.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAEySURBVHhe7ZoxagJRFEVnUsWVpIiLsIt9mrTuzBWk1tI9JGvRziRwEPnO5PnmIYnce0DOR/Az8/BemY+dMUaaHt+M/ebjyHISs+X8ptf4gGXxALAs5XxVM16l2hGOAJbFHYCv5q8zH5HtBEcAy+IOwKNkM//48sxqmMP2k9U0svtHneAIYFncAXiUqAOiTEZEnVDdv/+G5SCOAJbFHYBHqXbAYvXOapjN2xOrYar779av7oDf8ACwLBcD+Mn8+Yu375bofvwNwLLID+DiN7Ka++zzepbq/u35gCOAZXEH4BPVDvjvuAMaPAAsiweAZfEAsCweAJbFA8CyeABYFg8Ay5I+D2ifp7PnB9F/dqr7Za/fEcCyuAPwiTZDUWZbshlsqX6+JbofRwDLIj8AY4wyXfcF6NRxdxPx2foAAAAASUVORK5CYII=";
+            redGhostImage = new Image(); redGhostImage.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAE0SURBVHhe7ZrRaQJREEXXdBBrSEC7SA9WYBVpJxXEGvyzAwOmhliCRjhIeLvrZBwkhnsPyHkIPnYH75V92BljpJngm/E1ezqwvIrpx+dNr/EBy+IBYFnK+apmvEq1IxwBLIs7AP+av858RLYTHAEsizsAj5LN/ON2x2qY/fyZ1XVk9486wRHAsrgD8ChRB0SZjIg6obr/5BuWgzgCWBZ3AB6l2gEvy3dWw6w2r6yGqe6/flu4Ay7hAWBZegM4Zf7ni7f/LdH9+BuAZZEfQO83spr77PN6lur+7fmAI4BlcQfgM9UOuHfcAQ0eAJbFA8CyeABYFg8Ay+IBYFk8ACyLB4BlSZ8HtM/T2fOD6D871f2y1+8IYFncAfhMm6Eosy3ZDLZUP98S3Y8jgGWRH4AxRpmuOwJ14Wkvmqur6AAAAABJRU5ErkJggg==";
+            pacmanUpImage = new Image(); pacmanUpImage.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAADQSURBVHhe7dhBDgIxDEPRlvvfuWy8QBYolJkJIP+3MbtIlpKpGAAAINZUfmytsfTzqTmPz3h09rybMhYFKGNt72e1g677BrhqPiugjMUNUL5tdwfd7k24eh4roIzFDVC+dHQHXfcNcD6fFVDGogBlLApQxoovoP0d4Py73D2PFVDGogBlLApQxoov4OvvgG68AwwFKGOVN8D9202o/oNkBZSxKEAZiwKUseIL2H4HuF97F1TffccKKGNxA5SXOftG7O54hRVQxoovAAAApBrjDqe6KlgiIVJvAAAAAElFTkSuQmCC";
+            pacmanDownImage = new Image(); pacmanDownImage.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAADPSURBVHhe7djLCgIxEETRxP//57i5iIwMMeSBUvdsyl2koTphiiRJilXJZVorjZ9L1Lr+P757kLEcABlruF+rOz5rdkdYATKWO4C89Wud7xndCVaAjOUAyFgOgIwVP4CPO/Pf7v2e3rvACpCx3AHky+4dcO3k6fOurAAZywGQsRwAGSt+ANvfAaPf6E6fbwXIWA6AjOUAyFjxA+je0bP38ul3wOh5VoCM5Q4gb412crSDPbvPtwJkLHcA+bVeJ0/vgNnzrAAZK34AkiQpVSlPrJ0qWIkdXGMAAAAASUVORK5CYII=";
+            pacmanLeftImage = new Image(); pacmanLeftImage.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAADNSURBVHhe7dlBCsQgEERRM/e/s7P5i0EYGlHEUP9tKsvQUB2TNEnRHnKb3lvncovn2X+Pvz5kLAdAxpru1+6Or1rdEVaAjOUOIP+6rfOV2Z1gBchYDoCM5QDIWPEDWH7Xvv2cUJ0LrAAZyx1AHnN6Z7gDCg6AjHV8B1RO/1ewAmQsdwB5jOeAyzgAMtbyDvB7wMs5ADJWuQNu7/io6vzICpCxHAAZywGQseIHMP0ucNu5YPa5P7ICZCx3ALnN6e/6q6wAGSt+AJIkKVVrX8m9IV6OFDrRAAAAAElFTkSuQmCC";
+            pacmanRightImage = new Image(); pacmanRightImage.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAADMSURBVHhe7ZmxCgMhFAQ1///PppkqIEb0wiM708yVYWE3ntdEREQklo4fY4w2eLxC73d/8wvHYgA4luM+3e74KbsbYQVwLG4A/ppqnV+x2gQrgGMxAByLAeBY4gNYngOq/++f3g9YARyLG4Cn/HoDbt/5rbACOBY3AE+pfq9/ihXAsbgBeIrngD/HAHAs5TZgF+8DDjEAHMt2f6pvwierjbACOBYDwLEYAI4lPoDjd+9q54LddwMrgGNxA/BjVP+uYAVwLPEBiEgyrb0BmJwhXp0BiegAAAAASUVORK5CYII=";
+            pacmanEatImage = new Image(); pacmanEatImage.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAMd0lEQVR4AeyaS48cVxXHz7lV1dU9L9uJoigirLIItgwBRR577OQLsGPDNkJIYYuiLEFZIBYgIRCwQAiB2GbJGvHKOLbjOCiQlyA8FDYJj9iZGU93ve7ld251j3vsdrc7noejpHz/de4959xzzzn3UdXlcfIxvz5JwMd8AciBrIAQggIXwm/TEF7OboXxn09CeO5A/Bmf9D0f8PrW076/vRbKjVOhvLYawvVzQbaf9KH/ZFMPvlmVxdfLohyieKasB8+WTf+5qun/sK6LXzfVYC0MirVwvXwiXNv62va4s/tR3/MEJNmfJe9dkGz5FclWroh0zoN10c6LkkasQ9fFddYlA2l6XpLsQkSaXpCUetq5BAXp634/gh63uecJKBofKkbwwW4gZQhDkkhwQJ0Edl6QTIJmIgmKrhFxRtF3KdIEpKKOBqz9LG4vjYfwfJImG5oSnLNAFeveSwhe/AjiJQATURFBHoE80mE7SC0a3k+wsK9l7gS8d+2pRzbqtS32adPvn/bbxZmwXZwNg/6Tvi6+XfWSd9WFmsBqUQLlZkUc9QRkTHQWVDKvTD5pIF3C6hClHr0JYv0ybHTTf6VV8Rlf9lebweBMM+ifNdTQuuyfrbc2vvIfucsrDjmPjc7iX/7USS4vdjovu25+Rbudy9Jlz+b5BU2z11V1Q1jrrUkNLY13qxtoGLEZB8F58aoSHK5AmXaJYHmo+0DSzluadi+7Tn7Z5fkll3cvJHn+YpKBPH1zQe7yYtT5LKS+zhNzLtA1ZKJeATYC+xi+MH8RipyAmGwCFECQtFsxGVD0XcVCD1LSr0RQsU5qdDAZ9T08L4LUkMBLYh02DOXYsKzJXV14OV//brbNUYZbNQHUJY4QjNAeN6Ntw7gBb40a6HEjAA2CiOIjHBLr5kiCCRRqbUEq8fLcDeYyEookH6Qw76qYtakG3tt8auO/g9Vmszjl63DS+/rvylyKZHTr4AVLOPpoM26VGJiFinysBAIkW8M7AqxYIyUPeQicCV5S78U1CpK4qpR424dDwHITIWOXZu+kW9uPNh9sn6mvlk9UV/tP/3NMfEdVN0trcfHtxaX8Fdfr/FETeVOztD/sUnO619TNhIFkWPC2GgJsaMsNzKVIwj9HCBIhY1dUpj1GrWp7hz4IdpU4hG0/uOq2ZLH3tuv1riTd7Erqsrfuhz1XcbO0XVFLwswkzIzUTtQcMwcJK5ASz7PcYLMrBG2zugMv6AuaKs5n4jgzHM6r2IURZV3QMJMoCQqATonJUpQMo82R0DYo1OBEsBV44XDSwCtEyhIm1TnKzA5OkpA4BrQlbsvWMBxAd2bTSwxCcHwo20VG7BE14VjdqoTd9lZatvZNB9ratcY40LEmxNQT6rxWCa7NjAfVXWVmB++E8x33HAeexne81gCPMCXzKpW0QEcRmUfjgBWXgfXl1BeCMhaddkjsRssohGKRVSL0UfGoBtBEiD09zMYIyAU0pK92LEmZ75qdAFELB/NBxDwMLEuDNTi8NCYBGRpil+ncjMhvuI/p0RqVkfqoHakFGm1aH+MYnQCmXeL+EWGRzoxHbrpmdnDBqTKAxoBZbL4nYgjUkcihXsro+IF/Dv9SyzGceYqbphxCUKcbukvJxhxhWueDktU8iXgncSQh71w3z+YaeVdso57Xrj/rN4sv1YPmC1WSvcM8e+GZJ2LLUnkMur4ENoYtSDnUCw86bMk0IfwgTf03V/vHyu3+2mBrc3Vw7epX/zfLPTdRIXlTtPNy4pNXeQBssLhGWgzoeP6TiMDBQ0sMI+mBU5tvzwrghdrG7qTXJdHXsm73Ur649Eq+sPTXFeNPw8QE+KojKXs8I682xu4oI2eazYOV7UTg8ZahfcNCZcXyEAn2IwPWtLLTfVzJXkdT5j3FJCu9FcUHcht8aDn3yN1CMJhvRnHLfiNxcqWBWaQ5rQx77FZJHRnk97jEpWV15GYf0hZLwQgt5zDugUnyEYTBW6YEKG3xAXcasfcImXFZj1tUVOJ0mylkGFNAzRhBghFr3ZuwJNhkAQ9mOTkxAWIrZ4TbhGu2R5g1yP7JA6Y9GM42hzO7lnYSEcQo1SllcgI44a1Puw5Q4UE4KQ+WANM7LNj4rFZcs0TghTEgsVBnBXCPrdveiG6CzPHLSjlGWe6B4ANptSFGy9+sGib0PHCW+aGkQGzpg8BvhOBYEfF3B3SGRxMTEIM1Q7YSMCq2HXYZUl6MhtjFP4SGOesZN+APibCmTVRLJ4aH8o0yWSN00HCE71gDnSFGqgwUk0I7UtpoH0ppo2yHNl9YqdbwMRH8QA65NaeCKCbJE1EMOgxNkrY8AqdMVWkVD+bOihWmzAZzJEJJjrln7Wlwk4TKR4CEE8RhRLQWr3wLEN+qBmN68QhREWu1gkO4W4SOm0VhEeMNv17jhyXlK0YS32Wm+2Vdb9XQYbAYlNHLkGXVpjvutTbXI61bDRwcxyYg4Ft0a+Q3H2vEvlNEOt2X2yTATk9MR4NtXe1Ni+96wtawvEzuOH2wvZdq3KpK9BpXKD4bVaOMNqJUb1cmx4FBCn3MkOVXGEhERl+CqNqAzgazbNA+3GJ+Dj0YBa24q/GdeCiYTCYmIEiH0DSGhh0Wvqf3CHThsdjyAzJEh1YCIw/9imcTQcOJk8f7i2dr0JxaiOZWuXU0I2GXaDiQ8Sx6o/cEzEtD64zVGqbFE7wnCS339veJCWj46FEjaegXQMyrLS17145viK3knsoDQQdgntX4XFmdn8RUpxbCvFVe14+UzeDzvqlP8HlhOW4FsQMxAv0Yud0MtA+1mA8GJ8GvSN2c2Kyr05tVtdqvq+PXZ7k2MQEPHPtOvtT7VdLL3kh89Wlviz9ES6aeUEtIisHaNjisQyk2Nn7Y4cxsN/XDxUL6xspy5yJ4ceHY0k8/3Cex8Vh8WLFRdljxbNjF2REdWqWdHBHvj9qMzOXHHB34icEWCLxgGIQ1MNdI+6JsPrHr7WzCPpMTIHOVO0iAw+hoyqnuBO45ZjyDGQ9ySKV9WJsfNiXm63yO3EEChAeKI1gFZlztNqwfbvDREW5qb6e8u0iwvzaAMUdxc+iS4vYAlNGnpnshfnxQCyJ4JiX+J4G17hh3kIDaDBM8qvYGyLcCtVM3Zp1xcID74ZTR2AQfvwDHd5T5XCGq6R2q6ni/LE77un82+PKzwZ61t/QwRziBJGK3NJC+Frv5EmgbIG2xeTS0rRt34xlucGLN+vpl8cWJq/i3ATaL6tF/RNkct5kJOLL0y6Vu92KSLb7gkt4VN6gfCMFOXXvN9IxkjsTA2R58RxBOjBgcIqsH2i3a4yqyYx9qRocJEltREcpqG8qwG7BpsJ81AX0DP1SiTlM9vJn03rgvX7x0JO+eXzm6/IvP0XOuMjMBN1ur/aKUPAobvDB/o9y8smUYI8fLyDQfrU5ABDlkQWgTmEQedbHL3BjVrX0D6vg/KuAUysuOQoW2UA969Ibih6zZyPN17dj3wpzwE7EfG7VzUjP5DZBExVsScC4aJTGOLEXAUFGyYkOibN8XxKi1TWjPc0/FkgYxXUjgXPN82fHY8iTO800iMBhNqX38WzW0PnwZjn7nBnx5wg+qx0O//3jY2j4VNgerYQP0i9O4eTKU9eLQmBO12bKVEeGGfAh5YGeIGBWBWODCRfDGA8QqvIVK0xwPdbnmq2rNl9U5AK3P+LJe85U/zvd7ut1FGfPqzqwcW/hJeqyz7o4sXHRHF19y9/Uuuvt7L7nl7gWX6asuTR7xcRU0BFXVGGVm2TJU4uzbd3vPGeI5sY22fO7Ezt3WD6tI+BAXpAif8lnnNZd315Nuvp708j8kve5vkm7397TPJytLP7/rPTB3AszJaajK4Qpga4j9mfwwMLEpNcTOIQYpcRnAiDrcKLSQKSkDfmXIMe7+YM8ToEE5AWxvZyJNKsIZsAMCVuJQUWqZKO8VEkPkRhGuVubQwIbYJ1+Y+1jcXtsuyxNalGeEfSvNYFV8eYr6KamghaE4LUWxJsXgnBTFOamKs1JTr6FVcUaKATJoVa7R76TutX8329vzBBw5+jNlv2rW+52my+uaLF7UbOGidhbOa7d3XvP8mbSbf6Pb635rpdv90f1Z78cPpgvffyjt/eChrPu9B/Pud1d67Pfl/AXl9/ye+7fvCbh5gJvbql9uVL9YqD6xqXryfdXH/q26+m6Lc9SNz+/umzvuU3vfM7xPfu+Z2U8SsGep/Iga+mQFfEQnbs/c/sivgLvNxP8BAAD//4nnNDgAAAAGSURBVAMAof3dvX/vge4AAAAASUVORK5CYII=";
+            scaredGhostImage = new Image(); scaredGhostImage.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAEQSURBVHhe7ZfRCcJAEEQTO8mX5diGJdmG5fiVUiLCILKJrucqGuc9kDmEk7shM246ALCml36MYZgmLV9iHPuPnnEjtQUDpLaU81XNeJVqRxABqS10gPRpvp35jNZOIAJSW+gA6V1+PfMZWScQAaktGCC1BQOkttgb8PY54HQ4arXMdr/Tapnq/ghzQAIGSG2ZGXDJ/O1HX6+W7D48AVJb7A2Y/Uf+Q+4fEecCIiC1BQOktmCA1BZ7A5rngG+/71f3MwcEMEBqS9oBMXO/nvHsvHRAAAOktjTPAWuHDghggNSW5g6IGWrtjLg/Uv291vMTAaktdID0SsxQltlIawYj1f2R7D5EQGqLvQEA4EzXnQG5dnFmD+3lHgAAAABJRU5ErkJggg==";
+        }
+
+        // tilemap (your current version)
+        const tileMap = [
+    "XXXXXXXXXXXXXXXXXXX",
+    "XO       X       OX",
+    "XXX XXXX X XXXX XXX",
+    "X X             X X",
+    "X XX X XX XX X XX X",
+    "X    X       X    X",
+    "XXXX XXXX XXXX XXXX",
+    "X    X       X    X",
+    "XXXX X XXrXX X XXXX",
+    "O       bpo       O",
+    "XXXX X XXXXX X XXXX",
+    "X    X       X    X",
+    "XX X X XXXXX X X XX",
+    "X        X        X",
+    "X XX XXX X XXX XX X",
+    "X  X     P     X  X",
+    "XXXX X XXXXX X XXXX",
+    "X    X   X   X    X",
+    "XXX XXXX X XXXX XXX",
+    "XO               OX",
+    "XXXXXXXXXXXXXXXXXXX",
+];
+
+        // compute tunnel rows/cols + candidate pellet positions
+        function computeCandidatePelletsAndTunnel(){
+            // tunnel metadata
+            tunnelRows = new Set();
+            tunnelCols = [];
+            candidatePelletPositions = [];
+            for (let r=0; r<rowCount; r++){
+                for (let c=0; c<columnCount; c++){
+                    const ch = tileMap[r][c];
+                    if (ch === 'O'){
+                        tunnelRows.add(r);
+                        tunnelCols.push(c);
+                        candidatePelletPositions.push({r,c});
+                    }
+                }
+            }
+            tunnelCols = Array.from(new Set(tunnelCols)).sort((a,b)=>a-b);
+
+            // choose N pellet positions from candidates in "suitable" places
+            // YOU had set slice(0,6) in your copy — I preserve your logic.
+            const POWER_PELLET_COUNT = 6; // change this number if you want different count
+            const cx = (boardWidth/2), cy = (boardHeight/2);
+            const scored = candidatePelletPositions.map(p => {
+                const px = p.c * tileSize + tileSize/2;
+                const py = p.r * tileSize + tileSize/2;
+                const dist = Math.hypot(px - cx, py - cy);
+                return {p, dist};
+            });
+            scored.sort((a,b)=>b.dist - a.dist); // farthest first
+            chosenPelletPositions = scored.slice(0, POWER_PELLET_COUNT).map(s => s.p);
+
+            // fallback if there are fewer candidates than needed
+            if (chosenPelletPositions.length < Math.min(3, POWER_PELLET_COUNT)) {
+                const fallback = [];
+                for (let r=1; r<rowCount-1 && fallback.length<Math.min(3, POWER_PELLET_COUNT); r++){
+                    for (let c=1; c<columnCount-1 && fallback.length<Math.min(3, POWER_PELLET_COUNT); c++){
+                        if (tileMap[r][c] === ' ') fallback.push({r,c});
+                    }
+                }
+                chosenPelletPositions = chosenPelletPositions.concat(fallback).slice(0, Math.max(3, POWER_PELLET_COUNT));
+            }
+        }
+
+        // helpers for tunnel detection and pellet UI
+        function tileAtEntity(e){
+            if (!e) return null;
+            const cx = e.x + (e.width||0)/2;
+            const cy = e.y + (e.height||0)/2;
+            const col = Math.floor(cx / tileSize);
+            const row = Math.floor(cy / tileSize);
+            if (row < 0 || row >= rowCount || col < 0 || col >= columnCount) return {row, col, tile: null};
+            return { row, col, tile: tileMap[row][col] };
+        }
+
+        // TIGHTER tunnel detection:
+        // returns true only when Pac-Man's center tile (or immediate left/right neighbor)
+        // is actually an 'O' cell in the tileMap. This avoids the earlier broad edge test
+        // that caused vertical moves to be blocked near the right/left edges.
+        function isInTunnelArea(e) {
+            if (!e) return false;
+            const cx = e.x + (e.width||0)/2;
+            const cy = e.y + (e.height||0)/2;
+            const centerCol = Math.floor(cx / tileSize);
+            const row = Math.floor(cy / tileSize);
+            if (row < 0 || row >= rowCount) return false;
+
+            // if center tile is O -> tunnel
+            if (centerCol >= 0 && centerCol < columnCount && tileMap[row][centerCol] === 'O') return true;
+
+            // check immediate neighbors only (left/right) — safer than broad edge test
+            const left = centerCol - 1, right = centerCol + 1;
+            if (left >= 0 && tileMap[row][left] === 'O') return true;
+            if (right < columnCount && tileMap[row][right] === 'O') return true;
+
+            return false;
+        }
+
+        // Block class (updated reset -> updateVelocity to avoid stuck ghosts)
+        class Block {
+            constructor(image, x, y, width, height) {
+                this.image = image;
+                this.x = x; this.y = y;
+                this.width = width; this.height = height;
+                this.startX = x; this.startY = y;
+                this.direction = 'R';
+                this.velocityX = 0; this.velocityY = 0;
+                this.nextDirection = null; // queued direction if current can't be applied now
+                this.isScared = false; // ghost flag
+                this.originalImage = image; // keep original to restore after scared
+            }
+            // Tries to change direction. Returns true if direction accepted, false if rejected (collision).
+            updateDirection(direction) {
+                const prevDir = this.direction;
+                this.direction = direction;
+                this.updateVelocity();
+
+                // tentative move by one velocity step to test collision
+                this.x += this.velocityX;
+                this.y += this.velocityY;
+
+                for (let wall of walls) {
+                    if (collision(this, wall)) {
+                        // undo and revert
+                        this.x -= this.velocityX;
+                        this.y -= this.velocityY;
+                        this.direction = prevDir;
+                        this.updateVelocity();
+                        return false;
+                    }
+                }
+
+                // accepted (positions already advanced one step — that's fine)
+                return true;
+            }
+            updateVelocity() {
+                if (this.direction == 'U') { this.velocityX = 0; this.velocityY = -tileSize/4; }
+                else if (this.direction == 'D') { this.velocityX = 0; this.velocityY = tileSize/4; }
+                else if (this.direction == 'L') { this.velocityX = -tileSize/4; this.velocityY = 0; }
+                else if (this.direction == 'R') { this.velocityX = tileSize/4; this.velocityY = 0; }
+            }
+            reset() {
+                this.x = this.startX;
+                this.y = this.startY;
+                this.velocityX = 0;
+                this.velocityY = 0;
+                this.direction = 'R';
+                this.nextDirection = null;
+                this.isScared = false;
+                // restore original image when resetting
+                if (this.originalImage) this.image = this.originalImage;
+                // important: ensure velocity matches direction so ghost doesn't stay stuck
+                this.updateVelocity();
+            }
+        }
+
+        // helper: set pacman image based on current direction
+        function setPacmanImageAccordingToDirection() {
+            if (!pacman) return;
+            if (pacman.direction === 'U' && pacmanUpImage) pacman.image = pacmanUpImage;
+            else if (pacman.direction === 'D' && pacmanDownImage) pacman.image = pacmanDownImage;
+            else if (pacman.direction === 'L' && pacmanLeftImage) pacman.image = pacmanLeftImage;
+            else if (pacman.direction === 'R' && pacmanRightImage) pacman.image = pacmanRightImage;
+            else if (pacmanRightImage) pacman.image = pacmanRightImage;
+        }
+
+        // helper: show eating animation (pacmanEatImage) briefly then restore directional image
+        function showEatAnimation(ms = 140) {
+            if (!pacman || !pacmanEatImage) return;
+            const prev = pacman.image;
+            pacman.image = pacmanEatImage;
+            setTimeout(() => {
+                setPacmanImageAccordingToDirection();
+            }, ms);
+        }
+
+        function loadMap() {
+            walls.clear(); foods.clear(); ghosts.clear(); powerPellets.clear();
+            for (let r = 0; r < rowCount; r++) {
+                for (let c = 0; c < columnCount; c++) {
+                    const tileChar = tileMap[r][c];
+                    const x = c * tileSize, y = r * tileSize;
+                    if (tileChar == 'X') {
+                        const wall = new Block(wallImage, x, y, tileSize, tileSize);
+                        walls.add(wall);
+                    } else if (tileChar == 'b') {
+                        const g = new Block(blueGhostImage, x, y, tileSize, tileSize);
+                        g.originalImage = blueGhostImage; ghosts.add(g);
+                    } else if (tileChar == 'o') {
+                        const g = new Block(orangeGhostImage, x, y, tileSize, tileSize);
+                        g.originalImage = orangeGhostImage; ghosts.add(g);
+                    } else if (tileChar == 'p') {
+                        const g = new Block(pinkGhostImage, x, y, tileSize, tileSize);
+                        g.originalImage = pinkGhostImage; ghosts.add(g);
+                    } else if (tileChar == 'r') {
+                        const g = new Block(redGhostImage, x, y, tileSize, tileSize);
+                        g.originalImage = redGhostImage; ghosts.add(g);
+                    } else if (tileChar == 'P') {
+                        pacman = new Block(pacmanRightImage, x, y, tileSize, tileSize);
+                    } else if (tileChar == ' ') {
+                        const food = new Block(null, x+14, y+14, 4, 4);
+                        foods.add(food);
+                    } else if (tileChar == 'O') {
+                        // treat O as empty for dots as well (power pellets placed separately below)
+                        const food = new Block(null, x+14, y+14, 4, 4);
+                        foods.add(food);
+                    }
+                }
+            }
+
+            // place the chosen power pellets (chosenPelletPositions picked earlier)
+            if (!chosenPelletPositions || chosenPelletPositions.length === 0) {
+                computeCandidatePelletsAndTunnel();
+            }
+            for (let pos of chosenPelletPositions) {
+                const x = pos.c * tileSize;
+                const y = pos.r * tileSize;
+                const pellet = new Block(null, x + (tileSize/2 - 6), y + (tileSize/2 - 6), 12, 12);
+                powerPellets.add(pellet);
+            }
+        }
+
+        function update() {
+            if (!gameRunning) return;   // stop duplicate loops / unwanted runs
+            if (gameOver) return;
+            move();
+            draw();
+            setTimeout(update, 50); // 20 FPS
+        }
+
+        function draw() {
+            if (!context) return;
+            context.clearRect(0, 0, board.width, board.height);
+
+            // draw walls (image or fallback block) plus subtle inner stroke
+            for (let wall of walls) {
+                if (wall.image && wall.image.complete) {
+                    try { context.drawImage(wall.image, wall.x, wall.y, wall.width, wall.height); } catch (e) {}
+                } else {
+                    context.fillStyle = "#111";
+                    context.fillRect(wall.x, wall.y, wall.width, wall.height);
+                }
+                context.strokeStyle = "rgba(207,255,4,0.06)";
+                context.strokeRect(wall.x+1, wall.y+1, wall.width-2, wall.height-2);
+            }
+
+            // draw foods (dots)
+            context.fillStyle = "white";
+            for (let food of foods) {
+                context.fillRect(food.x, food.y, food.width, food.height);
+            }
+
+            // draw power pellets (crisper circle)
+            context.fillStyle = "#fff";
+            for (let pellet of powerPellets) {
+                context.beginPath();
+                context.arc(pellet.x + pellet.width/2, pellet.y + pellet.height/2, Math.min(pellet.width,pellet.height)/2, 0, Math.PI*2);
+                context.fill();
+            }
+
+            // ghosts
+            for (let ghost of ghosts) {
+                if (ghost.image && ghost.image.complete) {
+                    try { context.drawImage(ghost.image, ghost.x, ghost.y, ghost.width, ghost.height); } catch (e) {}
+                } else {
+                    context.fillStyle = ghost.isScared ? "#89f" : "#f55";
+                    context.fillRect(ghost.x, ghost.y, ghost.width, ghost.height);
+                }
+            }
+
+            // pacman
+            if (pacman && pacman.image && pacman.image.complete) {
+                try { context.drawImage(pacman.image, pacman.x, pacman.y, pacman.width, pacman.height); } catch (e) {}
+            } else if (pacman) {
+                context.fillStyle = "#FFD400";
+                context.fillRect(pacman.x, pacman.y, pacman.width, pacman.height);
+            }
+
+            if (spanScore) spanScore.innerText = score;
+        }
+
+        function move() {
+            if (!pacman) return;
+
+            // queued direction: increased tolerance to 3px for alignment (helps on mobile)
+            if (pacman.nextDirection) {
+                const alignedX = Math.abs((pacman.x % tileSize)) < 3 || Math.abs((pacman.x % tileSize) - tileSize) < 3;
+                const alignedY = Math.abs((pacman.y % tileSize)) < 3 || Math.abs((pacman.y % tileSize) - tileSize) < 3;
+                const queuedIsVertical = pacman.nextDirection === 'U' || pacman.nextDirection === 'D';
+
+                // do not apply vertical moves while in a true tunnel tile area
+                if (!(queuedIsVertical && isInTunnelArea(pacman))) {
+                    if (alignedX && alignedY) {
+                        const ok = pacman.updateDirection(pacman.nextDirection);
+                        if (ok) {
+                            if (pacman.direction === 'U') pacman.image = pacmanUpImage || pacman.image;
+                            else if (pacman.direction === 'D') pacman.image = pacmanDownImage || pacman.image;
+                            else if (pacman.direction === 'L') pacman.image = pacmanLeftImage || pacman.image;
+                            else if (pacman.direction === 'R') pacman.image = pacmanRightImage || pacman.image;
+                            pacman.nextDirection = null;
+                        }
+                    }
+                }
+            }
+
+            // move pacman by velocity
+            pacman.x += pacman.velocityX;
+            pacman.y += pacman.velocityY;
+
+            // horizontal tunnel wrapping for Pac-Man
+            if (typeof pacman.width === 'number') {
+                if (pacman.x + pacman.width < 0) {
+                    pacman.x = boardWidth - pacman.width;
+                    // clear queued vertical move after wrap to avoid accidental up/down blocking
+                    pacman.nextDirection = null;
+                } else if (pacman.x > boardWidth) {
+                    pacman.x = -pacman.width;
+                    pacman.nextDirection = null;
+                }
+            }
+
+            // if Pac-Man is inside tunnel area, prevent vertical movement (safety)
+            if (isInTunnelArea(pacman)) {
+                pacman.velocityY = 0;
+            }
+
+            // wall collision for pacman
+            for (let wall of walls) {
+                if (collision(pacman, wall)) {
+                    pacman.x -= pacman.velocityX;
+                    pacman.y -= pacman.velocityY;
+                    break;
+                }
+            }
+
+            // power pellet collision
+            let pelletEaten = null;
+            for (let pellet of powerPellets) {
+                if (collision(pacman, pellet)) {
+                    pelletEaten = pellet;
+                    break;
+                }
+            }
+            if (pelletEaten) {
+                powerPellets.delete(pelletEaten);
+                score += 50;
+
+                // show eating animation (Pac Man Eated)
+                showEatAnimation(140);
+
+                // set ghosts to scared mode and change images
+                startScaredMode(SCARED_DURATION_MS);
+            }
+
+            // ghost collision and movement (with scared logic)
+            for (let ghost of ghosts) {
+                // ghost eaten by pacman if scared
+                if (collision(ghost, pacman)) {
+                    if (ghost.isScared) {
+                        // Pac-Man eats the ghost
+                        score += 200;
+                        // show Pac-Man eating image briefly
+                        showEatAnimation(160);
+                        // reset ghost to start (now reset updates velocity to avoid stuck)
+                        ghost.reset();
+                        continue; // next ghost
+                    } else {
+                        // normal death
+                        lives--;
+                        if (lives == 0) { gameOver = true; showGameOver(); return; }
+                        resetPositions();
+                    }
+                }
+
+                if (Math.abs(ghost.y - tileSize*9) < 1 && ghost.direction != 'U' && ghost.direction != 'D') {
+                    ghost.updateDirection('U');
+                }
+
+                ghost.x += ghost.velocityX;
+                ghost.y += ghost.velocityY;
+
+                // horizontal tunnel wrapping for ghosts
+                if (typeof ghost.width === 'number') {
+                    if (ghost.x + ghost.width < 0) {
+                        ghost.x = boardWidth - ghost.width;
+                    } else if (ghost.x > boardWidth) {
+                        ghost.x = -ghost.width;
+                    }
+                }
+
+                for (let wall of walls) {
+                    if (collision(ghost, wall) || ghost.x <= 0 || ghost.x + ghost.width >= boardWidth) {
+                        ghost.x -= ghost.velocityX;
+                        ghost.y -= ghost.velocityY;
+                        const newDir = directions[Math.floor(Math.random()*4)];
+                        ghost.updateDirection(newDir);
+                    }
+                }
+            }
+
+            // food collision
+            let eaten = null;
+            for (let food of foods) {
+                if (collision(pacman, food)) {
+                    eaten = food;
+                    score += 10;
+                    break;
+                }
+            }
+            if (eaten) {
+                foods.delete(eaten);
+                // show eating animation for dot
+                showEatAnimation(120);
+            }
+
+            // next level
+            if (foods.size == 0) {
+                loadMap();
+                resetPositions();
+            }
+        }
+
+        function collision(a, b) {
+            return a.x < b.x + b.width &&
+                   a.x + a.width > b.x &&
+                   a.y < b.y + b.height &&
+                   a.y + a.height > b.y;
+        }
+
+        function resetPositions() {
+            if (!pacman) return;
+            pacman.reset();
+            pacman.velocityX = 0;
+            pacman.velocityY = 0;
+            for (let ghost of ghosts) {
+                ghost.reset();
+            }
+        }
+
+        // Scared mode handling: start/stop & UI timer
+        function startScaredMode(durationMs = SCARED_DURATION_MS) {
+            // mark ghosts as scared and change image
+            for (let g of ghosts) {
+                g.isScared = true;
+                g.image = scaredGhostImage || g.image;
+            }
+            // Setup end time & UI
+            if (scaredTimeout) clearTimeout(scaredTimeout);
+            if (scaredInterval) clearInterval(scaredInterval);
+            scaredEndAt = Date.now() + durationMs;
+            // show UI
+            const el = scaredTimerEl();
+            el.style.display = 'block';
+            updateScaredTimerUI(); // immediate update
+            // interval to update UI every 100ms
+            scaredInterval = setInterval(updateScaredTimerUI, 100);
+            // timeout to end scared mode
+            scaredTimeout = setTimeout(() => {
+                endScaredMode();
+            }, durationMs);
+        }
+
+        function updateScaredTimerUI(){
+            const el = scaredTimerEl();
+            const remainingMs = Math.max(0, scaredEndAt - Date.now());
+            const sec = Math.ceil(remainingMs / 1000);
+            el.innerText = sec + 's';
+            if (remainingMs <= 0) {
+                el.style.display = 'none';
+            }
+        }
+
+        function endScaredMode(){
+            if (scaredTimeout) { clearTimeout(scaredTimeout); scaredTimeout = null; }
+            if (scaredInterval) { clearInterval(scaredInterval); scaredInterval = null; }
+            for (let g of ghosts) {
+                g.isScared = false;
+                if (g.originalImage) g.image = g.originalImage;
+            }
+            const el = scaredTimerEl();
+            el.style.display = 'none';
+        }
+
+        // changeDir: prevents vertical move while inside tunnel area (queues instead)
+        function changeDir(dir) {
+            if (!pacman || !gameRunning || gameOver) return;
+
+            const dirMap = { 'UP':'U', 'DOWN':'D', 'LEFT':'L', 'RIGHT':'R' };
+            const want = dirMap[dir];
+            if (!want) return;
+
+            // If player wants vertical movement while inside a tunnel tile, don't apply it yet.
+            if ((want === 'U' || want === 'D') && isInTunnelArea(pacman)) {
+                pacman.nextDirection = want; // queue but do not change image or attempt now
+                return;
+            }
+
+            // Try to apply immediately
+            const ok = pacman.updateDirection(want);
+            if (ok) {
+                // only update image when move accepted
+                if (want === 'U') pacman.image = pacmanUpImage || pacman.image;
+                else if (want === 'D') pacman.image = pacmanDownImage || pacman.image;
+                else if (want === 'L') pacman.image = pacmanLeftImage || pacman.image;
+                else if (want === 'R') pacman.image = pacmanRightImage || pacman.image;
+
+                pacman.nextDirection = null;
+            } else {
+                // can't go that way right now — queue it (do NOT prematurely change image)
+                pacman.nextDirection = want;
+            }
+        }
+
+        // Guarded keyboard input
+        document.addEventListener("keydown", (e) => {
+            if (!gameRunning || !pacman || gameOver) return;
+            const key = e.key.toLowerCase();
+            if (key === "arrowleft" || key === "a") changeDir("LEFT");
+            else if (key === "arrowup" || key === "w") changeDir("UP");
+            else if (key === "arrowright" || key === "d") changeDir("RIGHT");
+            else if (key === "arrowdown" || key === "s") changeDir("DOWN");
+        });
+
+        function startGame() {
+            if (gameRunning) return; // prevent duplicates
+            document.getElementById("home-screen").style.display = "none";
+            document.getElementById("settings-screen").style.display = "none";
+            score = 0;
+            lives = 1;
+            gameOver = false;
+            gameRunning = true;
+
+            // recompute pellet choices each game (so they're not always same)
+            computeCandidatePelletsAndTunnel();
+
+            loadMap();
+            resetPositions();
+            for (let ghost of ghosts) {
+                const newDir = directions[Math.floor(Math.random()*4)];
+                ghost.updateDirection(newDir);
+            }
+            update();
+        }
+
+        function showGameOver() {
+            gameRunning = false;
+            const go = document.getElementById("game-over");
+            go.style.display = "flex";
+            go.classList.add("animate-go");
+            document.getElementById("final-score").innerText = "Score: " + score;
+            const msgEl = document.getElementById("high-score-msg");
+            const localBest = parseInt(localStorage.getItem('pacman_highscore')) || 0;
+            if (score > localBest) {
+                localStorage.setItem('pacman_highscore', score);
+            }
+            // Firebase sync (keeps original behavior)
+            db.ref('users/' + playerName.toLowerCase()).once('value', snap => {
+                const cloudBest = snap.val()?.pacman_highscore || 0;
+                if (score > cloudBest) {
+                    msgEl.innerText = "Syncing score, please wait...";
+                    msgEl.style.color = "#f1c40f";
+                    db.ref('users/' + playerName.toLowerCase()).update({ pacman_highscore: score })
+                    .then(() => {
+                        msgEl.innerText = "Successfully Synced! NEW HIGH SCORE! 🔥";
+                        msgEl.style.color = "#00ff88";
+                    }).catch(err => {
+                        msgEl.innerText = "Sync Failed! (Saved Locally)";
+                        msgEl.style.color = "#ff3366";
+                        console.error("Firebase Error:", err);
+                    });
+                } else {
+                    msgEl.innerText = "Best: " + Math.max(cloudBest, localBest);
+                    msgEl.style.color = "#CFFF04";
+                }
+            });
+        }
+
+        function resetGame() {
+            // end scared mode quickly if active
+            endScaredMode();
+            document.getElementById("game-over").style.display = "none";
+            document.getElementById("game-over").classList.remove("animate-go");
+            document.getElementById("home-screen").style.display = "flex";
+        }
+
+        function toggleSettings() {
+            const ss = document.getElementById("settings-screen");
+            ss.style.display = (ss.style.display === 'none' ? 'flex' : 'none');
+        }
+
+        let isCustomizing = false;
+        function toggleCtrlSettings() {
+            isCustomizing = !isCustomizing;
+            const screen = document.getElementById('ctrl-custom-screen');
+            screen.style.display = isCustomizing ? 'flex' : 'none';
+            document.getElementById('controls').classList.toggle('customizing', isCustomizing);
+        }
+
+        function resetControls() {
+                window.parent.postMessage({type:'confirm',msg:'Reset all controls to default positions?',icon:'🎮',action:'reset-pacman'},'*');
+        }
+        function _doResetControls() {
+                            const controlButtons = document.querySelectorAll('.ctrl-btn');
+                controlButtons.forEach(btn => {
+                    localStorage.removeItem('pos_' + btn.id);
+                });
+                const def={'btn-up':['50%','90px','translateX(-50%)'],'btn-left':['calc(50% - 109px)','20px',''],'btn-down':['50%','20px','translateX(-50%)'],'btn-right':['calc(50% + 44px)','20px','']};
+                controlButtons.forEach(btn=>{const d=def[btn.id];if(d){btn.style.left=d[0];btn.style.bottom=d[1];btn.style.transform=d[2];}});
+        }
+
+        // Load saved positions for each control button (run after DOM ready)
+        window.addEventListener('message',function(e){if(e.data&&e.data.type==='confirm-yes'&&e.data.action==='reset-pacman')_doResetControls();});
+        function loadButtonPositions() {
+            const controlButtons = document.querySelectorAll('.ctrl-btn');
+            controlButtons.forEach(btn => {
+                const pos = JSON.parse(localStorage.getItem('pos_' + btn.id));
+                if (pos) {
+                    btn.style.left = pos.left;
+                    btn.style.bottom = pos.bottom;
+                    btn.style.transform = 'none';
+                }
+            });
+
+            // attach per-button touchstart and a single global touchmove/touchend
+            let activeDragBtn = null;
+
+            controlButtons.forEach(btn => {
+                btn.addEventListener('touchstart', (e) => {
+                    if (!isCustomizing) return;
+                    activeDragBtn = btn;
+                    btn.style.opacity = "0.6";
+                }, { passive: false });
+
+                btn.addEventListener('touchcancel', () => {
+                    if (!activeDragBtn) return;
+                    activeDragBtn.style.opacity = "1";
+                    activeDragBtn = null;
+                }, { passive: false });
+            });
+
+            window.addEventListener('touchmove', (e) => {
+                if (!activeDragBtn || !isCustomizing) return;
+                e.preventDefault();
+                const touch = e.touches[0];
+                activeDragBtn.style.left = (touch.clientX - activeDragBtn.offsetWidth / 2) + "px";
+                activeDragBtn.style.bottom = (window.innerHeight - touch.clientY - activeDragBtn.offsetHeight / 2) + "px";
+                activeDragBtn.style.transform = "none";
+            }, { passive: false });
+
+            window.addEventListener('touchend', () => {
+                if (!activeDragBtn) return;
+                activeDragBtn.style.opacity = "1";
+                localStorage.setItem('pos_' + activeDragBtn.id, JSON.stringify({
+                    left: activeDragBtn.style.left,
+                    bottom: activeDragBtn.style.bottom
+                }));
+                activeDragBtn = null;
+            }, { passive: false });
+        }
+    </script>
+</body>
+</html>

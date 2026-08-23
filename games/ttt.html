@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+ <script>
+        // SECURITY CHECK & FIREBASE VERIFICATION
+        const storedName = localStorage.getItem('playerName');
+        
+        // Basic Local Check
+        if (localStorage.getItem('isLoggedIn') !== 'true' || !storedName) {
+            window.parent.postMessage('spa-back','*');
+        } else {
+            // Extra Protection: Check if user actually exists in Firebase
+            const checkId = storedName.toLowerCase().trim();
+            if (typeof db !== 'undefined' && db) {
+                db.ref('users/' + checkId).once('value', snap => {
+                    if (!snap.exists()) {
+                        window.parent.postMessage({type:'notify',msg:'⛔ Access denied! Please re-login.',nt:'error'},'*');
+                        localStorage.clear();
+                        window.parent.postMessage('spa-back','*');
+                    }
+                });
+            }
+        }
+    </script>
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Tic Tac Toe</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Teko:wght@500;700&display=swap');
+
+        :root {
+            --bg: #111;
+            --x-color: #00f3ff; /* Neon Cyan */
+            --o-color: #ff0055; /* Neon Pink */
+            --grid-color: #333;
+            --text-color: #fff;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-color);
+            font-family: 'Teko', sans-serif;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            touch-action: manipulation;
+        }
+
+        /* --- MODE SELECTION SCREEN --- */
+        #mode-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+            padding: 20px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        h1 {
+            font-size: 4rem;
+            margin: 0 0 20px 0;
+            text-shadow: 0 0 10px rgba(255,255,255,0.5);
+            line-height: 1;
+        }
+
+        .mode-btn {
+            background: linear-gradient(45deg, #222, #333);
+            border: 2px solid #555;
+            color: white;
+            padding: 20px;
+            font-size: 1.8rem;
+            font-family: 'Teko', sans-serif;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: 0.2s;
+            text-transform: uppercase;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .mode-btn:active { transform: scale(0.96); }
+
+        /* Specific Colors for Modes */
+        .btn-pvp { border-color: #f1c40f; color: #f1c40f; } /* Yellow */
+        .btn-ai { border-color: #00f3ff; color: #00f3ff; } /* Cyan */
+        .btn-sim { border-color: #ff0055; color: #ff0055; } /* Pink */
+
+        /* --- GAME SCREEN --- */
+        #game-screen {
+            display: none; /* Hidden by default */
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+
+        .status {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            height: 40px;
+            color: #ccc;
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            background-color: var(--bg);
+            padding: 10px;
+            border-radius: 15px;
+            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+        }
+
+        .cell {
+            width: 90px;
+            height: 90px;
+            background-color: #1a1a1a;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+            transition: background 0.2s;
+        }
+
+        /* Cell States */
+        .cell.x { color: var(--x-color); text-shadow: 0 0 15px var(--x-color); }
+        .cell.o { color: var(--o-color); text-shadow: 0 0 15px var(--o-color); }
+        .cell:active { background-color: #252525; }
+
+        /* WIN ANIMATION KEYFRAMES */
+        @keyframes winPulse {
+            0% { transform: scale(1); filter: brightness(1); }
+            50% { transform: scale(1.05); filter: brightness(1.5); box-shadow: 0 0 20px currentColor; }
+            100% { transform: scale(1); filter: brightness(1); }
+        }
+
+        .cell.win-highlight {
+            animation: winPulse 0.8s ease-in-out infinite;
+            background-color: #333;
+            border: 2px solid white;
+            z-index: 10; /* Bring to front */
+        }
+
+        /* Controls */
+        .controls {
+            margin-top: 30px;
+            display: flex;
+            gap: 20px;
+        }
+
+        .ctrl-btn {
+            padding: 10px 20px;
+            font-size: 1.2rem;
+            font-family: 'Teko', sans-serif;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background: #444;
+            color: white;
+        }
+
+        .btn-back { background: #e74c3c; }
+        .btn-reset { background: #3498db; }
+
+        /* Menu Link */
+        .main-menu-link {
+            margin-top: 30px;
+            color: #666;
+            text-decoration: none;
+            font-size: 1.2rem;
+            border-bottom: 1px solid #444;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body><style>#spabk{position:fixed;top:10px;left:10px;z-index:99999;background:rgba(0,0,0,0.8);color:#00f3ff;border:1px solid #00f3ff;padding:8px 18px;border-radius:20px;cursor:pointer;font-family:Segoe UI,sans-serif;font-size:.9rem;backdrop-filter:blur(5px);}#spabk:hover{background:#00f3ff;color:#000;}</style><button id="spabk" onclick="window.parent.postMessage('spa-back','*'); exitLandscapeAndRelease();">← Hub</button>
+
+    <div id="mode-menu">
+        <h1>TIC TAC TOE</h1>
+        <button class="mode-btn btn-pvp" onclick="startGame('PvP')">Player vs Player</button>
+        <button class="mode-btn btn-ai" onclick="startGame('PvAI')">Player vs AI</button>
+        <button class="mode-btn btn-sim" onclick="startGame('AIvAI')">AI vs AI</button>
+        
+        <button class="main-menu-link" onclick="window.parent.postMessage('spa-back','*')">← Main Menu</button>
+    </div>
+
+    <div id="game-screen">
+        <div class="status" id="status-text">Player X's Turn</div>
+        
+        <div class="board" id="board">
+            <div class="cell" onclick="handleCellClick(0)"></div>
+            <div class="cell" onclick="handleCellClick(1)"></div>
+            <div class="cell" onclick="handleCellClick(2)"></div>
+            <div class="cell" onclick="handleCellClick(3)"></div>
+            <div class="cell" onclick="handleCellClick(4)"></div>
+            <div class="cell" onclick="handleCellClick(5)"></div>
+            <div class="cell" onclick="handleCellClick(6)"></div>
+            <div class="cell" onclick="handleCellClick(7)"></div>
+            <div class="cell" onclick="handleCellClick(8)"></div>
+        </div>
+
+        <div class="controls">
+            <button class="ctrl-btn btn-back" onclick="showMenu()">Change Mode</button>
+            <button class="ctrl-btn btn-reset" onclick="resetGame()">Restart</button>
+        </div>
+    </div>
+
+    <script>
+        // --- GAME VARIABLES ---
+        let boardState = ["", "", "", "", "", "", "", "", ""];
+        let currentPlayer = "X";
+        let gameActive = true;
+        let currentMode = ""; // 'PvP', 'PvAI', 'AIvAI'
+        
+        const statusText = document.getElementById("status-text");
+        const cells = document.querySelectorAll(".cell");
+        const modeMenu = document.getElementById("mode-menu");
+        const gameScreen = document.getElementById("game-screen");
+
+        const winningConditions = [
+            [0, 1, 2], [3, 4, 5], [6, 7, 8], // Rows
+            [0, 3, 6], [1, 4, 7], [2, 5, 8], // Cols
+            [0, 4, 8], [2, 4, 6]             // Diagonals
+        ];
+
+        // --- NAVIGATION ---
+        function startGame(mode) {
+            currentMode = mode;
+            modeMenu.style.display = "none";
+            gameScreen.style.display = "flex";
+            resetGame();
+
+            if (currentMode === 'AIvAI') {
+                statusText.innerText = "Simulation Started...";
+                setTimeout(makeAIMove, 500); // Start the AI loop
+            }
+        }
+
+        function showMenu() {
+            gameActive = false; // Stop any running AI
+            gameScreen.style.display = "none";
+            modeMenu.style.display = "flex";
+        }
+
+        // --- GAME LOGIC ---
+        
+        function handleCellClick(index) {
+            // If game over, cell taken, or it's AI turn (in AI modes), ignore click
+            if (!gameActive || boardState[index] !== "") return;
+            
+            // In AIvAI, humans can't click
+            if (currentMode === 'AIvAI') return;
+
+            // Make Move
+            makeMove(index, currentPlayer);
+
+            // If game still active...
+            if (gameActive) {
+                if (currentMode === 'PvAI') {
+                    // Lock board, wait for AI
+                    setTimeout(makeAIMove, 600);
+                }
+            }
+        }
+
+        function makeMove(index, player) {
+            boardState[index] = player;
+            cells[index].innerText = player;
+            cells[index].classList.add(player.toLowerCase()); // Add class 'x' or 'o' for color
+
+            // Check for Win
+            let winningLine = checkWin();
+            if (winningLine) {
+                statusText.innerText = `${player} Wins!`;
+                statusText.style.color = player === 'X' ? 'var(--x-color)' : 'var(--o-color)';
+                
+                // --- APPLY WIN ANIMATION ---
+                winningLine.forEach(idx => {
+                    cells[idx].classList.add("win-highlight");
+                });
+                
+                gameActive = false;
+                return;
+            }
+
+            if (!boardState.includes("")) {
+                statusText.innerText = "It's a Draw!";
+                statusText.style.color = '#fff';
+                gameActive = false;
+                return;
+            }
+
+            // Switch Player
+            currentPlayer = currentPlayer === "X" ? "O" : "X";
+            statusText.innerText = `${currentPlayer}'s Turn`;
+            statusText.style.color = '#ccc';
+        }
+
+        function makeAIMove() {
+            if (!gameActive) return;
+
+            let moveIndex = getBestMove();
+            makeMove(moveIndex, currentPlayer);
+
+            // If Simulation Mode, trigger next move loop
+            if (currentMode === 'AIvAI' && gameActive) {
+                let delay = Math.random() * 500 + 500; // Random delay 0.5s - 1s
+                setTimeout(makeAIMove, delay); 
+            }
+        }
+
+        function resetGame() {
+            boardState = ["", "", "", "", "", "", "", "", ""];
+            gameActive = true;
+            currentPlayer = "X";
+            statusText.innerText = "Player X's Turn";
+            statusText.style.color = '#ccc';
+            
+            cells.forEach(cell => {
+                cell.innerText = "";
+                // Remove all classes to reset color and animation
+                cell.classList.remove("x", "o", "win-highlight");
+            });
+
+            // If restarting AI vs AI
+            if (currentMode === 'AIvAI') {
+                setTimeout(makeAIMove, 500);
+            }
+        }
+
+        // Returns Array of winning indices [0, 1, 2] OR null if no win
+        function checkWin() {
+            for (let condition of winningConditions) {
+                let [a, b, c] = condition;
+                if (boardState[a] && boardState[a] === boardState[b] && boardState[a] === boardState[c]) {
+                    return condition; 
+                }
+            }
+            return null;
+        }
+
+        // --- SIMPLE AI LOGIC ---
+        function getBestMove() {
+            // 1. Try to Win
+            let winMove = findWinningMove(currentPlayer);
+            if (winMove !== -1) return winMove;
+
+            // 2. Block Opponent
+            let opponent = currentPlayer === "X" ? "O" : "X";
+            let blockMove = findWinningMove(opponent);
+            if (blockMove !== -1) return blockMove;
+
+            // 3. Take Center if open
+            if (boardState[4] === "") return 4;
+
+            // 4. Take Random available
+            let available = [];
+            boardState.forEach((cell, index) => {
+                if (cell === "") available.push(index);
+            });
+            return available[Math.floor(Math.random() * available.length)];
+        }
+
+        function findWinningMove(player) {
+            for (let condition of winningConditions) {
+                let [a, b, c] = condition;
+                // Check if 2 spots are 'player' and 1 is empty
+                if (boardState[a] === player && boardState[b] === player && boardState[c] === "") return c;
+                if (boardState[a] === player && boardState[c] === player && boardState[b] === "") return b;
+                if (boardState[b] === player && boardState[c] === player && boardState[a] === "") return a;
+            }
+            return -1;
+        }
+
+    </script>
+</body>
+
+</html>

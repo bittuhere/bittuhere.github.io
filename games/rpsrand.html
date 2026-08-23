@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+     <script>
+        // SECURITY CHECK
+        // If user is not logged in, kick them to login.html
+        if (localStorage.getItem('isLoggedIn') !== 'true') {
+            window.parent.postMessage('spa-back','*');
+        }
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RPS Random Simulation</title>
+    <style>
+        :root {
+            --bg: #1a1a1a;
+            --surface: #2d2d2d;
+            --primary: #9b59b6;
+            --text: #ffffff;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .game-card {
+            background: var(--surface);
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        /* SCOREBOARD STYLES */
+        .scoreboard {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 2rem;
+            font-size: 1.2rem;
+            font-weight: bold;
+            background: rgba(0,0,0,0.3);
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        .battle-area {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin: 2rem 0;
+        }
+
+        .fighter {
+            display: flex;
+            flex-direction: column;
+            align-items: center; 
+            gap: 10px;
+        }
+
+        .emoji-display {
+            font-size: 4rem;
+            background: rgba(0,0,0,0.2);
+            width: 100px;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            border: 2px solid var(--primary);
+        }
+
+        .label-text {
+            font-size: 1.1rem;
+            color: #ccc;
+            font-weight: bold;
+            min-height: 1.5rem; 
+        }
+
+        .action-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1.2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(155, 89, 182, 0.4);
+            transition: transform 0.2s;
+        }
+
+        .action-btn:hover {
+            transform: scale(1.05);
+            background: #8e44ad;
+        }
+
+        #result {
+            min-height: 1.5em;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            color: #ddd;
+        }
+
+        .back-btn {
+            margin-top: 20px;
+            text-decoration: none;
+            color: #888;
+            font-size: 0.9rem;
+            border: 1px solid #444;
+            padding: 8px 16px;
+            border-radius: 20px;
+            display: inline-block;
+            transition: 0.3s;
+        }
+        .back-btn:hover { background: #444; color: #fff; }
+    </style>
+</head>
+<body><style>#spabk{position:fixed;top:10px;left:10px;z-index:99999;background:rgba(0,0,0,0.8);color:#00f3ff;border:1px solid #00f3ff;padding:8px 18px;border-radius:20px;cursor:pointer;font-family:Segoe UI,sans-serif;font-size:.9rem;backdrop-filter:blur(5px);}#spabk:hover{background:#00f3ff;color:#000;}</style><button id="spabk" onclick="window.parent.postMessage('spa-back','*'); exitLandscapeAndRelease();">← Hub</button>
+
+    <div class="game-card">
+        <h1>RPS Simulation</h1>
+        <p style="color: #888;">AI vs AI</p>
+
+        <div class="scoreboard">
+            <div>P1 Wins: <span id="p1-score">0</span></div>
+            <div>P2 Wins: <span id="p2-score">0</span></div>
+        </div>
+
+        <div class="battle-area">
+            <div class="fighter">
+                <span>Player 1</span>
+                <div id="p1-display" class="emoji-display">❔</div>
+                <div id="p1-label" class="label-text">...</div> 
+            </div>
+            
+            <div style="font-size: 1.5rem; font-weight: bold;">VS</div>
+
+            <div class="fighter">
+                <span>Player 2</span>
+                <div id="p2-display" class="emoji-display">❔</div>
+                <div id="p2-label" class="label-text">...</div>
+            </div>
+        </div>
+
+        <p id="result">Click simulate to start match</p>
+
+        <button class="action-btn" onclick="simulateRound()">Simulate Round</button>
+        <br>
+        <button class="back-btn" onclick="window.parent.postMessage('spa-back','*')">← Back to Menu</button>
+    </div>
+
+    <script>
+        // Score Variables
+        let p1Score = 0;
+        let p2Score = 0;
+
+        const emojis = ["🪨", "📄", "✂️"];
+        const names = ["Rock", "Paper", "Scissors"];
+
+        function simulateRound() {
+            let p1 = Math.floor(Math.random() * 3);
+            let p2 = Math.floor(Math.random() * 3);
+
+            // Update Emojis
+            document.getElementById("p1-display").innerText = emojis[p1];
+            document.getElementById("p2-display").innerText = emojis[p2];
+
+            // Update Labels
+            document.getElementById("p1-label").innerText = names[p1];
+            document.getElementById("p2-label").innerText = names[p2];
+
+            let msg = "";
+
+            if (p1 === p2) {
+                msg = "It's a Tie!";
+            } else if (
+                (p1 === 0 && p2 === 2) || 
+                (p1 === 1 && p2 === 0) || 
+                (p1 === 2 && p2 === 1)
+            ) {
+                msg = "Player 1 Wins!";
+                p1Score++; // Increase P1 Score
+            } else {
+                msg = "Player 2 Wins!";
+                p2Score++; // Increase P2 Score
+            }
+
+            // Update Score on Screen
+            document.getElementById("p1-score").innerText = p1Score;
+            document.getElementById("p2-score").innerText = p2Score;
+
+            document.getElementById("result").innerText = msg;
+        }
+    </script>
+</body>
+</html>
