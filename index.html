@@ -25,7 +25,26 @@
     <meta name="author" content="bittuhere">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0d0b22">
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+
+    <!-- Kill the browser's "Leave site? Changes you made may not be saved" dialog
+         AT THE SOURCE: nothing on this page is allowed to register a beforeunload
+         handler. (The PDF.js viewers are patched separately — see pdfjs/READMEs.) -->
+    <script>
+        (function () {
+            var origAdd = window.addEventListener.bind(window);
+            window.addEventListener = function (type, fn, opts) {
+                if (type === 'beforeunload') return;   // registration silently ignored
+                return origAdd(type, fn, opts);
+            };
+            try {
+                Object.defineProperty(window, 'onbeforeunload', {
+                    get: function () { return null; },
+                    set: function () { },
+                    configurable: true
+                });
+            } catch (e) { }
+        })();
+    </script>
 
     <script>
         if ('serviceWorker' in navigator) {
@@ -45,10 +64,6 @@
          prefers PNG over SVG), SVG (modern). Fixes old bug where
          type="image/x-icon" pointed at an .svg. -->
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
-    <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48.png">
-    <link rel="icon" type="image/png" sizes="64x64" href="/favicon-64.png">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link rel="mask-icon" href="/favicon.svg" color="#2be2e8">
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
@@ -81,8 +96,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-messaging.js"></script>
-    <script src="js/push-config.js"></script>
+    <script src="js/pdf-embed.js"></script>
     <style>
         *,
         *::before,
@@ -4252,7 +4266,7 @@
         <div class="admin-section-inner">
             <div class="admin-header-bar">
                 <h1>⚡ ADMIN CONTROL</h1>
-                <button class="admin-back-btn" onclick="(function(){window._adminIsHimanshu=false;spaGoBack();})()">← Hub</button>
+                <button class="admin-back-btn" onclick="(function(){window._adminIsHimanshu=false;MapsTo('section-hub','left');})()">← Hub</button>
             </div>
             <div style="width:100%;max-width:780px;background:rgba(0,0,0,.2);border-radius:14px;padding:16px;">
                 <div class="menu-container" style="display:flex;gap:7px;margin-bottom:16px;flex-wrap:wrap;">
@@ -5217,16 +5231,7 @@
                         days</span></button>
                 <div id="prof-cooldown-msg"></div>
             </div>
-            <div class="prof-card">
-                <div class="prof-card-title">🔔 Notifications</div>
-                <div style="font-size:0.78rem;color:rgba(255,255,255,0.5);margin-bottom:10px;line-height:1.4;">
-                    Get announcements &amp; messages even when the site is closed — like a real app.
-                </div>
-                <button class="prof-action-btn" data-push-toggle="1"
-                    data-label-on="🔔 Push Notifications: ON"
-                    data-label-off="🔔 Enable Push Notifications"
-                    style="border-color:rgba(0,243,255,0.3);color:#00f3ff;">🔔 Enable Push Notifications</button>
-            </div>
+            
             <div class="prof-card">
                 <div class="prof-card-title">🔍 Search Player</div>
                 <div class="prof-search-wrap">
@@ -5304,27 +5309,27 @@
     <!-- GAME FRAMES -->
     <div id="section-game-dino" class="spa-section hidden-right game-frame">
         <div class="game-section-wrapper">
-            <iframe allow="fullscreen; screen-orientation" id="iframe-dino" src="games/dino.html" sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock" allowfullscreen></iframe>
+            <iframe allow="fullscreen; screen-orientation" id="iframe-dino" data-gamesrc="games/dino.html" sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock" allowfullscreen></iframe>
         </div>
     </div>
     <div id="section-game-flappy" class="spa-section hidden-right game-frame">
         <div class="game-section-wrapper">
-            <iframe id="iframe-flappy" src="games/flappy.html" sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
+            <iframe id="iframe-flappy" data-gamesrc="games/flappy.html" sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
         </div>
     </div>
     <div id="section-game-pacman" class="spa-section hidden-right game-frame">
         <div class="game-section-wrapper">
-            <iframe id="iframe-pacman" src="games/pacman.html" sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock"></iframe>
+            <iframe id="iframe-pacman" data-gamesrc="games/pacman.html" sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock"></iframe>
         </div>
     </div>
     <div id="section-game-car" allow="fullscreen; screen-orientation" class="spa-section hidden-right game-frame">
         <div class="game-section-wrapper">
-            <iframe id="iframe-car" src="games/car.html" sandbox=&quot;allow-scripts allow-same-origin allow-forms allow-pointer-lock&quot; allowfullscreen></iframe>
+            <iframe id="iframe-car" data-gamesrc="games/car.html" sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock" allowfullscreen></iframe>
         </div>
     </div>
     <div id="section-game-snake" class="spa-section hidden-right game-frame">
         <div class="game-section-wrapper">
-            <iframe id="iframe-snake" src="games/snake.html" sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
+            <iframe id="iframe-snake" data-gamesrc="games/snake.html" sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
         </div>
     </div>
     <div id="section-game-fair" class="spa-section hidden-right game-frame">
@@ -5334,9 +5339,17 @@
                 <!-- Header -->
                 <div style="padding:16px 20px;background:rgba(0,0,0,0.6);backdrop-filter:blur(8px);border-bottom:1px solid rgba(0,243,255,0.2);z-index:10;flex-shrink:0;">
                     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
-                        <div>
-                            <h2 style="margin:0;font-family:'Teko',sans-serif;font-size:1.8rem;color:#00f3ff;letter-spacing:2px;">📋 Fair Copies</h2>
-                            <p style="margin:0;font-size:0.8rem;color:rgba(255,255,255,0.5);">Official exam copies &amp; study materials</p>
+                        <div style="display:flex;align-items:center;gap:14px;">
+                            <button id="fair-hub-btn" onclick="fairGoHub()" title="Back to Arcade Hub"
+                                style="background:rgba(0,243,255,0.1);border:1px solid rgba(0,243,255,0.6);color:#00f3ff;padding:8px 20px;border-radius:30px;font-family:'Teko',sans-serif;font-size:1.05rem;letter-spacing:1px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:background .2s,transform .1s;flex-shrink:0;"
+                                onmouseover="this.style.background='rgba(0,243,255,0.25)'"
+                                onmouseout="this.style.background='rgba(0,243,255,0.1)'"
+                                onmousedown="this.style.transform='scale(.94)'"
+                                onmouseup="this.style.transform='scale(1)'">← Hub</button>
+                            <div>
+                                <h2 style="margin:0;font-family:'Teko',sans-serif;font-size:1.8rem;color:#00f3ff;letter-spacing:2px;">📋 Fair Copies</h2>
+                                <p style="margin:0;font-size:0.8rem;color:rgba(255,255,255,0.5);">Official exam copies &amp; study materials</p>
+                            </div>
                         </div>
                         <a href="https://drive.google.com/drive/folders/1vGp2vyRvAAFxzF4cfrA4qHtGTjLlDrS9"
                             target="_blank" rel="noopener noreferrer"
@@ -5367,56 +5380,63 @@
     
     <div id="section-game-rps" class="spa-section hidden-right game-frame">
         <div class="game-section-wrapper">
-            <iframe id="iframe-rps" src="games/rps.html" sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
+            <iframe id="iframe-rps" data-gamesrc="games/rps.html" sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
         </div>
     </div>
     <div id="section-game-rpsrand" class="spa-section hidden-right game-frame">
         <div class="game-section-wrapper">
-            <iframe id="iframe-rpsrand" src="games/rpsrand.html" sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
+            <iframe id="iframe-rpsrand" data-gamesrc="games/rpsrand.html" sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
         </div>
     </div>
     <div id="section-game-ttt" class="spa-section hidden-right game-frame">
         <div class="game-section-wrapper">
-            <iframe id="iframe-ttt" src="games/ttt.html" sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
+            <iframe id="iframe-ttt" data-gamesrc="games/ttt.html" sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
         </div>
     </div>
     <div id="section-game-multittt" class="spa-section hidden-right game-frame">
         <div class="game-section-wrapper">
-            <iframe id="iframe-multittt" src="games/multittt.html" sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
+            <iframe id="iframe-multittt" data-gamesrc="games/multittt.html" sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
         </div>
     </div>
     <div id="section-game-multicar" class="spa-section hidden-right game-frame">
         <div class="game-section-wrapper">
             <iframe id="iframe-multicar" allow="fullscreen; screen-orientation"
-                style="width:100%;height:100%;border:none;" src="games/multicar.html"></iframe>
+                style="width:100%;height:100%;border:none;" data-gamesrc="games/multicar.html"></iframe>
         </div>
     </div>
 
     <!-- THANK YOU SECTION -->
-    <div id="section-thankyou" class="spa-section hidden-right" style="background:#0a0a0c;">
-        <div style="height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;">
-            <div id="ty-container"
-                style="text-align:center;background:rgba(255,255,255,0.03);padding:50px;border-radius:20px;border:2px solid #00f3ff;box-shadow:0 0 30px #00f3ff,inset 0 0 15px rgba(0,243,255,0.1);max-width:500px;width:90%;animation:tyGlow 2s infinite alternate;font-family:'Teko',sans-serif;">
-                <h1 style="font-size:4rem;margin:0;color:#00f3ff;text-shadow:0 0 10px #00f3ff;letter-spacing:3px;">
-                    MESSAGE SENT</h1>
-                <p style="font-size:1.5rem;color:#ccc;margin:20px 0;">Status: <span id="ty-status"
-                        style="color:#ff0055;font-weight:bold;text-transform:uppercase;">Sending...</span></p>
-                <p id="ty-msg" style="font-size:1.2rem;color:#aaa;">Your message is sending...</p>
-                <button onclick="tyGoHome()"
-                    style="display:inline-block;margin-top:30px;padding:10px 30px;background:#ff0055;color:white;border:none;font-family:'Teko',sans-serif;font-size:1.8rem;border-radius:5px;cursor:pointer;transition:0.3s;box-shadow:0 0 15px #ff0055;">BACK
-                    TO HOME</button>
-                <div style="margin-top:20px;font-size:1rem;color:#666;font-family:'Segoe UI',sans-serif;">Automatic
-                    redirect in <span id="ty-seconds" style="color:#00f3ff;font-weight:bold;">10</span>s</div>
+    <div id="section-thankyou" class="spa-section hidden-right">
+        <div class="ty-wrap">
+            <div class="ty-grid"></div>
+            <div class="ty-card">
+                <div class="ty-orb">
+                    <svg class="ty-check" viewBox="0 0 52 52" aria-hidden="true">
+                        <circle class="ty-check-circle" cx="26" cy="26" r="24" />
+                        <path class="ty-check-mark" d="M14.5 27l8 8 15-16" />
+                    </svg>
+                </div>
+                <h1 class="ty-title">MESSAGE SENT</h1>
+                <div class="ty-status-line"><span class="ty-dot" id="ty-dot"></span>Status: <span
+                        id="ty-status">Sending...</span></div>
+                <p id="ty-msg" class="ty-msg">Your message is sending...</p>
+                <button onclick="tyGoHome()" class="ty-btn-home">BACK TO HOME</button>
+                <div class="ty-redirect">
+                    <div class="ty-bar"><div class="ty-bar-fill" id="ty-bar-fill"></div></div>
+                    <div class="ty-count">Automatic redirect in <span id="ty-seconds">10</span>s</div>
+                </div>
             </div>
-        </div>
         </div>
     </div>
 
     <!-- ARCADECRAFT SECTION -->
     <div id="section-game-arcadecraft" class="spa-section hidden-right game-frame">
         <div class="game-section-wrapper">
+            <!-- src removed: this legacy iframe eagerly downloaded 15 MB on every boot.
+                 openGame('arcadecraft') navigates to eaglercraft.html directly, so the
+                 iframe is never used — keep it inert (games load lazily via data-gamesrc). -->
             <iframe id="iframe-arcadecraft" allow="fullscreen; screen-orientation; clipboard-read; clipboard-write"
-                style="width:100%;height:100%;border:none;display:block;" src="eaglercraft.html">
+                style="width:100%;height:100%;border:none;display:block;">
             </iframe>
         </div>
     </div>
@@ -5431,16 +5451,72 @@
         &#8592; Hub
     </button>
     <style>
-        /* ty-container border glow via opacity on a pseudo-layer instead of animating box-shadow */
-        @keyframes tyGlow {
-            from {
-                opacity: 0.85;
-            }
-
-            to {
-                opacity: 1;
-            }
+        /* ─── ThankYou section (remade) ─────────────────────────────── */
+        #section-thankyou { background: #07070f; }
+        .ty-wrap { height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; position: relative; overflow: hidden; }
+        .ty-grid {
+            position: absolute; inset: -44px; pointer-events: none;
+            background-image:
+                linear-gradient(rgba(0, 243, 255, .05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 243, 255, .05) 1px, transparent 1px);
+            background-size: 44px 44px;
+            -webkit-mask-image: radial-gradient(circle at 50% 45%, #000 0%, transparent 72%);
+            mask-image: radial-gradient(circle at 50% 45%, #000 0%, transparent 72%);
+            animation: tyGridMove 14s linear infinite;
         }
+        @keyframes tyGridMove { to { background-position: 44px 44px, 44px 44px; } }
+        .ty-card {
+            position: relative; text-align: center;
+            background: rgba(13, 11, 34, .85); backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 243, 255, .35); border-radius: 24px;
+            padding: 44px 42px 34px; max-width: 520px; width: 100%;
+            font-family: 'Teko', sans-serif;
+            box-shadow: 0 24px 70px rgba(0, 0, 0, .6), inset 0 0 44px rgba(0, 243, 255, .05);
+            animation: tyCardIn .6s cubic-bezier(.2, .9, .3, 1.15) both;
+        }
+        @keyframes tyCardIn { from { opacity: 0; transform: translateY(26px) scale(.96); } to { opacity: 1; transform: none; } }
+        .ty-orb {
+            width: 98px; height: 98px; margin: 0 auto 10px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            background: radial-gradient(circle, rgba(0, 243, 255, .22) 0%, rgba(0, 243, 255, 0) 70%);
+        }
+        .ty-check { width: 78px; height: 78px; }
+        .ty-check-circle {
+            fill: none; stroke: #00f3ff; stroke-width: 2.4;
+            stroke-dasharray: 151; stroke-dashoffset: 151;
+            animation: tyDraw .9s .15s ease-out forwards;
+            filter: drop-shadow(0 0 8px rgba(0, 243, 255, .8));
+        }
+        .ty-check-mark {
+            fill: none; stroke: #39ff88; stroke-width: 3.4; stroke-linecap: round; stroke-linejoin: round;
+            stroke-dasharray: 36; stroke-dashoffset: 36;
+            animation: tyDraw .45s .9s ease-out forwards;
+            filter: drop-shadow(0 0 8px rgba(57, 255, 136, .8));
+        }
+        @keyframes tyDraw { to { stroke-dashoffset: 0; } }
+        .ty-title {
+            font-size: 3.6rem; margin: 4px 0 2px; line-height: 1; letter-spacing: 4px;
+            color: #00f3ff; text-shadow: 0 0 18px rgba(0, 243, 255, .55);
+        }
+        .ty-status-line { color: #98a0b8; font-size: 1.3rem; letter-spacing: 1px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .ty-dot { width: 9px; height: 9px; border-radius: 50%; background: #ff0055; box-shadow: 0 0 10px #ff0055; animation: tyBlink 1.1s infinite; }
+        @keyframes tyBlink { 50% { opacity: .25; } }
+        #ty-status { color: #ff0055; font-weight: 700; text-transform: uppercase; }
+        .ty-msg { color: #aab3cc; font-size: 1.05rem; margin: 14px auto 24px; max-width: 380px; font-family: 'Segoe UI', system-ui, sans-serif; line-height: 1.55; }
+        .ty-btn-home {
+            padding: 12px 36px; border: none; border-radius: 12px; cursor: pointer;
+            background: linear-gradient(45deg, #00f3ff, #3a6bff); color: #fff;
+            font-family: 'Teko', sans-serif; font-size: 1.6rem; letter-spacing: 2px;
+            transition: transform .18s, box-shadow .18s;
+            box-shadow: 0 0 22px rgba(0, 120, 255, .45);
+        }
+        .ty-btn-home:hover { transform: translateY(-2px) scale(1.03); box-shadow: 0 0 34px rgba(0, 180, 255, .75); }
+        .ty-btn-home:active { transform: scale(.97); }
+        .ty-redirect { margin-top: 26px; }
+        .ty-bar { height: 5px; border-radius: 4px; background: rgba(255, 255, 255, .08); overflow: hidden; margin-bottom: 10px; }
+        .ty-bar-fill { height: 100%; width: 0%; border-radius: 4px; background: linear-gradient(90deg, #00f3ff, #ff00ff); transition: width 1s linear; }
+        .ty-count { color: #66708a; font-size: .92rem; font-family: 'Segoe UI', system-ui, sans-serif; }
+        #ty-seconds { color: #00f3ff; font-weight: 700; }
     </style>
 
     <script>
@@ -5571,12 +5647,11 @@
         //  blanks the iframe. Zero RAM used for games until user opens one.
         //  Opening a game reloads its file fresh (clean state every time).
         const _gameSrc = {};
-        document.querySelectorAll('.game-section-wrapper iframe[src]').forEach(fr => {
-            const s = fr.getAttribute('src') || '';
+        const _ahCacheBust = 'v20260829'; // bump when games change to bypass cache
+        document.querySelectorAll('.game-section-wrapper iframe[data-gamesrc]').forEach(fr => {
+            const s = fr.getAttribute('data-gamesrc') || '';
             if (!s.startsWith('games/')) return;   // skip external/WASM (eaglercraft)
             _gameSrc[fr.id] = s;
-            fr.removeAttribute('src');
-            fr.src = 'about:blank';
         });
         function _mountGame(iid) {
             const fr = document.getElementById(iid);
@@ -5587,7 +5662,7 @@
             // Double rAF: wait for blank to paint, then load the file fresh
             requestAnimationFrame(function() {
                 requestAnimationFrame(function() {
-                    fr.src = _gameSrc[iid];
+                    fr.src = _gameSrc[iid] + '?v=' + _ahCacheBust;
                     fr.dataset.mounted = '1';
                 });
             });
@@ -6327,8 +6402,6 @@ function disableGlobalZoom() {
             const st = { study: 'Study Mode', multi: 'Multiplayer Arena', single: 'Solo Arcade', contact: 'Contact Support' };
             document.getElementById('hub-subtitle').innerText = st[s] || 'Select a Category';
             if (s === 'contact') {
-                const m = document.getElementById('contactMsg'), pn = localStorage.getItem('playerName') || 'Gamer';
-                if (m.value === '') m.value = `Username: ${pn}\n------------------------\nMy Question is: `;
                 const sb = document.getElementById('contact-send-btn');
                 if (sb) { sb.disabled = false; sb.innerText = 'SEND MESSAGE'; }
                 const st = document.getElementById('contact-status');
@@ -6613,26 +6686,42 @@ function disableGlobalZoom() {
             try {
                 let sent = false;
 
-                // ── PRIMARY: GAS backend ──────────────────────────────────
-                if (!file) {
-                    try {
-                        statusEl.innerText = 'Sending via mail server...';
-                        const gasRes = await gasCall({
-                            action: 'send-contact',
-                            fromEmail: email,
-                            username,
-                            subject: subject || 'General Inquiry',
-                            message: cleanMsg
-                        });
-                        if (gasRes.ok) sent = true;
-                    } catch(gasErr) { /* fall through to formsubmit */ }
-                }
-
-                if (!sent) {
-                    // ── FALLBACK: FormSubmit ──────────────────────────────
-                    let res;
+                // ── ALWAYS FormSubmit — single reliable path (no fallbacks).
+                // XHR instead of fetch: only XHR reports REAL upload progress
+                // (bytes loaded / total) — fetch cannot do upload progress.
+                const _fmtBytes = b => b < 1048576
+                    ? (b / 1024).toFixed(0) + ' KB'
+                    : (b / 1048576).toFixed(1) + ' MB';
+                const sendViaFormSubmit = () => new Promise((resolve, reject) => {
+                    const xhr = new XMLHttpRequest();
                     if (file) {
-                        statusEl.innerText = 'Uploading file...';
+                        xhr.open('POST', 'https://formsubmit.co/anurag670singh@gmail.com');
+                        xhr.setRequestHeader('Accept', 'application/json');
+                    } else {
+                        xhr.open('POST', 'https://formsubmit.co/ajax/anurag670singh@gmail.com');
+                        xhr.setRequestHeader('Content-Type', 'application/json');
+                        xhr.setRequestHeader('Accept', 'application/json');
+                    }
+                    xhr.upload.onprogress = (e) => {
+                        if (e.lengthComputable && e.total > 0) {
+                            const pct = Math.min(100, Math.round((e.loaded / e.total) * 100));
+                            statusEl.innerText = 'Uploading... ' + _fmtBytes(e.loaded) + ' of ' +
+                                _fmtBytes(e.total) + ' (' + pct + '%)';
+                        } else {
+                            statusEl.innerText = 'Uploading... ' + _fmtBytes(e.loaded);
+                        }
+                    };
+                    xhr.onerror = () => reject(new Error('Network error'));
+                    xhr.onload = () => {
+                        let data = {};
+                        try { data = JSON.parse(xhr.responseText); }
+                        catch (err) { data = { success: (xhr.status >= 200 && xhr.status < 300) ? 'true' : 'false' }; }
+                        if (xhr.status >= 200 && xhr.status < 300 &&
+                            (data.success === 'true' || data.success === true)) resolve();
+                        else reject(new Error('Send failed'));
+                    };
+                    if (file) {
+                        statusEl.innerText = 'Uploading... 0%';
                         const fd = new FormData();
                         fd.append('email', email);
                         fd.append('_subject', prettySubject);
@@ -6640,23 +6729,14 @@ function disableGlobalZoom() {
                         fd.append('_captcha', 'false');
                         fd.append('_template', 'table');
                         fd.append('attachment', file, file.name);
-                        res = await fetch('https://formsubmit.co/anurag670singh@gmail.com', {
-                            method: 'POST',
-                            headers: { 'Accept': 'application/json' },
-                            body: fd
-                        });
+                        xhr.send(fd);
                     } else {
-                        statusEl.innerText = 'Trying backup server...';
-                        res = await fetch('https://formsubmit.co/ajax/anurag670singh@gmail.com', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                            body: JSON.stringify({ email, _subject: prettySubject, message: formattedMsg, _captcha: 'false' })
-                        });
+                        statusEl.innerText = 'Sending...';
+                        xhr.send(JSON.stringify({ email, _subject: prettySubject, message: formattedMsg, _captcha: 'false' }));
                     }
-                    const data = await res.json().catch(function() { return { success: res.ok ? 'true' : 'false' }; });
-                    if (data.success === 'true' || data.success === true) sent = true;
-                    else throw new Error('Send failed');
-                }
+                });
+                await sendViaFormSubmit();
+                sent = true;
 
                 if (sent) {
                     statusEl.style.color = '#00ff88';
@@ -6753,6 +6833,8 @@ function disableGlobalZoom() {
             document.getElementById('ty-status').innerText = 'Sending...';
             document.getElementById('ty-msg').innerText = 'Your message is sending...';
             let t = 10; document.getElementById('ty-seconds').innerText = t;
+            var _tyBar = document.getElementById('ty-bar-fill');
+            if (_tyBar) _tyBar.style.width = '0%';
             if (tyTimer) clearInterval(tyTimer);
             // After 0s: flip to "Sent"
             setTimeout(() => {
@@ -6763,6 +6845,7 @@ function disableGlobalZoom() {
             // Countdown + auto-redirect
             tyTimer = setInterval(() => {
                 t--; document.getElementById('ty-seconds').innerText = t;
+                if (_tyBar) _tyBar.style.width = ((10 - t) / 10 * 100) + '%';
                 if (t <= 0) { clearInterval(tyTimer); tyTimer = null; tyGoHome(); }
             }, 1000);
         }
@@ -8728,8 +8811,26 @@ showSection('global', document.querySelector('.admin-btn'));
         }
         (function boot() {
             showLoader();
-            _bp(10, 'STARTING UP...');
+            // ---- REAL boot progress ----
+            // The bar tracks ACTUAL work: how many external libraries have really
+            // finished downloading (via the Performance API), then real Firebase /
+            // session milestones. No fake ticking animation.
+            const _bootLibs = [
+                'fonts.googleapis.com/css2',
+                'firebase-app.js', 'firebase-database.js',
+                'firebase-auth.js',
+                'js/pdf-embed.js'
+            ];
             let bootTimedOut = false;
+            function _libProgress() {          // 0..1 — real fraction of libs loaded
+                try {
+                    const loaded = performance.getEntriesByType('resource').map(e => e.name);
+                    let n = 0;
+                    _bootLibs.forEach(u => { if (loaded.some(r => r.indexOf(u) !== -1)) n++; });
+                    return n / _bootLibs.length;
+                } catch (e) { return 0; }
+            }
+            _bp(5, 'STARTING UP...');
             const fallbackTimeout = setTimeout(() => {
                 if (!bootTimedOut) {
                     bootTimedOut = true;
@@ -8739,12 +8840,17 @@ showSection('global', document.querySelector('.admin-btn'));
                     if (ls) { ls.innerText = '⚠️ Connection timeout. Please check internet and refresh.'; ls.className = 'status-msg l-error'; document.getElementById('trouble-link').style.display = 'block'; }
                 }
             }, 8000);
-            _bp(30, 'LOADING FIREBASE...');
+            let _libsDone = false;
             const checkFB = setInterval(() => {
+                if (!_libsDone) {              // live-update real library progress (5→55%)
+                    const f = _libProgress();
+                    _bp(5 + Math.round(f * 50), 'LOADING LIBRARIES ' + Math.round(f * 100) + '%');
+                    if (f >= 1) _libsDone = true;
+                }
                 if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
                     clearInterval(checkFB);
                     clearTimeout(fallbackTimeout);
-                    _bp(60, 'FIREBASE READY...');
+                    _bp(65, 'CONNECTING TO DATABASE...');
                     const li = localStorage.getItem('isLoggedIn') === 'true';
                     const pn = localStorage.getItem('playerName');
                     if (li && pn) {
@@ -8944,60 +9050,17 @@ function setFairProgress(pct, label) {
     if (lb && label) lb.textContent = label;
 }
 
-function _loadPDFJS() {
-    return new Promise(function(resolve, reject) {
-        if (window.pdfjsLib) { resolve(); return; }
-        var s = document.createElement('script');
-        s.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js';
-        s.onload = function() {
-            pdfjsLib.GlobalWorkerOptions.workerSrc =
-                'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
-            resolve();
-        };
-        s.onerror = function() { reject(new Error('PDF.js failed to load')); };
-        document.head.appendChild(s);
-    });
-}
-
-async function _fetchProgress(url, onPct) {
-    var resp = await fetch(url);
-    if (!resp.ok) throw new Error('HTTP ' + resp.status + ': ' + resp.statusText);
-    var total = parseInt(resp.headers.get('content-length') || '0');
-    var reader = resp.body.getReader();
-    var chunks = [], loaded = 0;
-    var fakeTimer = null;
-    if (!total) {
-        var fakePct = 0;
-        fakeTimer = setInterval(function() {
-            fakePct = Math.min(85, fakePct + 3);
-            onPct(fakePct);
-        }, 180);
-    }
-    while (true) {
-        var _ref = await reader.read(), done = _ref.done, value = _ref.value;
-        if (done) break;
-        chunks.push(value);
-        loaded += value.length;
-        if (total) onPct(Math.round(loaded / total * 95));
-    }
-    if (fakeTimer) clearInterval(fakeTimer);
-    onPct(100);
-    var totalLen = chunks.reduce(function(s, c) { return s + c.length; }, 0);
-    var buf = new Uint8Array(totalLen);
-    var off = 0;
-    for (var i = 0; i < chunks.length; i++) { buf.set(chunks[i], off); off += chunks[i].length; }
-    return buf.buffer;
-}
-
+// Simple inline viewer for IMAGE / TEXT files (PDFs use the official Mozilla viewer instead).
 function _fairEnsureViewer() {
     if (document.getElementById('fair-viewer')) return;
     var div = document.createElement('div');
     div.id = 'fair-viewer';
     div.innerHTML =
         '<div id="fair-viewer-bar">' +
+          '<button class="fair-viewer-btn" id="fair-viewer-back">&#8592; Back</button>' +
           '<span id="fair-viewer-title">Loading...</span>' +
-          '<button class="fair-viewer-btn" id="fair-viewer-dl">📥 Download</button>' +
-          '<button class="fair-viewer-btn" id="fair-viewer-close" style="color:#ff3366;">✕</button>' +
+          '<button class="fair-viewer-btn" id="fair-viewer-dl">Download</button>' +
+          '<button class="fair-viewer-btn" id="fair-viewer-close" style="color:#ff3366;">Close</button>' +
         '</div>' +
         '<div id="fair-viewer-progress">' +
           '<div class="fair-ring-wrap">' +
@@ -9012,32 +9075,17 @@ function _fairEnsureViewer() {
         '<div id="fair-viewer-content"></div>';
     document.body.appendChild(div);
 
-    document.getElementById('fair-viewer-close').onclick = function() {
-        document.getElementById('fair-viewer').classList.remove('open');
+    function _closeViewer() {
+        div.classList.remove('open');
         document.getElementById('fair-viewer-content').innerHTML = '';
         document.getElementById('fair-viewer-content').style.display = 'none';
         document.getElementById('fair-viewer-progress').style.display = 'flex';
-        try { disableGlobalZoom(); } catch(e) {}
-    };
-
-    div.addEventListener('click', function(e) {
-        if (e.target === div) {
-            div.classList.remove('open');
-            document.getElementById('fair-viewer-content').innerHTML = '';
-            document.getElementById('fair-viewer-content').style.display = 'none';
-            document.getElementById('fair-viewer-progress').style.display = 'flex';
-            try { disableGlobalZoom(); } catch(e) {}
-        }
-    });
-
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && div.classList.contains('open')) {
-            div.classList.remove('open');
-            document.getElementById('fair-viewer-content').innerHTML = '';
-            document.getElementById('fair-viewer-content').style.display = 'none';
-            document.getElementById('fair-viewer-progress').style.display = 'flex';
-            try { disableGlobalZoom(); } catch(e) {}
-        }
+    }
+    document.getElementById('fair-viewer-close').onclick = _closeViewer;
+    document.getElementById('fair-viewer-back').onclick = _closeViewer;
+    div.addEventListener('click', function (e) { if (e.target === div) _closeViewer(); });
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && div.classList.contains('open')) _closeViewer();
     });
 }
 
@@ -9070,80 +9118,61 @@ function _fairGetType(mime) {
 }
 
 async function fairLoadFile(fileId, fileName, mimeType) {
+    var type = _fairGetType(mimeType);
+
+    if (type === 'pdf' || type === 'gdoc' || type === 'gsheet' || type === 'gslide') {
+        // ---- OFFICIAL Mozilla PDF.js viewer (pdfjs/ folder) ----
+        // We ship Mozilla's unmodified viewer (see pdfjs/README-ARCADE.md).
+        // js/pdf-embed.js downloads the file (REAL progress bar), creates a
+        // same-origin blob: URL (this is what passes the official viewer's
+        // validateFileURL security check) and embeds pdfjs/web/viewer.html
+        // in a fullscreen modal. Zoom, text layer, search, thumbnails,
+        // outline, print, presentation mode = 100% Mozilla code.
+        var isPdf = (type === 'pdf');
+        var mediaUrl = isPdf
+            ? 'https://www.googleapis.com/drive/v3/files/' + fileId + '?alt=media&key=' + FAIR_API_KEY
+            : 'https://www.googleapis.com/drive/v3/files/' + fileId + '/export?mimeType=application%2Fpdf&key=' + FAIR_API_KEY;
+        var dlUrl = 'https://drive.google.com/uc?export=download&id=' + fileId;
+        try {
+            if (typeof ArcadePDFOpen !== 'undefined') {
+                // Ask Drive for the file size first (tiny request) so the
+                // progress bar can show a REAL percentage — CORS hides the
+                // Content-Length header from JavaScript. Fails silently →
+                // the bar falls back to the looping animation.
+                var totalBytes = 0;
+                try {
+                    var meta = await fetch('https://www.googleapis.com/drive/v3/files/' + fileId +
+                            '?fields=size&key=' + FAIR_API_KEY).then(function (r) { return r.json(); });
+                    totalBytes = (meta && meta.size) ? (parseInt(meta.size, 10) || 0) : 0;
+                } catch (eMeta) { /* no size → looping bar */ }
+                ArcadePDFOpen.open({ url: mediaUrl, name: fileName, downloadUrl: dlUrl, totalBytes: totalBytes });
+            } else {
+                // Viewer bridge failed to load (flaky internet) — don't block the user:
+                window.open(mediaUrl, '_blank');
+            }
+        } catch (e) {
+            alert('Could not open viewer: ' + e.message);
+        }
+        return;
+    }
+
+    // ---- Non-PDF files: keep the simple inline viewer ----
     _fairEnsureViewer();
     var viewer = document.getElementById('fair-viewer');
     var content = document.getElementById('fair-viewer-content');
     var title = document.getElementById('fair-viewer-title');
     var dlBtn = document.getElementById('fair-viewer-dl');
-
     viewer.classList.add('open');
     try { enableGlobalZoom(); } catch(e) {}
-
     content.innerHTML = '';
     content.style.display = 'none';
     document.getElementById('fair-viewer-progress').style.display = 'flex';
     title.textContent = fileName;
     _setViewerProgress(0, 'Preparing...');
-
-    var type = _fairGetType(mimeType);
-    var dlUrl = '';
+    var dlUrl = 'https://drive.google.com/uc?export=download&id=' + fileId;
 
     try {
-        if (type === 'pdf') {
-            dlUrl = 'https://drive.google.com/uc?export=download&id=' + fileId;
-            dlBtn.onclick = function() { window.open(dlUrl, '_blank'); };
-            _setViewerProgress(5, 'Loading PDF.js...');
-            await _loadPDFJS();
-            _setViewerProgress(15, 'Fetching PDF...');
-            var mediaUrl = 'https://www.googleapis.com/drive/v3/files/' + fileId + '?alt=media&key=' + FAIR_API_KEY;
-            var buf = await _fetchProgress(mediaUrl, function(p) { _setViewerProgress(15 + p * 0.6, 'Downloading (' + p + '%)...'); });
-            _setViewerProgress(80, 'Rendering pages...');
-            var pdfDoc = await pdfjsLib.getDocument({ data: buf }).promise;
-            var numPages = pdfDoc.numPages;
-            for (var pg = 1; pg <= numPages; pg++) {
-                var page = await pdfDoc.getPage(pg);
-                var vp = page.getViewport({ scale: 2.0 });
-                var canvas = document.createElement('canvas');
-                canvas.width = vp.width;
-                canvas.height = vp.height;
-                canvas.style.cssText = 'display:block;margin:0 auto 8px;max-width:100%;will-change:transform;transform:translateZ(0);';
-                content.appendChild(canvas);
-                await page.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise;
-                _setViewerProgress(80 + (pg / numPages) * 18, 'Rendering page ' + pg + '/' + numPages);
-            }
-            _setViewerProgress(100, 'Done!');
-            _viewerShowContent();
-            // Debounced resize: only re-render after resize stops (not on every pixel)
-            (function() {
-                var _pdfDocRef = pdfDoc;
-                var _resizeTimer = null;
-                function _reRender() {
-                    if (_resizeTimer) clearTimeout(_resizeTimer);
-                    _resizeTimer = setTimeout(function() {
-                        var cont = document.getElementById('fair-viewer-content');
-                        if (!_pdfDocRef || !cont || cont.style.display==='none') return;
-                        cont.innerHTML = '';
-                        var nP = _pdfDocRef.numPages;
-                        (function rp(pg) {
-                            if (pg > nP) return;
-                            _pdfDocRef.getPage(pg).then(function(page) {
-                                var cw = cont.clientWidth - 16;
-                                var scale = Math.min(1.5, cw > 0 ? cw / page.getViewport({scale:1}).width : 1.5);
-                                var vp = page.getViewport({scale: Math.max(0.8, scale)});
-                                var cv = document.createElement('canvas');
-                                cv.width=vp.width; cv.height=vp.height; cv.style.marginBottom='6px'; cv.style.maxWidth='100%';
-                                cont.appendChild(cv);
-                                page.render({canvasContext:cv.getContext('2d'),viewport:vp}).promise.then(function(){ rp(pg+1); });
-                            });
-                        })(1);
-                    }, 400);
-                }
-                window.addEventListener('resize', _reRender);
-                // touchend removed — browser zoom handles pinch natively
-            })();
-
-        } else if (type === 'image') {
-            dlUrl = 'https://drive.google.com/uc?export=download&id=' + fileId;
+        if (type === 'image') {
             dlBtn.onclick = function() { window.open(dlUrl, '_blank'); };
             _setViewerProgress(5, 'Fetching image...');
             var mediaUrl = 'https://www.googleapis.com/drive/v3/files/' + fileId + '?alt=media&key=' + FAIR_API_KEY;
@@ -9157,9 +9186,7 @@ async function fairLoadFile(fileId, fileName, mimeType) {
             content.appendChild(img);
             _setViewerProgress(100, 'Done!');
             _viewerShowContent();
-
         } else if (type === 'text') {
-            dlUrl = 'https://drive.google.com/uc?export=download&id=' + fileId;
             dlBtn.onclick = function() { window.open(dlUrl, '_blank'); };
             _setViewerProgress(5, 'Fetching text...');
             var mediaUrl = 'https://www.googleapis.com/drive/v3/files/' + fileId + '?alt=media&key=' + FAIR_API_KEY;
@@ -9170,40 +9197,15 @@ async function fairLoadFile(fileId, fileName, mimeType) {
             content.appendChild(pre);
             _setViewerProgress(100, 'Done!');
             _viewerShowContent();
-
-        } else if (type === 'gdoc' || type === 'gsheet' || type === 'gslide') {
-            dlUrl = 'https://www.googleapis.com/drive/v3/files/' + fileId + '/export?mimeType=application%2Fpdf&key=' + FAIR_API_KEY;
-            dlBtn.onclick = function() { window.open(dlUrl, '_blank'); };
-            _setViewerProgress(5, 'Loading PDF.js...');
-            await _loadPDFJS();
-            _setViewerProgress(15, 'Exporting as PDF...');
-            var buf = await _fetchProgress(dlUrl, function(p) { _setViewerProgress(15 + p * 0.6, 'Exporting (' + p + '%)...'); });
-            _setViewerProgress(80, 'Rendering...');
-            var pdfDoc = await pdfjsLib.getDocument({ data: buf }).promise;
-            var numPages = pdfDoc.numPages;
-            for (var pg = 1; pg <= numPages; pg++) {
-                var page = await pdfDoc.getPage(pg);
-                var vp = page.getViewport({ scale: 2.0 });
-                var canvas = document.createElement('canvas');
-                canvas.width = vp.width; canvas.height = vp.height;
-                canvas.style.cssText = 'display:block;margin:0 auto 8px;max-width:100%;will-change:transform;transform:translateZ(0);';
-                content.appendChild(canvas);
-                await page.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise;
-                _setViewerProgress(80 + (pg / numPages) * 18, 'Rendering page ' + pg + '/' + numPages);
-            }
-            _setViewerProgress(100, 'Done!');
-            _viewerShowContent();
-
         } else {
-            dlUrl = 'https://drive.google.com/uc?export=download&id=' + fileId;
             dlBtn.onclick = function() { window.open(dlUrl, '_blank'); };
             _setViewerProgress(100, 'Preview not available');
             var msg = document.createElement('div');
             msg.className = 'fair-viewer-unsupported';
-            msg.innerHTML = '<div style="font-size:3rem;margin-bottom:16px;">📄</div>' +
+            msg.innerHTML = '<div style="font-size:3rem;margin-bottom:16px;">&#128196;</div>' +
                 '<div style="color:#fff;margin-bottom:12px;">' + fairEscape(fileName) + '</div>' +
                 '<div style="color:rgba(255,255,255,.4);font-size:.85rem;margin-bottom:24px;">This file type cannot be previewed here.</div>' +
-                '<button onclick="window.open(\'' + dlUrl + '\',\'_blank\')" style="background:linear-gradient(135deg,#00f3ff,#0066ff);color:#000;border:none;border-radius:10px;padding:12px 28px;cursor:pointer;font-size:1rem;font-weight:bold;">📥 Download File</button>';
+                '<button onclick="window.open(\'' + dlUrl + '\',\'_blank\')" style="background:linear-gradient(135deg,#00f3ff,#0066ff);color:#000;border:none;border-radius:10px;padding:12px 28px;cursor:pointer;font-size:1rem;font-weight:bold;">&#11015; Download File</button>';
             content.appendChild(msg);
             _viewerShowContent();
         }
@@ -9211,12 +9213,24 @@ async function fairLoadFile(fileId, fileName, mimeType) {
         _setViewerProgress(0, 'Error!');
         var msg = document.createElement('div');
         msg.className = 'fair-viewer-unsupported';
-        msg.innerHTML = '<div style="font-size:2rem;margin-bottom:12px;">❌</div>' +
+        msg.innerHTML = '<div style="font-size:2rem;margin-bottom:12px;">&#10060;</div>' +
             '<div style="color:#ff3366;">' + fairEscape(err.message) + '</div>' +
             '<div style="color:rgba(255,255,255,.4);font-size:.8rem;margin-top:8px;">Try downloading instead.</div>';
         content.appendChild(msg);
         _viewerShowContent();
     }
+}
+
+function fairGoHub() {
+    // ← Hub button in the Fair Copies header: close anything open, then go home.
+    try { if (typeof ArcadePDFOpen !== 'undefined' && ArcadePDFOpen.close) ArcadePDFOpen.close(); } catch (e) { }
+    try {
+        var fv = document.getElementById('fair-viewer');
+        if (fv && fv.classList.contains('open')) _closeViewer();
+    } catch (e) { }
+    var pop = document.getElementById('fair-opts-popup');
+    if (pop) pop.style.display = 'none';
+    MapsTo('section-hub', 'left');   // status auto-resets (section-game-* → hub)
 }
 
 function _fairEnsureOptsPopup() {
@@ -9274,21 +9288,16 @@ async function fairLoadFolder(folderId, folderName, addToHistory) {
     loader.style.display  = 'flex';
     listDiv.style.display = 'none';
     errDiv.style.display  = 'none';
-    setFairProgress(0, 'Connecting...');
-
-    var fakePct = 0;
-    var fakeTimer = setInterval(function() {
-        fakePct = Math.min(30, fakePct + 2);
-        setFairProgress(fakePct, 'Loading files...');
-    }, 120);
+    // Real stepped progress: each step is an actual event, no fake ticking timer.
+    setFairProgress(10, 'Connecting to Drive...');
 
     try {
         var url = 'https://www.googleapis.com/drive/v3/files?q=\'' + folderId +
             '\' in parents and trashed=false&key=' + FAIR_API_KEY +
             '&fields=files(id,name,mimeType,size),nextPageToken&orderBy=folder%2Cname&pageSize=50';
+        setFairProgress(40, 'Fetching file list...');
         var res = await fetch(url);
-        clearInterval(fakeTimer);
-        setFairProgress(60, 'Processing...');
+        setFairProgress(75, 'Reading response...');
         var data = await res.json();
         if (data.error) throw new Error(data.error.message);
         var files = data.files || [];
@@ -9447,7 +9456,6 @@ async function fairLoadFolder(folderId, folderName, addToHistory) {
         });
 
     } catch (err) {
-        clearInterval(fakeTimer);
         loader.style.display = 'none';
         errDiv.style.display = 'block';
         errDiv.innerHTML = '<div style="font-size:2rem;margin-bottom:8px;">❌</div>' +
@@ -10202,7 +10210,7 @@ window.loadFairCopies = function() {
         })(); // end quiz IIFE
         // launchAdminEntry is defined inside the admin IIFE above (uses matrix-rain + admin-login-overlay)
     </script>
-    <script src="js/push.js"></script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a32ce4dbdc28551c',t:'MTc4ODAyMDU0MA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 
 </html>
+

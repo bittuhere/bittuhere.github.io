@@ -1,9 +1,16 @@
 /* =====================================================================
    Arcade Hub — Firebase Messaging Service Worker
    ---------------------------------------------------------------------
-   Must live at the site root and be named exactly firebase-messaging-sw.js
-   so the FCM library auto-registers it. Handles push delivery WHILE THE
-   SITE IS CLOSED (the whole point of Web Push) and focuses the site on tap.
+   Handles push delivery WHILE THE SITE IS CLOSED (the whole point of Web
+   Push) and focuses the site on tap.
+
+   NOTE: since the great service-worker unification this file is NO LONGER
+   registered on its own. It is imported by /sw.js (the site's single
+   service worker: importScripts('./firebase-messaging-sw.js')), so the
+   FCM background handler and the site's caching live in ONE worker.
+   js/push.js passes that same /sw.js registration to getToken(), which
+   stops the FCM SDK from auto-registering a second, competing worker.
+   Keep this file at the root next to sw.js — do not rename either.
    ===================================================================== */
 importScripts('https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js');
 importScripts('https://www.gstatic.com/firebasejs/8.10.1/firebase-messaging.js');
