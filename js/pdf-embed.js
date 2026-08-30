@@ -519,4 +519,3 @@
         whichViewer: function () { return st.usingV6 ? 'v6' : 'v3'; }
     };
 })();
-
