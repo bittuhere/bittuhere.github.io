@@ -457,6 +457,17 @@ header h1{
   </div>
 </div>
 
+<!-- Voice invite: the OPPONENT gets asked to join with their mic -->
+<div class="mic-modal" id="micInviteModal">
+  <div class="mic-card">
+    <h3>&#127908; Voice Invite</h3>
+    <p>Your opponent started voice chat.<br>Join with your microphone?</p>
+    <button class="lob-btn pri" onclick="acceptVoiceWithMic()">&#127908; Join with Mic</button>
+    <button class="lob-btn sec" onclick="acceptVoiceListenOnly()">&#128066; Listen Only</button>
+    <button class="lob-btn sec" onclick="declineVoice()">Decline</button>
+  </div>
+</div>
+
 <!-- Remote audio (hidden) -->
 <audio id="remoteAudio" autoplay playsinline style="display:none"></audio>
 
@@ -1001,14 +1012,43 @@ socket.on('chess:chat', ({n, msg}) => {
   }
 });
 
-// WebRTC voice
+// WebRTC voice — TWO-WAY: the receiver is invited to open their OWN mic too.
+let _pendingOffer = null;
 socket.on('voice:offer', async ({offer}) => {
-  if (!peerConn) await _setupPeer();
-  await peerConn.setRemoteDescription(new RTCSessionDescription(offer));
-  const answer = await peerConn.createAnswer();
-  await peerConn.setLocalDescription(answer);
-  socket.emit('voice:answer', {answer});
-  document.getElementById('voiceBar').style.display = 'block';
+  if (voiceActive) { await _acceptVoiceOffer(offer, true); return; }   // renegotiate w/ our mic
+  _pendingOffer = offer;
+  const m = document.getElementById('micInviteModal');
+  if (m) m.style.display = 'flex';
+});
+async function _acceptVoiceOffer(offer, withMic) {
+  try {
+    if (withMic && !localStream) localStream = await navigator.mediaDevices.getUserMedia({audio:true});
+    if (!peerConn) await _setupPeer();
+    if (withMic && localStream) {
+      localStream.getTracks().forEach(t => {
+        if (!peerConn.getSenders().some(s => s.track === t)) peerConn.addTrack(t, localStream);
+      });
+    }
+    await peerConn.setRemoteDescription(new RTCSessionDescription(offer));
+    const answer = await peerConn.createAnswer();
+    await peerConn.setLocalDescription(answer);
+    socket.emit('voice:answer', {answer});
+    voiceActive = true; micEnabled = withMic;
+    document.getElementById('voiceBar').style.display = 'block';
+    document.getElementById('voiceStatus').innerText = withMic ? 'Voice connected (mic ON)' : 'Voice connected (listen only)';
+    document.getElementById('micToggleBtn').innerHTML = withMic ? '🎙️ ON' : '👂 Listen';
+  } catch(err) {
+    if (err.name === 'NotAllowedError') document.getElementById('micBlockedModal').style.display = 'flex';
+  }
+}
+function acceptVoiceWithMic()     { _closeVoiceInvite(); const o = _pendingOffer; _pendingOffer = null; if (o) _acceptVoiceOffer(o, true); }
+function acceptVoiceListenOnly()  { _closeVoiceInvite(); const o = _pendingOffer; _pendingOffer = null; if (o) _acceptVoiceOffer(o, false); }
+function declineVoice()           { _closeVoiceInvite(); _pendingOffer = null; try { socket.emit('voice:decline', {}); } catch(e){} }
+function _closeVoiceInvite()      { const m = document.getElementById('micInviteModal'); if (m) m.style.display = 'none'; }
+socket.on('voice:decline', () => {
+  setStatus('Opponent declined voice chat');
+  document.getElementById('voiceBar').style.display = 'none';
+  if (!micEnabled || !peerConn || peerConn.connectionState === 'new') stopVoice();
 });
 socket.on('voice:answer', async ({answer}) => { if (peerConn) await peerConn.setRemoteDescription(new RTCSessionDescription(answer)); });
 socket.on('voice:candidate', async ({candidate}) => { try { if (peerConn) await peerConn.addIceCandidate(new RTCIceCandidate(candidate)); } catch(e){} });
@@ -1095,7 +1135,8 @@ async function startVoice() {
     voiceActive = true;
     micEnabled = true;
     document.getElementById('micToggleBtn').innerHTML = '🎙️ ON';
-    document.getElementById('voiceBar').style.display = 'none'; // hide voice bar
+    document.getElementById('voiceBar').style.display = 'block';
+    document.getElementById('voiceStatus').innerText = 'Calling... waiting for opponent';
   } catch(err) {
     if (err.name==='NotAllowedError') document.getElementById('micBlockedModal').style.display='flex';
   }

@@ -22,6 +22,61 @@ app.use(express.json());
 // ── SOCKET.IO ─────────────────────────────────────────────────────────────────
 const io = new Server(server, { cors: { origin: '*', methods: ['GET', 'POST'] } });
 
+// ── FIREBASE ADMIN (FCM sender — Spark-plan safe: NO Cloud Functions needed,
+//    this server IS the trigger. Set FIREBASE_SERVICE_ACCOUNT on Render:
+//    Firebase Console → Project Settings → Service Accounts → Generate new
+//    private key → paste the whole JSON as the env var value.) ──────────────
+let fcmAdmin = null, fcmDB = null, fcmMsg = null;
+function fcmInit() {
+    if (fcmAdmin) return true;
+    if (!process.env.FIREBASE_SERVICE_ACCOUNT) return false;
+    try {
+        fcmAdmin = require('firebase-admin');
+        const sa = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+        fcmAdmin.initializeApp({
+            credential: fcmAdmin.credential.cert(sa),
+            databaseURL: 'https://bittuhere-90415-default-rtdb.asia-southeast1.firebasedatabase.app'
+        });
+        fcmDB  = fcmAdmin.database();
+        fcmMsg = fcmAdmin.messaging();
+        console.log('FCM sender: READY');
+        return true;
+    } catch (err) {
+        console.error('FCM init failed:', err.message);
+        return false;
+    }
+}
+
+// simple per-IP rate limit (sliding window, in-memory)
+const _rl = new Map();
+function rlOk(ip, max = 30, windowMs = 60000) {
+    const now = Date.now();
+    const arr = (_rl.get(ip) || []).filter(t => now - t < windowMs);
+    if (arr.length >= max) { _rl.set(ip, arr); return false; }
+    arr.push(now); _rl.set(ip, arr);
+    return true;
+}
+
+async function fcmSendToTokens(tokens, title, body, tag) {
+    // chunk (FCM multicast limit 400) + clean dead tokens
+    let sent = 0; const dead = [];
+    for (let i = 0; i < tokens.length; i += 400) {
+        const chunk = tokens.slice(i, i + 400);
+        try {
+            const res = await fcmMsg.sendEachForMulticast({
+                tokens: chunk,
+                notification: { title: String(title).slice(0, 80), body: String(body).slice(0, 200) },
+                webpush: { notification: { tag: String(tag || 'arcade').slice(0, 60), icon: '/favicon-192.png', renotify: true } }
+            });
+            res.responses.forEach((r, j) => {
+                if (r.success) sent++;
+                else if (r.error && /UNREGISTERED|INVALID_ARGUMENT/i.test(r.error.code || r.error.message || '')) dead.push(chunk[j]);
+            });
+        } catch (e) { console.error('fcm chunk fail:', e.message); }
+    }
+    return { sent, dead };
+}
+
 // ── NODEMAILER ────────────────────────────────────────────────────────────────
 const transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -374,6 +429,22 @@ io.on('connection', socket => {
         if (room) socket.to(room).emit('voice:candidate', { candidate });
     });
 
+    // ── CHAT TYPING INDICATOR (Arcade Hub WhatsApp-style chat) ────────────────
+    // Ephemeral signals belong on the socket, NOT in Firebase (quota!).
+    socket.on('join',   ({ chatId } = {}) => { if (typeof chatId === 'string' && chatId.length <= 120) socket.join('c:' + chatId); });
+    socket.on('leave',  ({ chatId } = {}) => { if (typeof chatId === 'string') socket.leave('c:' + chatId); });
+    socket.on('typing', (d) => {
+        if (!d || typeof d.chatId !== 'string' || typeof d.user !== 'string') return;
+        if (d.chatId.length > 120 || d.user.length > 40) return;
+        socket.to('c:' + d.chatId).emit('typing', { chatId: d.chatId, user: d.user, on: !!d.on });
+    });
+
+    // ── VOICE: relay a decline so the caller is informed ──────────────────────
+    socket.on('voice:decline', () => {
+        const room = socket.tttRoom || socket.chessRoom || socket.carRoom;
+        if (room) socket.to(room).emit('voice:decline');
+    });
+
     // ── DISCONNECT ────────────────────────────────────────────────────────────
     socket.on('disconnect', () => {
         // Car
@@ -443,5 +514,63 @@ function contactTemplate({ fromEmail, username, subject, message }) {
     </div>
   </div>`;
 }
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  PUSH NOTIFICATION ROUTES (FCM via Admin SDK — works on the Spark plan)
+// ═══════════════════════════════════════════════════════════════════════════
+
+// Chat message: client calls this right after writing the message to the DB.
+app.post('/notify/user', async (req, res) => {
+    const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || '?';
+    if (!rlOk(ip, 30)) return res.status(429).json({ ok: false, error: 'Too many requests' });
+    const { to, title, body } = req.body || {};
+    if (!/^[a-z0-9]{2,30}$/.test(String(to || ''))) return res.status(400).json({ ok: false, error: 'bad target' });
+    if (!title || !body) return res.status(400).json({ ok: false, error: 'title and body required' });
+    if (!fcmInit()) return res.json({ ok: true, sent: 0, note: 'push not configured (set FIREBASE_SERVICE_ACCOUNT)' });
+    try {
+        const snap = await fcmDB.ref('fcmTokens/' + to).once('value');
+        const tokens = snap.exists() ? Object.keys(snap.val()) : [];
+        if (!tokens.length) return res.json({ ok: true, sent: 0 });
+        const { sent, dead } = await fcmSendToTokens(tokens, title, body, 'chat-' + to);
+        // remove dead tokens so we never retry them
+        await Promise.all(dead.map(t => fcmDB.ref('fcmTokens/' + to + '/' + t).remove().catch(() => {})));
+        res.json({ ok: true, sent });
+    } catch (err) {
+        console.error('notify/user error:', err.message);
+        res.status(500).json({ ok: false, error: 'send failed' });
+    }
+});
+
+// Global announcement (admin panel). Requires the admin key.
+app.post('/notify/all', async (req, res) => {
+    const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || '?';
+    if (!rlOk(ip, 10)) return res.status(429).json({ ok: false, error: 'Too many requests' });
+    const { key, title, body } = req.body || {};
+    const expected = process.env.ADMIN_NOTIFY_KEY || 'anuragAdmin@123';
+    if (key !== expected) return res.status(403).json({ ok: false, error: 'bad key' });
+    if (!title || !body) return res.status(400).json({ ok: false, error: 'title and body required' });
+    if (!fcmInit()) return res.json({ ok: true, sent: 0, note: 'push not configured (set FIREBASE_SERVICE_ACCOUNT)' });
+    try {
+        const snap = await fcmDB.ref('fcmTokens').once('value');
+        const all = snap.exists() ? snap.val() : {};
+        const jobs = [];
+        for (const [user, tokens] of Object.entries(all)) {
+            const list = Object.keys(tokens || {});
+            if (!list.length) continue;
+            jobs.push(fcmSendToTokens(list, title, body, 'arcade-global')
+                .then(({ dead }) => Promise.all(dead.map(t => fcmDB.ref('fcmTokens/' + user + '/' + t).remove().catch(() => {})))));
+        }
+        const results = await Promise.all(jobs);
+        const sent = results.reduce((a, r) => a + (r && r.sent ? r.sent : 0), 0);
+        res.json({ ok: true, sent: sent || results.length });
+    } catch (err) {
+        console.error('notify/all error:', err.message);
+        res.status(500).json({ ok: false, error: 'send failed' });
+    }
+});
+
+app.get('/notify/status', (req, res) => {
+    res.json({ ok: true, pushConfigured: fcmInit() || !!process.env.FIREBASE_SERVICE_ACCOUNT });
+});
 
 server.listen(PORT, () => console.log(`Arcade Hub server on port ${PORT}`));
