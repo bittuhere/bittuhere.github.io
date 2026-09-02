@@ -5784,6 +5784,15 @@ function disableGlobalZoom() {
                 history.pushState({ spa: currentSection }, '', '#' + currentSection);
             }
             if (e.data === 'spa-leaderboard') { MapsTo('section-leaderboard', 'right'); }
+            // Tapped a push notification → open that exact chat
+            if (e.data && typeof e.data === 'object' && e.data.type === 'push-click' && e.data.chat) {
+                try {
+                    if (localStorage.getItem('isLoggedIn') === 'true') {
+                        MapsTo('section-chat', 'right');
+                        setTimeout(function () { try { openChatWith(String(e.data.chat)); } catch (_e) { } }, 600);
+                    }
+                } catch (_e) { }
+            }
             if (e.data === 'score-saved' || e.data === 'score-syncing') { _showScoreSync(e.data); }
             if (e.data === 'fs-entered') { _fsActive = true; _updateRotateOverlay(); }
             if (e.data === 'fs-exited') { _fsActive = false; try { if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock(); } catch (_) { } _updateRotateOverlay(); }
@@ -5796,6 +5805,18 @@ function disableGlobalZoom() {
                 }, e.data.icon);
             }
         });
+
+        // ─── PUSH DEEP LINK: notification tapped while the site was closed (?chat=name) ───
+        setTimeout(function () {
+            try {
+                var m = new URLSearchParams(location.search).get('chat');
+                if (m && localStorage.getItem('isLoggedIn') === 'true') {
+                    history.replaceState(null, '', location.pathname);
+                    MapsTo('section-chat', 'right');
+                    setTimeout(function () { try { openChatWith(m); } catch (_e) { } }, 700);
+                }
+            } catch (_e) { }
+        }, 2500);
 
         // ─── LOADER ───
         function showLoader() { const ol = document.getElementById('loading-overlay'); ol.style.display = 'flex'; ol.classList.remove('fade-out'); }

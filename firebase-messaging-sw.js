@@ -46,7 +46,7 @@ messaging.onBackgroundMessage(function (payload) {
         icon: icon,
         badge: badge,
         tag: tag,
-        data: { url: clickUrl },
+        data: { url: clickUrl, chat: (payload.data && payload.data.chat) || null },
         requireInteraction: false
     });
 });
@@ -54,13 +54,15 @@ messaging.onBackgroundMessage(function (payload) {
 // Tap on the notification → open/focus the site at the right place.
 self.addEventListener('notificationclick', function (event) {
     event.notification.close();
-    var targetUrl = (event.notification.data && event.notification.data.url) || '/';
+    var nd = (event.notification.data) || {};
+    var targetUrl = nd.url || '/';
+    if (nd.chat) targetUrl = '/?chat=' + encodeURIComponent(nd.chat);   // tap → that chat
     event.waitUntil(
         self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function (clientList) {
             for (var i = 0; i < clientList.length; i++) {
                 var c = clientList[i];
                 if ('focus' in c) {
-                    c.postMessage({ type: 'push-click', url: targetUrl });
+                    c.postMessage({ type: 'push-click', url: targetUrl, chat: nd.chat || null });
                     return c.focus();
                 }
             }
