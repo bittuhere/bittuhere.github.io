@@ -5924,6 +5924,8 @@ function disableGlobalZoom() {
         function loginSuccess(u, userData) {
             localStorage.setItem('isLoggedIn', 'true');
             localStorage.setItem('playerName', u);
+            // Push: if this browser had push on, re-register for the new user automatically
+            try { if (window.ArcadePush && ArcadePush.onLogin) setTimeout(function () { ArcadePush.onLogin(); }, 3000); } catch (e) { }
             try { db.ref('users/' + u).update({ lastLogin: firebase.database.ServerValue.TIMESTAMP }); } catch (e) { }
             setTimeout(() => _startBgChatNotifListener(u), 2500);
             setTimeout(function() {
@@ -6467,6 +6469,10 @@ function disableGlobalZoom() {
             MapsTo('section-login', 'left');
         } */
         function logout() {
+    // Push: remove this device's token from the logging-out user FIRST
+    // (before localStorage clears — or the next account on this device
+    // would keep receiving THIS user's notifications!)
+    try { if (window.ArcadePush && ArcadePush.onLogout) ArcadePush.onLogout(); } catch (e) { }
     var _logoutUser = localStorage.getItem('playerName');
     if (_logoutUser && typeof db !== 'undefined') {
         try {
@@ -7633,6 +7639,10 @@ function disableGlobalZoom() {
                 if (Notification.permission === 'granted') {
                     localStorage.setItem(_notifKey(friend), 'true');
                     showNotify('🔔 Notifications ' + (friend ? 'from ' + friend + ' ' : '') + 'enabled!', 'success');
+                    // ALSO switch on full push (device token) if not already active
+                    try {
+                        if (typeof ArcadePush !== 'undefined' && !ArcadePush.isEnabled()) ArcadePush.enable();
+                    } catch (e) { }
                 } else if (Notification.permission === 'denied') {
                     chk.checked = false;
                     showConfirm(
@@ -7649,6 +7659,9 @@ function disableGlobalZoom() {
                                 if (perm === 'granted') {
                                     chk.checked = true;
                                     localStorage.setItem(_notifKey(friend), 'true');
+                                    try {
+                                        if (typeof ArcadePush !== 'undefined' && !ArcadePush.isEnabled()) ArcadePush.enable();
+                                    } catch (e) { }
                                     // Test notification
                                     try {
                                         new Notification('🎮 Arcade Hub', {
@@ -7684,6 +7697,10 @@ function disableGlobalZoom() {
                     const cid = [myName, friend].sort().join('_');
                     const ref = db.ref('chats/' + cid).limitToLast(1);
                     ref.on('child_added', msgSnap => {
+                        // Chat section open? Its live listeners already notify —
+                        // stepping aside here is what prevents DOUBLE notifications.
+                        const cs = document.getElementById('section-chat');
+                        if (cs && cs.classList.contains('active')) return;
                         const d = msgSnap.val();
                         if (!d || d.sender === myName) return;
                         if (!d.timestamp || (Date.now() - d.timestamp) > 30000) return;
@@ -7695,8 +7712,13 @@ function disableGlobalZoom() {
             });
         }
 
+        var _lastNotifSig = '', _lastNotifAt = 0;
         function _sendChatNotif(from, text) {
             if (!('Notification' in window) || Notification.permission !== 'granted') return;
+            // dedup: identical sender+text within 2.5s = the same message twice
+            var sig = from + '|' + text;
+            if (sig === _lastNotifSig && Date.now() - _lastNotifAt < 2500) return;
+            _lastNotifSig = sig; _lastNotifAt = Date.now();
             if (!_notifEnabled(from)) return;
             // Don't notify if the user is actively reading this chat
             if (currentChatFriend === from && !document.hidden) return;
@@ -7773,7 +7795,7 @@ function disableGlobalZoom() {
                         fetch(window.PUSH_CONFIG.SERVER_URL + '/notify/user', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ to: currentChatFriend, title: '💬 ' + mn, body: text.slice(0, 120) })
+                            body: JSON.stringify({ to: currentChatFriend, from: mn, title: '💬 ' + mn, body: text.slice(0, 120) })
                         }).catch(function () { });
                     } catch (e) { }
                 });

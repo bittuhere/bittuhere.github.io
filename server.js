@@ -555,15 +555,18 @@ app.post('/push/unregister', async (req, res) => {
 app.post('/notify/user', async (req, res) => {
     const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || '?';
     if (!rlOk(ip, 30)) return res.status(429).json({ ok: false, error: 'Too many requests' });
-    const { to, title, body } = req.body || {};
+    const { to, from, title, body } = req.body || {};
     if (!/^[a-z0-9]{2,30}$/.test(String(to || ''))) return res.status(400).json({ ok: false, error: 'bad target' });
+    if (from && String(from).toLowerCase() === String(to).toLowerCase()) return res.json({ ok: true, sent: 0 }); // no self-notify
     if (!title || !body) return res.status(400).json({ ok: false, error: 'title and body required' });
     if (!fcmInit()) return res.json({ ok: true, sent: 0, note: 'push not configured (set FIREBASE_SERVICE_ACCOUNT)' });
     try {
         const snap = await fcmDB.ref('fcmTokens/' + to).once('value');
         const tokens = snap.exists() ? Object.keys(snap.val()) : [];
         if (!tokens.length) return res.json({ ok: true, sent: 0 });
-        const { sent, dead } = await fcmSendToTokens(tokens, title, body, 'chat-' + to, to);
+        // Tap-to-chat opens the chat WITH THE SENDER (from), not the recipient
+        const chatWith = from ? String(from).toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 30) : '';
+        const { sent, dead } = await fcmSendToTokens(tokens, title, body, 'chat-' + to, chatWith);
         // remove dead tokens so we never retry them
         await Promise.all(dead.map(t => fcmDB.ref('fcmTokens/' + to + '/' + t).remove().catch(() => {})));
         res.json({ ok: true, sent });
