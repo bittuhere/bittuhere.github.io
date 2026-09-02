@@ -4,7 +4,7 @@
  * for same-origin static assets. POSTs always bypass (upload progress fix). */
 importScripts('./firebase-messaging-sw.js');
 
-var VERSION = 'ah-v3.0.0';
+var VERSION = 'ah-v3.1.0';
 var SHELL_CACHE = 'ah-shell-' + VERSION;
 var RUNTIME_CACHE = 'ah-runtime-' + VERSION;
 var PDFJS_CACHES = { '/pdfjs/': 'ah-pdfjs-3.11.174', '/pdfjs6/': 'ah-pdfjs6-6.2.108' };

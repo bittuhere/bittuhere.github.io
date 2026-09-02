@@ -63,11 +63,18 @@ async function fcmSendToTokens(tokens, title, body, tag, chatName) {
     for (let i = 0; i < tokens.length; i += 400) {
         const chunk = tokens.slice(i, i + 400);
         try {
+            // DATA-ONLY: no `notification` payload → the browser can NEVER
+            // auto-display it. Exactly one side shows it: our service worker
+            // (browser closed) OR the open page's own listener — never both.
             const res = await fcmMsg.sendEachForMulticast({
                 tokens: chunk,
-                notification: { title: String(title).slice(0, 80), body: String(body).slice(0, 200) },
-                data: { chat: chatName ? String(chatName).slice(0, 30) : '', url: '/' },
-                webpush: { notification: { tag: String(tag || 'arcade').slice(0, 60), icon: '/favicon-192.png', renotify: true } }
+                data: {
+                    title: String(title).slice(0, 80),
+                    body: String(body).slice(0, 200),
+                    chat: chatName ? String(chatName).slice(0, 30) : '',
+                    url: '/',
+                    tag: String(tag || 'arcade').slice(0, 60)
+                }
             });
             res.responses.forEach((r, j) => {
                 if (r.success) sent++;
