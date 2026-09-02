@@ -41,13 +41,22 @@ messaging.onBackgroundMessage(function (payload) {
     var tag = data.tag || 'arcade-' + (data.scope || 'general');
 
     var clickUrl = data.url || data.click_url || '/';
-    self.registration.showNotification(title, {
-        body: body,
-        icon: icon,
-        badge: badge,
-        tag: tag,
-        data: { url: clickUrl, chat: (payload.data && payload.data.chat) || null },
-        requireInteraction: false
+
+    // ═══ THE DOUBLE-NOTIFICATION KILLER ═══
+    // If ANY Arcade Hub tab/window is open, the page's own Firebase listeners
+    // are alive and show the (smarter, context-aware) notification. Showing
+    // one here too = two notifications for one message. So: pages open → skip.
+    event = null; // (scope safety)
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function (clientList) {
+        if (clientList && clientList.length > 0) return;   // page alive → it handles it
+        self.registration.showNotification(title, {
+            body: body,
+            icon: icon,
+            badge: badge,
+            tag: tag,
+            data: { url: clickUrl, chat: (payload.data && payload.data.chat) || null },
+            requireInteraction: false
+        });
     });
 });
 
@@ -70,3 +79,4 @@ self.addEventListener('notificationclick', function (event) {
         })
     );
 });
+

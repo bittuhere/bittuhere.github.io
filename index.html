@@ -97,8 +97,8 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-messaging.js"></script>
-    <script src="js/push-config.js"></script>
-    <script src="js/pdf-embed.js"></script>
+    <script src="js/push-config.js?v=20260831"></script>
+    <script src="js/pdf-embed.js?v=20260831"></script>
     <style>
         *,
         *::before,
@@ -1744,6 +1744,7 @@
         .msg-status { font-size:.75rem; font-weight:bold; letter-spacing:-2px; }
         .tick-read { color:#53bdeb; }
         .tick-sent { color:rgba(233,237,239,.55); }
+        .wa-unread-sep span { background: rgba(0, 168, 132, .25) !important; color: #00d9a6 !important; font-weight: 600; }
         .msg-system { align-self:center; background:rgba(255,255,255,.07); border-radius:10px; padding:5px 14px; max-width:90%; font-size:.78rem; color:#8696a0; text-align:center; }
 
         .status-sub { font-size:.72rem; color:#00a884; font-weight:normal; }
@@ -7212,6 +7213,7 @@ function disableGlobalZoom() {
         let chatInit = false, currentChatFriend = null, currentChatId = null;
 
         // ── WhatsApp-style helpers ─────────────────────────────────────
+        function waCap(name) { return name ? name.charAt(0).toUpperCase() + name.slice(1) : name; }
         function waHue(name) { var h = 0; for (var i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) % 360; return h; }
         function waAvaHtml(name, cls) {
             var hue = waHue(name);
@@ -7488,7 +7490,7 @@ function disableGlobalZoom() {
                     div.innerHTML =
                         '<div id="ava-' + fn + '">' + waAvaHtml(fn, 'md') + '</div>' +
                         '<div class="wa-row-main">' +
-                            '<span class="wa-row-name">' + fn + '</span>' +
+                            '<span class="wa-row-name">' + waCap(fn) + '</span>' +
                             '<span class="wa-row-prev" id="prev-' + fn + '">Tap to chat</span>' +
                         '</div>' +
                         '<div class="wa-row-side">' +
@@ -7555,6 +7557,7 @@ function disableGlobalZoom() {
             db.ref('friend_requests/' + mn + '/' + fromUser).remove();
             showNotify(fromUser + '\'s request declined.', 'info');
         }
+        var _unreadDividerKey = null;
         function openChatWith(fn) {
             const mn = localStorage.getItem('playerName');
             if (currentChatId) db.ref('chats/' + currentChatId).off();
@@ -7564,9 +7567,19 @@ function disableGlobalZoom() {
             if (_waSocket) { try { _waSocket.emit('join', { chatId: currentChatId }); } catch (e) { } }
             db.ref('chats/' + currentChatId).once('value', snap => {
                 const msgs = snap.val();
-                if (msgs) Object.keys(msgs).forEach(id => { if (msgs[id].sender === fn && !msgs[id].read) db.ref('chats/' + currentChatId + '/' + id).update({ read: true }); });
+                if (msgs) {
+                    // WhatsApp-style: remember the FIRST unread incoming message —
+                    // the "Unread messages" divider is drawn above it.
+                    _unreadDividerKey = null;
+                    Object.keys(msgs).forEach(id => {
+                        if (msgs[id].sender === fn && !msgs[id].read) {
+                            db.ref('chats/' + currentChatId + '/' + id).update({ read: true });
+                            if (!_unreadDividerKey) _unreadDividerKey = id;
+                        }
+                    });
+                }
             });
-            document.getElementById('chat-title').innerText = fn;
+            document.getElementById('chat-title').innerText = waCap(fn);
             var _avaWrap = document.getElementById('wa-chat-ava-wrap');
             if (_avaWrap) _avaWrap.innerHTML = waAvaHtml(fn, 'md');
             var _hp = document.getElementById('wa-chat-presence');
@@ -7757,6 +7770,14 @@ function disableGlobalZoom() {
                         sep.innerHTML = '<span>' + label + '</span>'; mc.appendChild(sep);
                     }
                 }
+                // WhatsApp-style unread divider
+                if (_unreadDividerKey && id === _unreadDividerKey) {
+                    const usep = document.createElement('div');
+                    usep.className = 'chat-date-sep wa-unread-sep';
+                    usep.innerHTML = '<span>&#128233; Unread messages</span>';
+                    mc.appendChild(usep);
+                    _unreadDividerKey = null;
+                }
                 const div = document.createElement('div'); div.id = 'msg-' + id;
                 const isSystem = d.sender === '_system';
                 const isMine = !isSystem && d.sender === mn;
@@ -7795,7 +7816,7 @@ function disableGlobalZoom() {
                         fetch(window.PUSH_CONFIG.SERVER_URL + '/notify/user', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ to: currentChatFriend, from: mn, title: '💬 ' + mn, body: text.slice(0, 120) })
+                            body: JSON.stringify({ to: currentChatFriend, from: mn, title: '💬 ' + waCap(mn), body: text.slice(0, 120) })
                         }).catch(function () { });
                     } catch (e) { }
                 });
@@ -10440,7 +10461,7 @@ window.loadFairCopies = function() {
         // launchAdminEntry is defined inside the admin IIFE above (uses matrix-rain + admin-login-overlay)
     </script>
 
-<script src="js/push.js"></script>
+<script src="js/push.js?v=20260831"></script>
 
 <!-- ═══════════════════ MODERN UI LAYER (cascade overrides) ═══════════════════ -->
 <style>
@@ -10603,3 +10624,4 @@ window.loadFairCopies = function() {
 </body>
 
 </html>
+
