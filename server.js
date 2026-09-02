@@ -57,7 +57,7 @@ function rlOk(ip, max = 30, windowMs = 60000) {
     return true;
 }
 
-async function fcmSendToTokens(tokens, title, body, tag) {
+async function fcmSendToTokens(tokens, title, body, tag, chatName) {
     // chunk (FCM multicast limit 400) + clean dead tokens
     let sent = 0; const dead = [];
     for (let i = 0; i < tokens.length; i += 400) {
@@ -66,6 +66,7 @@ async function fcmSendToTokens(tokens, title, body, tag) {
             const res = await fcmMsg.sendEachForMulticast({
                 tokens: chunk,
                 notification: { title: String(title).slice(0, 80), body: String(body).slice(0, 200) },
+                data: { chat: chatName ? String(chatName).slice(0, 30) : '', url: '/' },
                 webpush: { notification: { tag: String(tag || 'arcade').slice(0, 60), icon: '/favicon-192.png', renotify: true } }
             });
             res.responses.forEach((r, j) => {
@@ -519,6 +520,37 @@ function contactTemplate({ fromEmail, username, subject, message }) {
 //  PUSH NOTIFICATION ROUTES (FCM via Admin SDK — works on the Spark plan)
 // ═══════════════════════════════════════════════════════════════════════════
 
+// Token registration — the ONLY writer to fcmTokens (Admin SDK bypasses
+// the database security rules, so the client never gets PERMISSION_DENIED).
+app.post('/push/register', async (req, res) => {
+    const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || '?';
+    if (!rlOk(ip, 60)) return res.status(429).json({ ok: false, error: 'Too many requests' });
+    const { user, token } = req.body || {};
+    if (!/^[a-z0-9]{2,30}$/.test(String(user || ''))) return res.status(400).json({ ok: false, error: 'bad user' });
+    const t = String(token || '');
+    if (t.length < 50 || t.length > 500) return res.status(400).json({ ok: false, error: 'bad token' });
+    if (!fcmInit()) return res.status(503).json({ ok: false, error: 'Server push not configured — set FIREBASE_SERVICE_ACCOUNT on Render' });
+    try {
+        await fcmDB.ref('fcmTokens/' + user + '/' + t).set({ ts: Date.now() });
+        res.json({ ok: true });
+    } catch (err) {
+        console.error('push/register error:', err.message);
+        res.status(500).json({ ok: false, error: 'Registration failed' });
+    }
+});
+
+app.post('/push/unregister', async (req, res) => {
+    const { user, token } = req.body || {};
+    if (!/^[a-z0-9]{2,30}$/.test(String(user || ''))) return res.status(400).json({ ok: false, error: 'bad user' });
+    if (!fcmInit()) return res.json({ ok: true, note: 'not configured' });
+    try {
+        await fcmDB.ref('fcmTokens/' + user + '/' + String(token || '')).remove();
+        res.json({ ok: true });
+    } catch (err) {
+        res.status(500).json({ ok: false, error: 'Failed' });
+    }
+});
+
 // Chat message: client calls this right after writing the message to the DB.
 app.post('/notify/user', async (req, res) => {
     const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || '?';
@@ -531,7 +563,7 @@ app.post('/notify/user', async (req, res) => {
         const snap = await fcmDB.ref('fcmTokens/' + to).once('value');
         const tokens = snap.exists() ? Object.keys(snap.val()) : [];
         if (!tokens.length) return res.json({ ok: true, sent: 0 });
-        const { sent, dead } = await fcmSendToTokens(tokens, title, body, 'chat-' + to);
+        const { sent, dead } = await fcmSendToTokens(tokens, title, body, 'chat-' + to, to);
         // remove dead tokens so we never retry them
         await Promise.all(dead.map(t => fcmDB.ref('fcmTokens/' + to + '/' + t).remove().catch(() => {})));
         res.json({ ok: true, sent });
