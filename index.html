@@ -96,6 +96,8 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-messaging.js"></script>
+    <script src="js/push-config.js"></script>
     <script src="js/pdf-embed.js"></script>
     <style>
         *,
@@ -4409,7 +4411,19 @@
             showConfirm('📢 Publish this message to ALL players?', function(){
                 var key=db.ref('notifications/global').push().key;
                 db.ref('notifications/global/'+key).set({message:text,time:Date.now(),_k:ADMIN_KEY})
-                    .then(function(){ showNotify('✅ Published!','success'); document.getElementById('adminGlobalText').value=''; adminLoadGlobalMessages(); })
+                    .then(function(){
+                        showNotify('✅ Published!','success');
+                        document.getElementById('adminGlobalText').value='';
+                        adminLoadGlobalMessages();
+                        // ALSO push to every device (browser closed too) via the Render server
+                        try {
+                            fetch(window.PUSH_CONFIG.SERVER_URL + '/notify/all', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ key: ADMIN_KEY, title: '🎮 Arcade Hub', body: text.replace(/<[^>]*>/g, '').slice(0, 140) })
+                            }).catch(function () { });
+                        } catch (e) { }
+                    })
                     .catch(function(e){ showNotify('❌ '+e.message,'error'); });
             },'📢');
         };
@@ -5130,6 +5144,16 @@
                 <div id="prof-cooldown-msg"></div>
             </div>
             
+            <div class="prof-card">
+                <div class="prof-card-title">🔔 Notifications</div>
+                <div style="font-size:0.78rem;color:rgba(255,255,255,0.5);margin-bottom:10px;line-height:1.4;">
+                    Get announcements &amp; messages even when the site is closed — like a real app.
+                </div>
+                <button class="prof-action-btn" data-push-toggle="1"
+                    data-label-on="🔔 Push Notifications: ON"
+                    data-label-off="🔔 Enable Push Notifications"
+                    style="border-color:rgba(0,243,255,0.3);color:#00f3ff;">🔔 Enable Push Notifications</button>
+            </div>
             <div class="prof-card">
                 <div class="prof-card-title">🔍 Search Player</div>
                 <div class="prof-search-wrap">
@@ -7720,7 +7744,18 @@ function disableGlobalZoom() {
             }
             _waSetTypingOff();
             db.ref('chats/' + currentChatId).push({ sender: mn, text, timestamp: Date.now(), read: false })
-                .then(() => _pruneChat(currentChatId));
+                .then(() => {
+                    _pruneChat(currentChatId);
+                    // Push to the friend's devices via our Render server (FCM) —
+                    // fires even when their browser/tab is fully closed.
+                    try {
+                        fetch(window.PUSH_CONFIG.SERVER_URL + '/notify/user', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ to: currentChatFriend, title: '💬 ' + mn, body: text.slice(0, 120) })
+                        }).catch(function () { });
+                    } catch (e) { }
+                });
             input.value = ''; requestAnimationFrame(() => input.focus());
         }
         function _pruneChat(chatId) {
@@ -8969,8 +9004,8 @@ showSection('global', document.querySelector('.admin-btn'));
             const _bootLibs = [
                 'fonts.googleapis.com/css2',
                 'firebase-app.js', 'firebase-database.js',
-                'firebase-auth.js',
-                'js/pdf-embed.js'
+                'firebase-auth.js', 'firebase-messaging.js',
+                'js/pdf-embed.js', 'js/push.js'
             ];
             let bootTimedOut = false;
             function _libProgress() {          // 0..1 — real fraction of libs loaded
@@ -10361,6 +10396,8 @@ window.loadFairCopies = function() {
         })(); // end quiz IIFE
         // launchAdminEntry is defined inside the admin IIFE above (uses matrix-rain + admin-login-overlay)
     </script>
+
+<script src="js/push.js"></script>
 
 <!-- ═══════════════════ MODERN UI LAYER (cascade overrides) ═══════════════════ -->
 <style>
