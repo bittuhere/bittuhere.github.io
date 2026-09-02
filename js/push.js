@@ -55,18 +55,29 @@
         return (localStorage.getItem('playerName') || '').toLowerCase().trim();
     }
 
+    // Token storage goes through OUR Render server — NOT direct Firebase writes.
+    // (Direct writes hit PERMISSION_DENIED under the site's security rules; the
+    //  server's Admin SDK bypasses rules and owns all token storage.)
     function saveToken(token) {
         var name = playerName();
         if (!name || !token) return Promise.resolve();
-        var db = firebase.database();
-        return db.ref(cfg.TOKENS_PATH + '/' + name + '/' + token).set(true);
+        return fetch(cfg.SERVER_URL + '/push/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user: name, token: token })
+        }).then(function (r) { return r.json(); }).then(function (j) {
+            if (!j.ok) throw new Error(j.error || 'Registration failed');
+        });
     }
 
     function removeToken(token) {
         var name = playerName();
         if (!name || !token) return Promise.resolve();
-        var db = firebase.database();
-        return db.ref(cfg.TOKENS_PATH + '/' + name + '/' + token).remove();
+        return fetch(cfg.SERVER_URL + '/push/unregister', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user: name, token: token })
+        }).catch(function () { });
     }
 
     async function enable() {
