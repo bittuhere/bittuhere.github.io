@@ -81,40 +81,48 @@
     }
 
     async function enable() {
+        if (_busy || isEnabled()) return false;
+        setBusy(true, '⏳ Turning on notifications…');
+        var done = function (ok) { setBusy(false); return ok; };
         if (!supported()) {
             try { global.showNotify && global.showNotify('Push notifications are not supported on this browser.', 'error'); } catch (e) {}
-            return false;
+            return done(false);
         }
         var m = initMessaging();
-        if (!m) return false;
+        if (!m) return done(false);
         try {
             var perm = await Notification.requestPermission();
             if (perm !== 'granted') {
                 try { global.showNotify && global.showNotify('Notifications were blocked. Enable them in your browser settings to receive updates.', 'error'); } catch (e) {}
                 updateButtons(false);
-                return false;
+                return done(false);
             }
             // register the SW explicitly (firebase-messaging-sw.js at root)
             await navigator.serviceWorker.register('/firebase-messaging-sw.js');
             var token = await m.getToken();
             if (!token) {
                 try { global.showNotify && global.showNotify('Could not get a push token. Try again.', 'error'); } catch (e) {}
-                return false;
+                return done(false);
             }
             currentToken = token;
             await saveToken(token);
+            try { localStorage.setItem('push_pref', 'on'); } catch (e) { }
             try { global.showNotify && global.showNotify('🔔 Push notifications enabled! You’ll get updates even when the site is closed.', 'success'); } catch (e) {}
             updateButtons(true);
-            return true;
+            return done(true);
         } catch (err) {
             console.error('[ArcadePush] enable error', err);
             try { global.showNotify && global.showNotify('Push setup failed: ' + (err.message || err), 'error'); } catch (e) {}
-            return false;
+            updateButtons(false);
+            return done(false);
         }
     }
 
     async function disable() {
+        if (_busy) return;
+        setBusy(true, '⏳ Turning off…');
         try {
+            try { localStorage.removeItem('push_pref'); } catch (e) { }
             if (messaging && currentToken) {
                 await messaging.deleteToken(currentToken);
                 await removeToken(currentToken);
@@ -125,6 +133,29 @@
         } catch (e) {
             console.warn('[ArcadePush] disable error', e);
         }
+        setBusy(false);
+    }
+
+    // ── Account switch handling ──────────────────────────────────────────
+    // Logout: REMOVE this device's token from the user (otherwise the next
+    // account on this device would receive the previous user's pushes!).
+    function onLogout() {
+        try { localStorage.removeItem('push_pref'); } catch (e) { }
+        var name = playerName();
+        if (currentToken && name) removeToken(currentToken);   // fire & forget
+    }
+    // Login: if this browser had push enabled, silently re-register the
+    // token under the NEW user — no button press needed.
+    async function onLogin() {
+        try {
+            if (localStorage.getItem('push_pref') !== 'on') return;
+            if (!supported() || Notification.permission !== 'granted') return;
+            var m = initMessaging();
+            if (!m) return;
+            await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+            var t = await m.getToken();
+            if (t) { currentToken = t; await saveToken(t); updateButtons(true); }
+        } catch (e) { }
     }
 
     function isEnabled() {
@@ -155,10 +186,34 @@
         updateButtons(false);
     }
 
+    var _busy = false;
+    function setBusy(b, label) {
+        _busy = b;
+        document.querySelectorAll(BUTTON_SELECTOR).forEach(function (btn) {
+            btn.disabled = b;
+            btn.style.opacity = b ? '0.6' : '';
+            btn.style.cursor = b ? 'wait' : '';
+            if (b && label) btn.textContent = label;
+        });
+    }
+
     function init() {
         document.querySelectorAll(BUTTON_SELECTOR).forEach(function (btn) {
             btn.addEventListener('click', function () {
-                if (btn.dataset.on === '1') disable(); else enable();
+                if (_busy) return;                       // no double-clicks mid-flight
+                if (btn.dataset.on === '1') {
+                    // Already ON → confirm before disabling (no accidental taps)
+                    try {
+                        if (typeof showConfirm === 'function') {
+                            showConfirm('Disable push notifications?\n\nYou will stop receiving messages and announcements when the site is closed.',
+                                function () { disable(); }, '🔕');
+                            return;
+                        }
+                    } catch (e) { }
+                    disable();
+                } else {
+                    enable();
+                }
             });
         });
         // Wait until logged in + firebase ready before checking state.
@@ -173,7 +228,8 @@
     }
 
     global.ArcadePush = { init: init, enable: enable, disable: disable,
-                          isEnabled: isEnabled, supported: supported };
+                          isEnabled: isEnabled, supported: supported,
+                          onLogout: onLogout, onLogin: onLogin };
 
     if (document.readyState === 'complete' || document.readyState === 'interactive') {
         setTimeout(init, 600);
