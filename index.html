@@ -6177,8 +6177,11 @@ function disableGlobalZoom() {
             const res = await gasCall({ action:'verify-code', email:_forgotEmail, code });
             if (!res.ok) { st.style.color='#ff3366'; st.innerText = res.error || 'Wrong code.'; return; }
             const snap = await db.ref('users').orderByChild('email').equalTo(_forgotEmail).once('value');
-            let foundUser = ''; snap.forEach(c => { foundUser = c.key; });
-            await db.ref('users/' + foundUser).update({ password: await hashPw(newPass) });
+            let foundUser = ''; let oldHash = null;
+            snap.forEach(c => { foundUser = c.key; oldHash = c.val().password || null; });
+            // Rules require proving the OLD password (_oldPw) to change it —
+            // the GAS email code already verified identity.
+            await db.ref('users/' + foundUser).update({ password: await hashPw(newPass), _oldPw: oldHash || undefined });
             st.style.color='#00ff88'; st.innerText = 'Password reset! You can now login.';
             setTimeout(closeForgotPassword, 2000);
         }
@@ -6560,7 +6563,10 @@ function disableGlobalZoom() {
                 const nwH = await hashPw(nwVal);
                 document.getElementById('cp-confirm-btn').disabled = true;
                 document.getElementById('cp-confirm-btn').innerText = 'Saving...';
-                db.ref('users/' + uid).update({ password: nwH }).then(() => {
+                // Read the current hash so the rules can verify we knew the old password
+                db.ref('users/' + uid + '/password').once('value').then(function (pwSnap) {
+                    return db.ref('users/' + uid).update({ password: nwH, _oldPw: pwSnap.val() || undefined });
+                }).then(() => {
                     closeChangePass();
                     _cpStep = 1;
                     showNotify('🔐 Password changed successfully! Logging out...', 'success');
@@ -10621,7 +10627,7 @@ window.loadFairCopies = function() {
         }
     }
 </style>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a34c5028db96ff0c',t:'MTc4ODM0OTk5NA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 
 </html>
 
