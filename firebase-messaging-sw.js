@@ -54,6 +54,8 @@ messaging.onBackgroundMessage(function (payload) {
             icon: icon,
             badge: badge,
             tag: tag,
+            renotify: true,                 // each NEW message re-alerts (stack replaces, sound replays)
+            vibrate: [80, 40, 80],          // mobile feedback
             data: { url: clickUrl, chat: (payload.data && payload.data.chat) || null },
             requireInteraction: false
         });

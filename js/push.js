@@ -15,6 +15,20 @@
     'use strict';
 
     var cfg = global.PUSH_CONFIG || {};
+
+    // Cookie helpers — localStorage gets cleared on logout, cookies survive,
+    // so "this browser had push on for user X" can be remembered across
+    // logout → login of the SAME user (auto-resume).
+    function _ckSet(name, val, days) {
+        try { document.cookie = name + '=' + encodeURIComponent(val) + '; path=/; max-age=' + (days || 365) * 86400; } catch (e) { }
+    }
+    function _ckGet(name) {
+        try {
+            var m = document.cookie.match(new RegExp('(?:^|; )' + name + '=([^;]*)'));
+            return m ? decodeURIComponent(m[1]) : null;
+        } catch (e) { return null; }
+    }
+    function _ckDel(name) { try { document.cookie = name + '=; path=/; max-age=0'; } catch (e) { } }
     var messaging = null;
     var currentToken = null;
     var BUTTON_SELECTOR = '[data-push-toggle]';
@@ -84,6 +98,10 @@
         if (_busy || isEnabled()) return false;
         setBusy(true, '⏳ Turning on notifications…');
         var done = function (ok) { setBusy(false); return ok; };
+        if (!playerName()) {
+            try { global.showNotify && global.showNotify('Log in first to enable push notifications.', 'error'); } catch (e) { }
+            return done(false);
+        }
         if (!supported()) {
             try { global.showNotify && global.showNotify('Push notifications are not supported on this browser.', 'error'); } catch (e) {}
             return done(false);
@@ -107,6 +125,8 @@
             currentToken = token;
             await saveToken(token);
             try { localStorage.setItem('push_pref', 'on'); } catch (e) { }
+            _ckSet('ah_push', 'on');
+            _ckSet('ah_push_user', playerName() || '');
             try { global.showNotify && global.showNotify('🔔 Push notifications enabled! You’ll get updates even when the site is closed.', 'success'); } catch (e) {}
             updateButtons(true);
             return done(true);
@@ -123,6 +143,7 @@
         setBusy(true, '⏳ Turning off…');
         try {
             try { localStorage.removeItem('push_pref'); } catch (e) { }
+            _ckDel('ah_push'); _ckDel('ah_push_user');
             if (messaging && currentToken) {
                 await messaging.deleteToken(currentToken);
                 await removeToken(currentToken);
@@ -140,21 +161,53 @@
     // Logout: REMOVE this device's token from the user (otherwise the next
     // account on this device would receive the previous user's pushes!).
     function onLogout() {
-        try { localStorage.removeItem('push_pref'); } catch (e) { }
+        // Remember WHO had push on (cookie survives localStorage.clear) but
+        // remove THIS device's token so the next account isn't spammed.
         var name = playerName();
+        if (name) _ckSet('ah_push_user', name);
         if (currentToken && name) removeToken(currentToken);   // fire & forget
     }
-    // Login: if this browser had push enabled, silently re-register the
-    // token under the NEW user — no button press needed.
+    // ── ULTRA LOGIN FLOW (any ID, WhatsApp model) ────────────────────────
+    // 1. Permission granted → auto-register this device under the user. Done.
+    // 2. Permission 'default' + the user has push devices elsewhere (server
+    //    check) → show ONE gentle confirm: "enable notifications?" — delayed
+    //    9s so it never collides with the post-login email modal.
     async function onLogin() {
         try {
-            if (localStorage.getItem('push_pref') !== 'on') return;
-            if (!supported() || Notification.permission !== 'granted') return;
-            var m = initMessaging();
-            if (!m) return;
-            await navigator.serviceWorker.register('/firebase-messaging-sw.js');
-            var t = await m.getToken();
-            if (t) { currentToken = t; await saveToken(t); updateButtons(true); }
+            var name = playerName();
+            if (!name || !supported()) return;
+            if (Notification.permission === 'granted') {
+                var m = initMessaging();
+                if (!m) return;
+                await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+                var t = await m.getToken();
+                if (t) {
+                    currentToken = t; await saveToken(t); updateButtons(true);
+                    try { localStorage.setItem('push_pref', 'on'); } catch (e) { }
+                    _ckSet('ah_push', 'on'); _ckSet('ah_push_user', name);
+                }
+                return;
+            }
+            if (Notification.permission !== 'default') return;   // 'denied' → browser-level block
+            // Does this user have push on other devices?
+            fetch(cfg.SERVER_URL + '/push/has-tokens?user=' + encodeURIComponent(name))
+                .then(function (r) { return r.json(); })
+                .then(function (j) {
+                    if (!j || !j.has) return;
+                    // wait 9s so the email modal (if any) finishes first — no modal collision
+                    setTimeout(function () {
+                        try {
+                            showConfirm('🔔 We detected you have push notifications enabled on another device,\n\nbut this browser is not allowing notifications. Allow them here so you never miss a message?',
+                                function () {
+                                    Notification.requestPermission().then(function (perm) {
+                                        if (perm === 'granted') { onLogin(); }   // re-run → auto-registers
+                                        else { showNotify('🔕 Notifications stay off for this browser.', 'info'); }
+                                    });
+                                }, '🔔');
+                        } catch (e) { }
+                    }, 9000);
+                })
+                .catch(function () { });
         } catch (e) { }
     }
 
@@ -176,7 +229,11 @@
         if (!supported()) { updateButtons(false); return; }
         var m = initMessaging();
         if (!m) { updateButtons(false); return; }
-        if (Notification.permission === 'granted') {
+        // Only resume if the user actually WANTS push (off must stay off —
+        // browser permission being granted is not the same as opted-in!)
+        var wantsPush = false;
+        try { wantsPush = localStorage.getItem('push_pref') === 'on' || _ckGet('ah_push') === 'on'; } catch (e) { }
+        if (Notification.permission === 'granted' && wantsPush) {
             try {
                 await navigator.serviceWorker.register('/firebase-messaging-sw.js');
                 var t = await m.getToken();

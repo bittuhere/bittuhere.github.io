@@ -558,11 +558,34 @@ app.post('/push/unregister', async (req, res) => {
     }
 });
 
+// Does a user have push devices registered? (login-time auto-resume check)
+app.get('/push/has-tokens', async (req, res) => {
+    const user = String(req.query.user || '');
+    if (!/^[a-z0-9]{2,30}$/.test(user)) return res.status(400).json({ ok: false, has: false });
+    if (!fcmInit()) return res.json({ ok: true, has: false });
+    try {
+        const snap = await fcmDB.ref('fcmTokens/' + user).once('value');
+        const has = snap.exists() && Object.keys(snap.val()).length > 0;
+        res.json({ ok: true, has });
+    } catch (e) { res.json({ ok: true, has: false }); }
+});
+
+// Per-RECIPIENT protection: nobody may be spammed more than 20 pushes/min
+const _rlTo = new Map();
+function rlTargetOk(user, max = 20, windowMs = 60000) {
+    const now = Date.now();
+    const arr = (_rlTo.get(user) || []).filter(t => now - t < windowMs);
+    if (arr.length >= max) { _rlTo.set(user, arr); return false; }
+    arr.push(now); _rlTo.set(user, arr);
+    return true;
+}
+
 // Chat message: client calls this right after writing the message to the DB.
 app.post('/notify/user', async (req, res) => {
     const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || '?';
-    if (!rlOk(ip, 30)) return res.status(429).json({ ok: false, error: 'Too many requests' });
+    if (!rlOk(ip, 60)) return res.status(429).json({ ok: false, error: 'Too many requests' });   // 60/min per sender IP
     const { to, from, title, body } = req.body || {};
+    if (to && !rlTargetOk(String(to))) return res.status(429).json({ ok: false, error: 'Recipient is being messaged too fast' });
     if (!/^[a-z0-9]{2,30}$/.test(String(to || ''))) return res.status(400).json({ ok: false, error: 'bad target' });
     if (from && String(from).toLowerCase() === String(to).toLowerCase()) return res.json({ ok: true, sent: 0 }); // no self-notify
     if (!title || !body) return res.status(400).json({ ok: false, error: 'title and body required' });

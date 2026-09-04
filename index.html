@@ -4519,6 +4519,17 @@
         };
 
         // ── USERS ────────────────────────────────────────────────────────────
+        window.adminTestPush = function(uid) {
+            if (!uid) return;
+            showConfirm('🔔 Send a TEST push notification to "'+uid+'"?', function(){
+                fetch(window.PUSH_CONFIG.SERVER_URL + '/notify/user', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ to: uid, from: 'admin', title: '🔔 Arcade Hub', body: 'Test push from the admin panel — your notifications work!' })
+                }).then(function(r){ return r.json(); }).then(function(j){
+                    showNotify(j.sent > 0 ? '✅ Test push delivered to ' + j.sent + ' device(s)!' : 'ℹ️ ' + (uid) + ' has no registered devices (or push server not configured).', j.sent > 0 ? 'success' : 'info');
+                }).catch(function(){ showNotify('❌ Push server unreachable.', 'error'); });
+            }, '🔔');
+        };
         function adminLoadUsers() {
             if (typeof db === 'undefined' || !db) return showNotify('Database not ready','error');
             db.ref('users').once('value').then(function(snap){
@@ -4554,6 +4565,7 @@
                     '<button onclick="adminToggleBlock(\''+u.id+'\','+(bl?'false':'true')+')" style="background:'+(bl?'#2ecc71':'#e74c3c')+';border:none;color:'+(bl?'#000':'#fff')+';padding:4px 8px;border-radius:4px;cursor:pointer;font-size:.74rem;margin:2px;">'+(bl?'UNBLOCK':'BLOCK')+'</button>'+
                     '<button onclick="adminResetPass(\''+u.id+'\')" style="background:#3498db;border:none;color:#fff;padding:4px 8px;border-radius:4px;cursor:pointer;font-size:.74rem;margin:2px;">RESET PW</button>'+
                     '<button onclick="adminToggleEmailVerif(\''+u.id+'\','+(evOff?'true':'false')+')" style="background:'+(evOff?'#8e44ad':'#2c3e50')+';border:none;color:#fff;padding:4px 8px;border-radius:4px;cursor:pointer;font-size:.74rem;margin:2px;" title="'+(evOff?'Email verif disabled':'Email verif required')+'">[E]'+(evOff?'ON':'OFF')+'</button>'+
+                    '<button onclick="adminTestPush(\''+u.id+'\')" style="background:#8e44ad;opacity:1;font-family:inherit;font-size:.74rem;" title="Send a test push notification">🔔</button>' +
                     '<button onclick="adminStrictVerify(\''+u.id+'\')" style="background:#e67e22;border:none;color:#fff;padding:4px 8px;border-radius:4px;cursor:pointer;font-size:.74rem;margin:2px;" title="Force user to re-verify email on next login. No skip allowed.">FORCE VERIFY</button>'+
                     '</td></tr>';
             }).join('')||'<tr><td colspan="4" style="text-align:center;padding:14px;color:#888;">No users.</td></tr>';
@@ -5954,22 +5966,20 @@ function disableGlobalZoom() {
             function _askForEmail(required) {
                 showInputModal(required ? '📧 EMAIL REQUIRED' : '📧 ADD YOUR EMAIL',
                     'you@example.com', async function (email) {
-                        email = (email || '').trim();
-                        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showNotify('❌ Enter a valid email address!', 'error'); return; }
-                        try {
-                            if (required) {
-                                await db.ref('users/' + u).update({ email: email, emailVerified: false });
-                                _verifyMode = 'existing';
-                                const res = await gasCall({ action: 'send-code', email: email, username: u, purpose: 'verify' }).catch(() => ({ ok: false }));
-                                if (res.ok) _openVerifyPage(email);
-                                else { showNotify('❌ Could not send the code — try again later.', 'error'); }
-                            } else {
-                                await db.ref('users/' + u).update({ email: email });
-                                showNotify('✅ Email saved! You can verify it anytime from your profile.', 'success');
-                            }
-                        } catch (e) { showNotify('❌ Could not save email: ' + e.message, 'error'); }
-                    }, '');
+                    email = (email || '').trim();
+                    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showNotify('❌ Enter a valid email address!', 'error'); if (required) setTimeout(function(){ _askForEmail(true); }, 400); return; }
+                    try {
+                        // Send the code FIRST — the email is only saved after the
+                        // code is verified. No fake emails can be stored!
+                        _pendingEmail = email;
+                        _verifyMode = 'email-add';
+                        const res = await gasCall({ action: 'send-code', email: email, username: u, purpose: 'verify' }).catch(() => ({ ok: false }));
+                        if (res.ok) { _openVerifyPage(email); }
+                        else { showNotify('❌ Could not send the code — try again later.', 'error'); if (required) setTimeout(function(){ _askForEmail(true); }, 600); }
+                    } catch (e) { showNotify('❌ ' + e.message, 'error'); }
+                }, '', required);
             }
+            var _askForEmailLegacy = function () {}; // (old body below is replaced)
             if (needsVerify) {
                 _verifyMode = 'existing';
                 setTimeout(async () => {
@@ -5993,6 +6003,7 @@ function disableGlobalZoom() {
 
         // ── Email Verify Page ─────────────────────────────────────────────
         let _verifyEmailAddr = '';
+        let _pendingEmail = null;   // email awaiting code verification (email-add mode)
         function _openVerifyPage(email) {
             _verifyEmailAddr = email;
             document.getElementById('verify-code-input').value = '';
@@ -6017,6 +6028,13 @@ function disableGlobalZoom() {
                 _pendingReg = null;
                 st.style.color='#00ff88'; st.innerText = 'Account created! Welcome!';
                 setTimeout(() => loginSuccess(username, userData), 900);
+            } else if (_verifyMode === 'email-add') {
+                // email added via the profile/forced modal → save ONLY now (code verified)
+                const u2 = localStorage.getItem('playerName');
+                if (u2) await db.ref('users/' + u2.toLowerCase().trim()).update({ email: _pendingEmail, emailVerified: true });
+                _pendingEmail = null;
+                st.style.color = '#00ff88'; st.innerText = '✅ Email verified & saved!';
+                setTimeout(function () { MapsTo('section-hub', 'right'); }, 900);
             } else if (_verifyMode === 'existing') {
                 const u = localStorage.getItem('playerName');
                 if (u) await db.ref('users/' + u).update({ emailVerified:true, forceVerify:null });
@@ -7481,9 +7499,13 @@ function disableGlobalZoom() {
 
             // Update dot on initial load and whenever a new message arrives
             updateChatDot();
-            // Listen for any chat changes
-            db.ref('chats').on('child_added', function () { updateChatDot(); });
-            db.ref('chats').on('child_changed', function () { updateChatDot(); });
+            // Listen for any chat changes — registered ONCE per page life
+            // (previously every chat-section visit piled up duplicate listeners!)
+            if (!window._chatDotWatchers) {
+                window._chatDotWatchers = true;
+                db.ref('chats').on('child_added', function () { updateChatDot(); });
+                db.ref('chats').on('child_changed', function () { updateChatDot(); });
+            }
 
             // ── WhatsApp-style friends list ──
             LC.fb('section-chat', db.ref('friends/' + myName), 'value', snapshot => {
@@ -7724,6 +7746,14 @@ function disableGlobalZoom() {
                         if (!d || d.sender === myName) return;
                         if (!d.timestamp || (Date.now() - d.timestamp) > 30000) return;
                         if (currentChatFriend === friend && !document.hidden) return;
+                        // Friends-button red dot — works from ANY section now
+                        // (previously only updated while the chat section was open!)
+                        if (currentChatFriend !== friend) {
+                            var _cd = document.getElementById('chat-notif-dot');
+                            if (_cd) _cd.style.display = 'block';
+                            var _fb = document.querySelector('.hub-friends-btn');
+                            if (_fb) _fb.classList.add('has-notif');
+                        }
                         _sendChatNotif(d.sender, d.text);
                     });
                     _bgChatRefs.push(ref);
@@ -7731,13 +7761,33 @@ function disableGlobalZoom() {
             });
         }
 
-        var _lastNotifSig = '', _lastNotifAt = 0;
+        var _lastNotifSig = '', _lastNotifAt = 0, _chimeCtx = null;
+        function _playChime() {
+            // Custom two-tone ding for in-page notifications (browsers don't
+            // allow custom sounds for system notifications — only when open).
+            try {
+                var AC = window.AudioContext || window.webkitAudioContext;
+                if (!AC) return;
+                if (!_chimeCtx) _chimeCtx = new AC();
+                if (_chimeCtx.state === 'suspended') { _chimeCtx.resume().catch(function () { }); }
+                var t = _chimeCtx.currentTime;
+                var o = _chimeCtx.createOscillator(), g = _chimeCtx.createGain();
+                o.type = 'sine';
+                o.frequency.setValueAtTime(880, t);
+                o.frequency.setValueAtTime(1318, t + 0.12);
+                g.gain.setValueAtTime(0.16, t);
+                g.gain.exponentialRampToValueAtTime(0.001, t + 0.4);
+                o.connect(g); g.connect(_chimeCtx.destination);
+                o.start(t); o.stop(t + 0.42);
+            } catch (e) { }
+        }
         function _sendChatNotif(from, text) {
             if (!('Notification' in window) || Notification.permission !== 'granted') return;
             // dedup: identical sender+text within 2.5s = the same message twice
             var sig = from + '|' + text;
             if (sig === _lastNotifSig && Date.now() - _lastNotifAt < 2500) return;
             _lastNotifSig = sig; _lastNotifAt = Date.now();
+            _playChime();
             if (!_notifEnabled(from)) return;
             // Don't notify if the user is actively reading this chat
             if (currentChatFriend === from && !document.hidden) return;
@@ -7822,7 +7872,7 @@ function disableGlobalZoom() {
                         fetch(window.PUSH_CONFIG.SERVER_URL + '/notify/user', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ to: currentChatFriend, from: mn, title: '💬 ' + waCap(mn), body: text.slice(0, 120) })
+                            body: JSON.stringify({ to: currentChatFriend, from: mn, title: '💬 ' + waCap(mn), body: text.length > 117 ? text.slice(0, 117) + '…' : text })
                         }).catch(function () { });
                     } catch (e) { }
                 });
@@ -8807,7 +8857,7 @@ showSection('global', document.querySelector('.admin-btn'));
 
         // ═══ ADMIN INPUT MODAL (replaces prompt) ═══
         var _admInputCb = null;
-        function showInputModal(title, placeholder, cb, defaultVal) {
+        function showInputModal(title, placeholder, cb, defaultVal, noCancel) {
             var ov = document.getElementById('adm-input-overlay');
             var fld = document.getElementById('adm-input-field');
             if (!ov) return;
@@ -8815,6 +8865,8 @@ showSection('global', document.querySelector('.admin-btn'));
             fld.placeholder = placeholder || '';
             fld.value = defaultVal || '';
             _admInputCb = cb;
+            var cbBtn = document.getElementById('adm-cancel-btn');
+            if (cbBtn) cbBtn.style.display = noCancel ? 'none' : '';   // forced = no escape
             ov.classList.add('adm-show');
             setTimeout(function () { fld.focus(); }, 200);
         }
